@@ -12,12 +12,20 @@ Disse verktøyene er nødvendige for å bygge og kjøre applikasjonen i et conta
 ## Komponenter i løsningen
 ![Arkitektur](komponenter.jpg)
 
-## Last ned demonstrator prosjektet
-Start med å laste ned demonstrator prosjektet som inneholder front-end, socket-io, web-api, binary-creator og config filer for analyseoppsett mot datasettene i DOK
+## Last ned demonstratorprosjektet
+Start med å laste ned demonstratorprosjektet som inneholder front-end, socket-io, web-api og binary-creator.
 
 ```bash
-git clone https://github.com/kartverket/DOK.Arealanalyse.demonstrator.git
-cd DOK.Arealanalyse.demonstrator
+git clone https://github.com/kartverket/DOK.Arealanalyse.Demonstrator.git
+cd DOK.Arealanalyse.Demonstrator
+```
+
+## Last ned konfigurasjonsfiler
+Last ned konfigurasjonsfiler for analyseoppsett mot datasettene i DOK.
+
+```bash
+git clone https://github.com/kartverket/DOK.Arealanalyse.Config.git
+cd DOK.Arealanalyse.Config
 ```
 
 ### Justere konfigurasjonen til ditt miljø
