@@ -7,6 +7,7 @@ import { OSM } from 'ol/source';
 import WMTS, { optionsFromCapabilities } from 'ol/source/WMTS';
 import { WMTSCapabilities } from 'ol/format';
 import GeoJSON from 'ol/format/GeoJSON';
+import { grayscale as grayscaleFunc } from 'ol-ext/util/imagesLoader';
 import './config/projections.config';
 import './config/extents.config';
 
@@ -54,7 +55,7 @@ async function createTempMap(options) {
 
     if (baseMap) {
         if (baseMap.osm) {
-            layers.push(createOsmLayer());
+            layers.push(createOsmLayer(baseMap.osm.grayscale));
         } else if (baseMap.wmts) {
             layers.push(await createWmtsLayer(baseMap.wmts));
         }
@@ -86,9 +87,19 @@ async function createTempMap(options) {
     return [map, mapElement];
 }
 
-function createOsmLayer() {
+function createOsmLayer(grayscale) {
+    let osm;
+
+    if (grayscale) {
+        osm = new OSM({
+            tileLoadFunction: grayscaleFunc()
+        });
+    } else {
+        osm = new OSM();
+    }
+
     return new TileLayer({
-        source: new OSM(),
+        source: osm,
         maxZoom: 22
     });
 }

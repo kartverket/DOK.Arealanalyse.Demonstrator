@@ -11,6 +11,7 @@ import { defaults as defaultControls, FullScreen } from 'ol/control';
 import { defaults as defaultInteractions, DragRotateAndZoom } from 'ol/interaction';
 import Style from 'ol/style/Style';
 import Stroke from 'ol/style/Stroke';
+import { grayscale } from 'ol-ext/util/imagesLoader';
 import { getEpsgCode } from './helpers';
 import baseMap from 'config/baseMap.config';
 
@@ -163,8 +164,12 @@ function createFeature(geoJson, projection, style) {
 }
 
 function createOsmLayer() {
+    const osm = new OSM({ 
+        tileLoadFunction: grayscale()
+    });
+
     return new TileLayer({
-        source: new OSM()
+        source: osm
     });
 }
 

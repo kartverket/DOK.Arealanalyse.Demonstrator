@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import queue from 'express-queue';
 import { createMapImage } from './services/map-image.js';
 import { getResource } from './services/cache.js';
 import log from './utils/logger.js';
@@ -9,6 +10,9 @@ const port = 5003;
 
 app.use(express.json({ limit: '10mb' }));
 app.use(cors());
+
+const queueMw = queue({ activeLimit: 5, queuedLimit: -1 });
+app.use(queueMw);
 
 app.post('/binary/create/map-image', async (req, res) => {
     try {

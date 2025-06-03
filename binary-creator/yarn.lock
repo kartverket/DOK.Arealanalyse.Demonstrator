@@ -337,7 +337,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"debug@npm:2.6.9":
+"debug@npm:2.6.9, debug@npm:^2.2.0":
   version: 2.6.9
   resolution: "debug@npm:2.6.9"
   dependencies:
@@ -355,6 +355,15 @@ __metadata:
     supports-color:
       optional: true
   checksum: 10c0/db94f1a182bf886f57b4755f85b3a74c39b5114b9377b7ab375dc2cfa3454f09490cc6c30f829df3fc8042bc8b8995f6567ce5cd96f3bc3688bd24027197d9de
+  languageName: node
+  linkType: hard
+
+"debug@npm:^3.1.0":
+  version: 3.2.7
+  resolution: "debug@npm:3.2.7"
+  dependencies:
+    ms: "npm:^2.1.1"
+  checksum: 10c0/37d96ae42cbc71c14844d2ae3ba55adf462ec89fd3a999459dec3833944cd999af6007ff29c780f1c61153bcaaf2c842d1e4ce1ec621e4fc4923244942e4a02a
   languageName: node
   linkType: hard
 
@@ -528,6 +537,26 @@ __metadata:
   version: 1.8.1
   resolution: "etag@npm:1.8.1"
   checksum: 10c0/12be11ef62fb9817314d790089a0a49fae4e1b50594135dcb8076312b7d7e470884b5100d249b28c18581b7fd52f8b485689ffae22a11ed9ec17377a33a08f84
+  languageName: node
+  linkType: hard
+
+"express-end@npm:0.0.8":
+  version: 0.0.8
+  resolution: "express-end@npm:0.0.8"
+  dependencies:
+    debug: "npm:^2.2.0"
+  checksum: 10c0/f6f8e117e895ae89bb2fa4b46f6dbc04a1dbf4ff91d33aeffb6f76950eff22728fcb483e4c18cf6f4845c7204e765e43b8bb7d4b1561a656b4203b25360689de
+  languageName: node
+  linkType: hard
+
+"express-queue@npm:^0.0.13":
+  version: 0.0.13
+  resolution: "express-queue@npm:0.0.13"
+  dependencies:
+    debug: "npm:^4.3.4"
+    express-end: "npm:0.0.8"
+    mini-queue: "npm:0.0.14"
+  checksum: 10c0/5a5ef41570e9d386792890e409f10b69ddff0c60589c2e4f127bc66a0be25309ce4a820b72474e926df68de8d26aeedb4cad7b9a5cac5c74f971c8e7b24b2bd8
   languageName: node
   linkType: hard
 
@@ -876,6 +905,7 @@ __metadata:
     date-and-time: "npm:^3.6.0"
     dotenv: "npm:^16.4.7"
     express: "npm:^4.21.2"
+    express-queue: "npm:^0.0.13"
     keyv: "npm:^5.2.3"
     keyv-file: "npm:^5.1.1"
     mime-types: "npm:^2.1.35"
@@ -938,6 +968,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"mini-queue@npm:0.0.14":
+  version: 0.0.14
+  resolution: "mini-queue@npm:0.0.14"
+  dependencies:
+    debug: "npm:^3.1.0"
+  checksum: 10c0/5c2521dd1455358935ead65db9a8484392cd2cafe423c6a564cadb3cc3648e10ec3cc15a589b91c769b8b03c43cd2e29e985385eb393984f6e957f518641c5f3
+  languageName: node
+  linkType: hard
+
 "mitt@npm:3.0.1":
   version: 3.0.1
   resolution: "mitt@npm:3.0.1"
@@ -959,7 +998,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ms@npm:2.1.3, ms@npm:^2.1.3":
+"ms@npm:2.1.3, ms@npm:^2.1.1, ms@npm:^2.1.3":
   version: 2.1.3
   resolution: "ms@npm:2.1.3"
   checksum: 10c0/d924b57e7312b3b63ad21fc5b3dc0af5e78d61a1fc7cfb5457edaf26326bf62be5307cc87ffb6862ef1c2b33b0233cdb5d4f01c4c958cc0d660948b65a287a48
