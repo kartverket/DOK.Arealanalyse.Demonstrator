@@ -17,7 +17,7 @@ app.add_middleware(
     allow_origins=[
         'https://dok-arealanalyse-api.azurewebsites.net',
         'http://localhost:5173',
-        'http://localhost:5000',        
+        'http://localhost:5000',
         'http://localhost'
     ],
     allow_methods=['GET', 'POST'],
@@ -49,6 +49,16 @@ async def dataset_analyzed(_, data):
 @sio.on('create_fact_sheet_api')
 async def create_fact_sheet(_, data):
     await sio.emit('create_fact_sheet', None, data['recipient'])
+
+
+@sio.on('create_map_images_api')
+async def create_fact_sheet(_, data):
+    await sio.emit('create_map_images', None, data['recipient'])
+
+
+@sio.on('create_report_api')
+async def create_fact_sheet(_, data):
+    await sio.emit('create_report', None, data['recipient'])
 
 
 if __name__ == '__main__':

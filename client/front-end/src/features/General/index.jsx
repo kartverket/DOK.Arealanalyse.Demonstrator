@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Paper } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton } from '@mui/material';
 import GeneralInfo from './GeneralInfo';
 import Map from './Map';
 import Area from './Area';
@@ -7,7 +7,8 @@ import Buildings from './Buildings';
 import Roads from './Roads';
 import CloseIcon from '@mui/icons-material/Close';
 import InfoIcon from '@mui/icons-material/Info';
-import styles from './FactSheet.module.scss';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import styles from './General.module.scss';
 
 const DATASET_ID = {
     'AREA_TYPES': '166382b4-82d6-4ea9-a68e-6fd0c87bf788',
@@ -15,7 +16,7 @@ const DATASET_ID = {
     'ROADS': '900206a8-686f-4591-9394-327eb02d0899'
 };
 
-export default function FactSheet({ inputGeometryArea, municipalityNumber, municipalityName, rasterResult, cartography, factList }) {
+export default function General({ inputGeometryArea, municipalityNumber, municipalityName, rasterResult, cartography, factList, report }) {
     const [modalOpen, setModalOpen] = useState(false);
 
     const { areaTypes, buildings, roads } = useMemo(
@@ -43,7 +44,7 @@ export default function FactSheet({ inputGeometryArea, municipalityNumber, munic
                 sx={{
                     '& .MuiDialog-container': {
                         '& > .MuiPaper-root': {
-                            maxWidth: '1280px',
+                            maxWidth: '1068px',
                         }
                     }
                 }}
@@ -101,6 +102,20 @@ export default function FactSheet({ inputGeometryArea, municipalityNumber, munic
                             startIcon={<InfoIcon />}
                         >
                             Vis faktainformasjon
+                        </Button>
+                    )
+                }
+
+                {
+                    report !== null && (
+                        <Button 
+                            href={report}
+                            target="_blank"
+                            variant="contained"
+                            download={true}
+                            startIcon={<PictureAsPdfIcon />}
+                        >
+                            Last ned rapport
                         </Button>
                     )
                 }

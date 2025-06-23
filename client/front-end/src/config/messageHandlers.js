@@ -16,4 +16,12 @@ messageHandlers.set('create_fact_sheet', _ => {
     store.dispatch(setStatus('Lager faktainformasjon...'));
 });
 
+messageHandlers.set('create_map_images', _ => {
+    store.dispatch(setStatus('Lager kartbilder...'));
+});
+
+messageHandlers.set('create_report', _ => {
+    store.dispatch(setStatus('Lager rapport...'));
+});
+
 export default messageHandlers;

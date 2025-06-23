@@ -44,20 +44,6 @@ services:
       - internal      
     restart: always    
 
-  binary-creator:
-    container_name: dokanalyse-binary-creator
-    build:
-      context: ./binary-creator
-    ports:
-      - "5003:5003"
-    expose:
-      - "5003"
-    networks:
-      - internal   
-    volumes:
-      - dokanalyse:/mnt/dokanalyse
-    restart: always    
-
 volumes:
   dokanalyse:
 

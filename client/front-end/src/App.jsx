@@ -5,7 +5,7 @@ import { resetProgress } from 'store/slices/datasetSlice';
 import { useMap } from 'context/MapContext';
 import { analyze } from 'utils/api';
 import { createRandomId } from 'utils/helpers';
-import { FactSheet, Form, ResultDialog, ResultList } from 'features';
+import { General, Form, ResultDialog, ResultList } from 'features';
 import { Heading, ProgressBar, Toaster } from 'components';
 import groupBy from 'lodash.groupby';
 import useSocketIO from 'hooks/useSocketIO';
@@ -70,13 +70,14 @@ export default function App() {
                 {
                     data !== null && (
                         <>
-                            <FactSheet
+                            <General
                                 inputGeometryArea={data.inputGeometryArea}
                                 municipalityNumber={data.municipalityNumber}
                                 municipalityName={data.municipalityName}
                                 rasterResult={data.factSheetRasterResult?.imageUri}
                                 cartography={data.factSheetCartography}
                                 factList={data.factList}
+                                report={data.report}
                             />
                             <ResultList data={data} />
                             <ResultDialog inputGeometry={data.inputGeometry} />
@@ -88,4 +89,3 @@ export default function App() {
         </div>
     );
 }
-

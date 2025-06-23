@@ -50,5 +50,5 @@
       "vite": "^5.4.8",
       "vite-jsconfig-paths": "^2.0.1"
    },
-   "packageManager": "yarn@4.6.0"
+   "packageManager": "yarn@4.9.2"
 }

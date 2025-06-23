@@ -8,6 +8,7 @@ export default function GuidanceLinks({ result }) {
    return (
       <div className="paper">
          <h3>Veiledningslenker</h3>
+         
          <ul className={styles.guidanceLinks}>
             {
                result.guidanceUri.map(uri => {
