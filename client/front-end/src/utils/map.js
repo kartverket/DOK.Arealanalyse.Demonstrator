@@ -11,13 +11,11 @@ import { defaults as defaultControls, FullScreen } from 'ol/control';
 import { defaults as defaultInteractions, DragRotateAndZoom } from 'ol/interaction';
 import Style from 'ol/style/Style';
 import Stroke from 'ol/style/Stroke';
-import { grayscale } from 'ol-ext/util/imagesLoader';
 import { getEpsgCode } from './helpers';
 import baseMap from 'config/baseMap.config';
 
 const MAP_WIDTH = 720;
 const MAP_HEIGHT = 480;
-const CACHE_API_URL = import.meta.env.VITE_CACHE_API_URL;
 const BASE_MAP = import.meta.env.VITE_BASE_MAP;
 
 export async function createMap(inputGeometry, result) {
@@ -190,8 +188,7 @@ async function getWmtsOptions() {
     let xml;
 
     try {
-        const url = `${CACHE_API_URL}${encodeURIComponent(baseMap.wmtsUrl)}`
-        const response = await fetch(url, { timeout: 10000 });
+        const response = await fetch(baseMap.wmtsUrl, { timeout: 10000 });
         xml = await response.text();
     } catch {
         return null;
@@ -206,14 +203,7 @@ async function getWmtsOptions() {
 
     const wmtsOptions = {
         ...options,
-        crossOrigin: 'anonymous',
-        tileLoadFunction: (tile, src) => {
-            if (tile.tileCoord[0] >= 12) {
-                tile.getImage().src = `${CACHE_API_URL}${encodeURIComponent(src)}`;
-            } else {
-                tile.getImage().src = src;
-            }
-        }
+        crossOrigin: 'anonymous'
     };
 
     return wmtsOptions;

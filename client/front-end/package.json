@@ -22,7 +22,6 @@
       "lodash.groupby": "^4.6.0",
       "marked": "^14.1.2",
       "ol": "^10.2.1",
-      "ol-ext": "^4.0.31",
       "pretty-print-json": "^3.0.2",
       "proj4": "^2.12.1",
       "react": "^18.3.1",
