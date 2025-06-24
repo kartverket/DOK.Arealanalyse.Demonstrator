@@ -1796,7 +1796,6 @@ __metadata:
     lodash.groupby: "npm:^4.6.0"
     marked: "npm:^14.1.2"
     ol: "npm:^10.2.1"
-    ol-ext: "npm:^4.0.31"
     pretty-print-json: "npm:^3.0.2"
     proj4: "npm:^2.12.1"
     react: "npm:^18.3.1"
@@ -3529,15 +3528,6 @@ __metadata:
     define-properties: "npm:^1.2.1"
     es-object-atoms: "npm:^1.0.0"
   checksum: 10c0/3c47814fdc64842ae3d5a74bc9d06bdd8d21563c04d9939bf6716a9c00596a4ebc342552f8934013d1ec991c74e3671b26710a0c51815f0b603795605ab6b2c9
-  languageName: node
-  linkType: hard
-
-"ol-ext@npm:^4.0.31":
-  version: 4.0.31
-  resolution: "ol-ext@npm:4.0.31"
-  peerDependencies:
-    ol: ">= 5.3.0"
-  checksum: 10c0/6b2314bfbdbeaccfe182b63f6e5181ab79991764d2cd585c9c93967364542cd3d63cab4364c8959332844d4af7fb992466819b72d72254c4251a7465f3610a9b
   languageName: node
   linkType: hard
 
