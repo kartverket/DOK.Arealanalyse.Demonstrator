@@ -26,6 +26,7 @@ public class PygeoapiService(
 
         try
         {
+            httpClient.Timeout = TimeSpan.FromMinutes(5);
             using var response = await httpClient.SendAsync(message);
 
             response.EnsureSuccessStatusCode();

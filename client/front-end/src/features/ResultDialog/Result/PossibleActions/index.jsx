@@ -1,3 +1,4 @@
+import { marked } from 'marked';
 import { Alert } from '@mui/material';
 import styles from './PossibleActions.module.scss';
 
@@ -12,7 +13,7 @@ export default function PossibleActions({ result }) {
                 <h3>Mulige tiltak</h3>
                 <ul className={styles.possibleActionsList}>
                     {
-                        result.possibleActions.map(action => <li key={action}>{action}</li>)
+                        result.possibleActions.map(action => <li key={action} dangerouslySetInnerHTML={{ __html: marked.parse(action.trim()) }}></li>)
                     }
                 </ul>
             </div>
