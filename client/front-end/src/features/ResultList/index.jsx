@@ -40,7 +40,9 @@ export default function ResultList({ data }) {
 
     function renderThemeName(result) {
         return (
-            <strong className={`${styles.themeName} ${getResultClassNames(result, styles)}`}>{result.themes[0]}</strong>
+            <strong className={`${styles.themeName} ${getResultClassNames(result, styles)}`}>
+                <span>{result.themes[0]}</span>
+            </strong>
         );
     }
 

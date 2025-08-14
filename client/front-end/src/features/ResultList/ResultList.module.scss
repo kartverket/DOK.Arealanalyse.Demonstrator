@@ -25,7 +25,10 @@
 
     .themeName {
         display: flex;
-        text-transform: capitalize;
+
+        > span::first-letter {
+            text-transform: uppercase;
+        }
 
         &::before {
             display: flex;
