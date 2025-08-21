@@ -31,7 +31,7 @@ export default function Form({ fetching, onSubmit }) {
     }
 
     function handleGeometryDialogOk(polygon) {
-        setState({ ...state, inputGeometry: polygon });
+        setState({ ...state, inputGeometry: polygon });        
     }
 
     function handleSubmit() {

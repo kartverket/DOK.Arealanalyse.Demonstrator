@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setErrorMessage } from 'store/slices/appSlice';
-import { resetProgress } from 'store/slices/datasetSlice';
+import { resetProgress, setTotalSteps } from 'store/slices/datasetSlice';
 import { useMap } from 'context/MapContext';
 import { analyze } from 'utils/api';
 import { createRandomId } from 'utils/helpers';
@@ -29,6 +29,10 @@ export default function App() {
 
     async function start(payload) {
         resetState();
+        
+        if (!payload.inputs.includeFacts) {
+            dispatch(setTotalSteps(-1));
+        }
 
         try {
             setFetching(true);

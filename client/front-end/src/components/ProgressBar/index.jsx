@@ -4,9 +4,10 @@ import { LinearProgress } from '@mui/material';
 import styles from './ProgressBar.module.scss';
 
 export default function ProgressBar() {
-    const count = useSelector(state => state.dataset.count);
-    const analyzed = useSelector(state => state.dataset.analyzed);
-    const progress = useMemo(() => count !== 0 ? Math.round((analyzed.length / count) * 100) : 0, [count, analyzed]);
+    const totalSteps = useSelector(state => state.dataset.totalSteps);
+    const currentStep = useSelector(state => state.dataset.step);
+
+    const progress = useMemo(() => totalSteps !== 0 ? Math.round((currentStep / totalSteps) * 100) : 0, [totalSteps, currentStep]);
 
     return (
         <div className={styles.progressBar}>

@@ -1,26 +1,31 @@
 import store from 'store';
-import { addAnalyzed, setCount, setStatus } from 'store/slices/datasetSlice';
+import { addStep, setStatus, setTotalSteps } from 'store/slices/datasetSlice';
 
 const messageHandlers = new Map();
 
 messageHandlers.set('datasets_counted', message => {
-    store.dispatch(setCount(parseInt(message)));
+    const count = parseInt(message);
+
+    store.dispatch(setTotalSteps(count))
     store.dispatch(setStatus('Analyserer...'));
 });
 
-messageHandlers.set('dataset_analyzed', message => {
-    store.dispatch(addAnalyzed(message));
+messageHandlers.set('dataset_analyzed', _ => {
+    store.dispatch(addStep());
 });
 
 messageHandlers.set('create_fact_sheet', _ => {
+    store.dispatch(addStep());
     store.dispatch(setStatus('Lager faktainformasjon...'));
 });
 
 messageHandlers.set('create_map_images', _ => {
+    store.dispatch(addStep());
     store.dispatch(setStatus('Lager kartbilder...'));
 });
 
 messageHandlers.set('create_report', _ => {
+    store.dispatch(addStep());
     store.dispatch(setStatus('Lager rapport...'));
 });
 

@@ -2,8 +2,8 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
     status: 'Starter opp...',
-    count: 0,
-    analyzed: []
+    step: 0,
+    totalSteps: 4
 };
 
 export const datasetSlice = createSlice({
@@ -16,19 +16,16 @@ export const datasetSlice = createSlice({
                 status: action.payload
             };
         },
-        setCount: (state, action) => {
+        setTotalSteps: (state, action) => {
             return {
                 ...state,
-                count: action.payload
+                totalSteps: state.totalSteps + action.payload
             };
         },
-        addAnalyzed: (state, action) => {
+        addStep: (state) => {
             return {
                 ...state,
-                analyzed: [
-                    ...state.analyzed,
-                    action.payload
-                ]
+                step: state.step + 1
             };
         },
         resetProgress: () => {
@@ -37,6 +34,6 @@ export const datasetSlice = createSlice({
     }
 });
 
-export const { setStatus, setCount, addAnalyzed, resetProgress } = datasetSlice.actions;
+export const { setStatus, setTotalSteps, addStep, resetProgress } = datasetSlice.actions;
 
 export default datasetSlice.reducer;

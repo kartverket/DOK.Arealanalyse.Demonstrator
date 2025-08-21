@@ -1,4 +1,6 @@
 import axios from 'axios';
+import store from 'store';
+import { addStep } from 'store/slices/datasetSlice';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -39,5 +41,17 @@ export async function analyze(payload, correlationId) {
     const headers = { 'x-correlation-id': correlationId };
     const response = await axios.post(url, payload, { headers });
 
+    await addLastStep()
+
     return response.data;
+}
+
+async function addLastStep() {
+    return new Promise((resolve) => {
+        store.dispatch(addStep())
+
+        setTimeout(() => {            
+            resolve();
+        }, 1000)
+    }); 
 }
