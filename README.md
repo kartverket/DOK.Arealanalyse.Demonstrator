@@ -41,10 +41,8 @@ SOCKET_IO_SRV_URL=http://localhost:5002/
 docker-compose up --build
 ```
 ## Last ned pygeoapi med plugin for DOK arealanalyse
-Må bruke branch 0.19.1 som passer sammen med process-plugin for DOK arealanalyse
-
 ```bash
-git clone --branch 0.19.1 https://github.com/kartverket/DOK.Arealanalyse.Pygeoapi.git
+git clone --branch main https://github.com/kartverket/DOK.Arealanalyse.Pygeoapi.git
 cd DOK.Arealanalyse.Pygeoapi
 ```
 ### Justere konfigurasjonen til ditt miljø
