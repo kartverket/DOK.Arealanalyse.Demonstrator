@@ -1,16 +1,37 @@
-import { Paper } from '@mui/material';
-import styles from './Map.module.scss';
+import { Button, Paper, Tooltip } from "@mui/material";
+import { buildQueryFromInputGeometry } from "./helpers";
+import styles from "./Map.module.scss";
 
-export default function Map({ rasterResult }) {
-    if (!rasterResult) {
-        return null;
-    }
-    
-    return (
-        <Paper className={styles.mapImage}>
-            <div >
-                <img src={rasterResult} alt="Kartutsnitt" />
-            </div>
-        </Paper>
-    );
+export default function Map({ rasterResult, inputGeometry }) {
+   if (!rasterResult) {
+      return null;
+   }
+
+   const query = buildQueryFromInputGeometry(inputGeometry);
+   console.log(query);
+
+   return (
+      <Paper className={styles.mapImage}>
+         <div>
+            <img src={rasterResult} alt="Kartutsnitt" />
+         </div>
+
+         <div className={styles.buttonContainer}>
+            <Tooltip
+               slotProps={{ tooltip: { sx: { fontSize: "1em" } } }}
+               title="Mulighet for å melde inn feil eller mangler i temadata til en førstelinje behandling i en konseptutprøving i geolett 2 datafunn"
+            >
+               <Button
+                  className={styles.button}
+                  variant="contained"
+                  href={`https://dibk-datafunn-dev.azurewebsites.net/${query}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+               >
+                  Meld feil i kartet (Test)
+               </Button>
+            </Tooltip>
+         </div>
+      </Paper>
+   );
 }

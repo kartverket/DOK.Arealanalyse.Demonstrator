@@ -16,7 +16,7 @@ const DATASET_ID = {
     'ROADS': '900206a8-686f-4591-9394-327eb02d0899'
 };
 
-export default function General({ inputGeometryArea, municipalityNumber, municipalityName, rasterResult, cartography, factList, report }) {
+export default function General({ inputGeometryArea, inputGeometry, municipalityNumber, municipalityName, rasterResult, cartography, factList, report }) {
     const [modalOpen, setModalOpen] = useState(false);
 
     const { areaTypes, buildings, roads } = useMemo(
@@ -72,7 +72,7 @@ export default function General({ inputGeometryArea, municipalityNumber, municip
                         area={inputGeometryArea}
                     />
 
-                    <Map rasterResult={rasterResult} />
+                    <Map rasterResult={rasterResult} inputGeometry={inputGeometry} />
                     <Area factPart={areaTypes} />
                     <Buildings factPart={buildings} />
                     <Roads factPart={roads} />

@@ -7,4 +7,13 @@
         border-radius: 4px;
         overflow: hidden;
     }
+
+    .buttonContainer {
+        display: flex;
+        justify-content: right;
+        
+        .button {
+            margin-top: 18px;
+        }
+    }
 }
