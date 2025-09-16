@@ -7,8 +7,9 @@ export default function Map({ rasterResult, inputGeometry }) {
       return null;
    }
 
-   const query = buildQueryFromInputGeometry(inputGeometry);
-   console.log(query);
+   const url = `${
+      import.meta.env.VITE_DATAFUNN_URL
+   }/${buildQueryFromInputGeometry(inputGeometry)}`;
 
    return (
       <Paper className={styles.mapImage}>
@@ -24,7 +25,7 @@ export default function Map({ rasterResult, inputGeometry }) {
                <Button
                   className={styles.button}
                   variant="contained"
-                  href={`https://dibk-datafunn-dev.azurewebsites.net/${query}`}
+                  href={url}
                   target="_blank"
                   rel="noopener noreferrer"
                >
