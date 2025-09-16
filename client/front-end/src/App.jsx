@@ -76,6 +76,7 @@ export default function App() {
                         <>
                             <General
                                 inputGeometryArea={data.inputGeometryArea}
+                                inputGeometry={data.inputGeometry}
                                 municipalityNumber={data.municipalityNumber}
                                 municipalityName={data.municipalityName}
                                 rasterResult={data.factSheetRasterResult?.imageUri}
