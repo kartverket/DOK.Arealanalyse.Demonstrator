@@ -13,7 +13,7 @@ Disse verktøyene er nødvendige for å bygge og kjøre applikasjonen i et conta
 ![Arkitektur](komponenter.jpg)
 
 ## Last ned demonstratorprosjektet
-Start med å laste ned demonstratorprosjektet som inneholder front-end, socket-io, web-api og binary-creator.
+Start med å laste ned demonstratorprosjektet som inneholder front-end, socket-io og web-api.
 
 ```bash
 git clone https://github.com/kartverket/DOK.Arealanalyse.Demonstrator.git
@@ -28,18 +28,11 @@ git clone https://github.com/kartverket/DOK.Arealanalyse.Config.git
 cd DOK.Arealanalyse.Config
 ```
 
-### Justere konfigurasjonen til ditt miljø
-juster miljøvariabler i prosjektet
-
-```ini
-PYGEOAPI_API_URL=http://localhost:5000
-APP_FILES_DIR=/mnt/dokanalyse
-SOCKET_IO_SRV_URL=http://localhost:5002/
-```
 ### Kjøre applikasjonene i docker 
 ```bash
 docker-compose up --build
 ```
+
 ## Last ned pygeoapi med plugin for DOK arealanalyse
 ```bash
 git clone --branch main https://github.com/kartverket/DOK.Arealanalyse.Pygeoapi.git
@@ -51,12 +44,11 @@ juster miljøvariabler i prosjektet
 ```ini
 PYGEOAPI_CONFIG=/pygeoapi/local.config.yml
 PYGEOAPI_API_URL=http://localhost:5000/
-APP_FILES_DIR=/mnt/dokanalyse
+DOKANALYSE_APP_FILES_DIR=/mnt/dokanalyse
 DOKANALYSE_CONFIG_DIR=/mnt/dokanalyse/config
-AR5_FGDB_PATH=
-BLOB_STORAGE_CONN_STR=
-MAP_IMAGE_API_URL=http://host.docker.internal:5003/binary/create/map-image
-SOCKET_IO_SRV_URL=http://host.docker.internal:5002/
+DOKANALYSE_AR5_FGDB_PATH=
+DOKANALYSE_BLOB_STORAGE_CONN_STR=
+DOKANALYSE_SOCKET_IO_SRV_URL=http://host.docker.internal:5002/
 ```
 ### Kjøre applikasjonene i docker 
 ```bash
