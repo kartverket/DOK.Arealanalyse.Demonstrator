@@ -25,6 +25,11 @@
     "fileName": "eidanger.geojson"
   },
   {
+    "name": "Frydenlund",
+    "description": "Kulturminner",
+    "fileName": "frydenlund.geojson"
+  },
+  {
     "name": "Gamvik",
     "fileName": "gamvik.geojson"
   },

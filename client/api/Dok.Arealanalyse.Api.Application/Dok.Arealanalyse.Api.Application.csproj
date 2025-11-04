@@ -33,6 +33,9 @@
     <None Update="Resources\GeoJson\eidanger.geojson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Resources\GeoJson\frydenlund.geojson">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\GeoJson\his-alle.geojson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
