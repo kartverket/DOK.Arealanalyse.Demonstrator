@@ -1,10 +1,9 @@
 FROM debian:trixie-slim AS build
 
-WORKDIR /app
-
 ENV VIRTUAL_ENV=/app/.venv
 ENV PATH="$VIRTUAL_ENV/bin:/root/.local/bin/:$PATH"
 
+WORKDIR /app
 COPY main.py pyproject.toml uv.lock ./
 
 RUN apt -y update \
@@ -16,7 +15,7 @@ RUN apt -y update \
     && uv sync \
     && pyinstaller --name main --onefile --hidden-import=main ./main.py
 
-    
+
 FROM debian:trixie-slim
 
 WORKDIR /app
