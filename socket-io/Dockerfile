@@ -1,17 +1,23 @@
-FROM python:3.12 AS build
+FROM debian:trixie-slim AS build
 
 WORKDIR /app
-ENV VIRTUAL_ENV=/opt/venv
-RUN python3 -m venv $VIRTUAL_ENV
-ENV PATH="$VIRTUAL_ENV/bin:$PATH"
-COPY main.py requirements.txt ./
 
-RUN apt update \
-    && apt install -y binutils \
-    && pip3 install -r requirements.txt \
+ENV VIRTUAL_ENV=/app/.venv
+ENV PATH="$VIRTUAL_ENV/bin:/root/.local/bin/:$PATH"
+
+COPY main.py pyproject.toml uv.lock ./
+
+RUN apt -y update \
+    && apt -y install curl binutils \
+    && curl -LsSf https://astral.sh/uv/install.sh | sh \
+    && uv python install 3.13 \
+    && uv venv $VIRTUAL_ENV \
+    && . activate \
+    && uv sync \
     && pyinstaller --name main --onefile --hidden-import=main ./main.py
 
-FROM debian:bookworm-slim
+    
+FROM debian:trixie-slim
 
 WORKDIR /app
 COPY --from=build /app/dist /app

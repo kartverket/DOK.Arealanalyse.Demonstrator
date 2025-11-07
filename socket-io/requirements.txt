@@ -1,5 +1,0 @@
-asyncio
-fastapi
-python-socketio
-pyinstaller
-uvicorn

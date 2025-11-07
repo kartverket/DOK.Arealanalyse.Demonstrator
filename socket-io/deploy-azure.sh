@@ -8,6 +8,6 @@ APP_VERSION=v1
 az login --tenant ${TENANT} --use-device-code
 az acr login -n ${NAME_OF_REGISTRY}
 
-docker build -t ${APP_NAME}:${APP_VERSION} .
+docker build -t ${APP_NAME}:${APP_VERSION} . --no-cache
 docker tag ${APP_NAME}:${APP_VERSION} ${NAME_OF_REGISTRY}.azurecr.io/${APP_NAME}:${APP_VERSION}
 docker push ${NAME_OF_REGISTRY}.azurecr.io/${APP_NAME}:${APP_VERSION}
