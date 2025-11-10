@@ -1,0 +1,86 @@
+name: docker_build_push_acr
+
+on:
+   push:
+      branches: [staging]
+   workflow_dispatch:
+      inputs:
+         environment:
+            description: "Target environment"
+            type: choice
+            options: [staging, production]
+            default: staging
+         tag:
+            description: "Optional image tag (defaults: staging→staging, production→main)"
+            required: false
+
+jobs:
+   build:
+      runs-on: ubuntu-latest
+
+      environment: ${{ github.event_name == 'push' && 'staging' || inputs.environment }}
+
+      strategy:
+         fail-fast: false
+         matrix:
+            include:
+               - app: dokanalyse-front-end
+                 dir: front-end
+               - app: dokanalyse-web-api
+                 dir: web-api
+               - app: dokanalyse-socket-io
+                 dir: socket-io
+
+      steps:
+         - uses: actions/checkout@v4
+
+         - name: Detect changes
+           id: changes
+           uses: dorny/paths-filter@v3
+           with:
+              token: ${{ secrets.GITHUB_TOKEN }}
+              filters: |
+                 frontend:
+                   - 'front-end/**'
+                 webapi:
+                   - 'web-api/**'
+                 socket:
+                   - 'socket-io/**'
+
+         - name: Decide tag
+           run: |
+              if [[ "${GITHUB_EVENT_NAME}" == "push" ]]; then
+                TAG="staging"
+              elif [[ -n "${{ inputs.tag }}" ]]; then
+                TAG="${{ inputs.tag }}"
+              elif [[ "${{ inputs.environment }}" == "production" ]]; then
+                TAG="main"
+              else
+                TAG="staging"
+              fi
+              echo "IMAGE_TAG=$TAG" >> $GITHUB_ENV
+
+         - name: Docker login (ACR)
+           uses: azure/docker-login@v2
+           with:
+              login-server: ${{ secrets.ACR_SERVER }}
+              username: ${{ secrets.ACR_USERNAME }}
+              password: ${{ secrets.ACR_PASSWORD }}
+
+         - name: Build image
+           if: ${{ github.event_name == 'workflow_dispatch'
+              || (matrix.app == 'dokanalyse-front-end'  && steps.changes.outputs.frontend == 'true')
+              || (matrix.app == 'dokanalyse-web-api'    && steps.changes.outputs.webapi   == 'true')
+              || (matrix.app == 'dokanalyse-socket-io'  && steps.changes.outputs.socket   == 'true') }}
+           run: |
+              IMAGE="${{ secrets.ACR_SERVER }}/${{ matrix.app }}:${IMAGE_TAG}"
+              docker build -t "$IMAGE" "${{ matrix.dir }}"
+
+         - name: Push image
+           if: ${{ github.event_name == 'workflow_dispatch'
+              || (matrix.app == 'dokanalyse-front-end'  && steps.changes.outputs.frontend == 'true')
+              || (matrix.app == 'dokanalyse-web-api'    && steps.changes.outputs.webapi   == 'true')
+              || (matrix.app == 'dokanalyse-socket-io'  && steps.changes.outputs.socket   == 'true') }}
+           run: |
+              IMAGE="${{ secrets.ACR_SERVER }}/${{ matrix.app }}:${IMAGE_TAG}"
+              docker push "$IMAGE"
