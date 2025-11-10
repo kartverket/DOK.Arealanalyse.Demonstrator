@@ -1,0 +1,100 @@
+name: docker_build_push_acr
+
+on:
+   push:
+      branches:
+         - staging
+   workflow_dispatch:
+
+jobs:
+   docker_build_push_acr:
+      name: Build ${{ matrix.app }}
+      runs-on: ubuntu-latest
+
+      if: ${{ github.ref_name == 'main' || github.ref_name == 'staging' }}
+
+      environment: ${{ (github.ref_name == 'main' && 'production') || (github.ref_name == 'staging' && 'staging') }}
+
+      strategy:
+         fail-fast: false
+         matrix:
+            app: [frontend, api, socket-io]
+
+      steps:
+         - name: Checkout
+           uses: actions/checkout@v4
+
+         - name: Detect changes
+           if: github.event_name == 'push'
+           id: changes
+           uses: dorny/paths-filter@v3
+           with:
+              filters: |
+                 frontend:
+                   - 'client/front-end/**'
+                 webapi:
+                   - 'client/api/**'
+                 socket:
+                   - 'socket-io/**'
+
+         - name: Resolve app config & decide if this app should be built
+           run: |
+              app="${{ matrix.app }}"
+              SHOULD_BUILD="true"  # default for workflow_dispatch (manual)
+
+              case "$app" in
+                frontend)
+                  APP_DIR="client/front-end"
+                  IMAGE_NAME="dokanalyse-front-end"
+                  if [[ "${GITHUB_EVENT_NAME}" == "push" ]]; then
+                    SHOULD_BUILD="${{ steps.changes.outputs.frontend }}"
+                  fi
+                  ;;
+                api)
+                  APP_DIR="client/api"
+                  IMAGE_NAME="dokanalyse-web-api"
+                  if [[ "${GITHUB_EVENT_NAME}" == "push" ]]; then
+                    SHOULD_BUILD="${{ steps.changes.outputs.webapi }}"
+                  fi
+                  ;;
+                socket-io)
+                  APP_DIR="socket-io"
+                  IMAGE_NAME="dokanalyse-socket-io"
+                  if [[ "${GITHUB_EVENT_NAME}" == "push" ]]; then
+                    SHOULD_BUILD="${{ steps.changes.outputs.socket }}"
+                  fi
+                  ;;
+                *)
+                  echo "Unknown app: $app"
+                  exit 1
+                  ;;
+              esac
+
+              # For push events: paths-filter outputs "true" or empty → normalize to true/false
+              if [[ "${GITHUB_EVENT_NAME}" == "push" && "${SHOULD_BUILD}" != "true" ]]; then
+                SHOULD_BUILD="false"
+              fi
+
+              echo "APP_DIR=$APP_DIR" >> "$GITHUB_ENV"
+              echo "IMAGE_NAME=$IMAGE_NAME" >> "$GITHUB_ENV"
+              echo "SHOULD_BUILD=$SHOULD_BUILD" >> "$GITHUB_ENV"
+
+         - name: Docker Login
+           if: env.SHOULD_BUILD == 'true'
+           uses: azure/docker-login@v2
+           with:
+              login-server: ${{ secrets.ACR_SERVER }}
+              username: ${{ secrets.ACR_USERNAME }}
+              password: ${{ secrets.ACR_PASSWORD }}
+
+         - name: Build image
+           if: env.SHOULD_BUILD == 'true'
+           run: |
+              IMAGE="${{ secrets.ACR_SERVER }}/${IMAGE_NAME}:${{ github.ref_name }}"
+              docker build -t "$IMAGE" "$APP_DIR"
+
+         - name: Push image
+           if: env.SHOULD_BUILD == 'true'
+           run: |
+              IMAGE="${{ secrets.ACR_SERVER }}/${IMAGE_NAME}:${{ github.ref_name }}"
+              docker push "$IMAGE"
