@@ -1,6 +1,7 @@
 import { Button, Paper, Tooltip } from "@mui/material";
 import { buildQueryString } from "./helpers";
 import styles from "./Map.module.scss";
+import datafunn from "../../../assets/gfx/datafunn.svg";
 
 const DATAFUNN_URL = import.meta.env.VITE_DATAFUNN_URL;
 
@@ -31,7 +32,7 @@ export default function Map({ rasterResult, inputGeometry }) {
                         target="_blank"
                         rel="noopener noreferrer"
                     >
-                        Meld feil i kartet (test)
+                        <img src={datafunn} />  Meld feil i kartet (test)
                     </Button>
                 </Tooltip>
             </div>
