@@ -128,6 +128,7 @@ export default function Form({ fetching, onSubmit }) {
                                 <MenuItem value="Kyst og fiskeri">Kyst og fiskeri</MenuItem>                                
                                 <MenuItem value="Landbruk">Landbruk</MenuItem>
                                 <MenuItem value="Natur">Natur</MenuItem>
+                                <MenuItem value="Plan">Plan</MenuItem>
                                 <MenuItem value="Samferdsel">Samferdsel</MenuItem>
                                 <MenuItem value="Samfunnssikkerhet">Samfunnssikkerhet</MenuItem>
                             </Select>
