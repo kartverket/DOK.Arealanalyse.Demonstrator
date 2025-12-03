@@ -10,6 +10,7 @@ import QualityMeasurement from './QualityMeasurement';
 import PossibleActions from './PossibleActions';
 import Data from './Data';
 import MapView from 'features/MapView';
+import DatafunnButton from 'components/DatafunnButton';
 import styles from './Result.module.scss';
 
 export default function Result({ inputGeometry, result }) {
@@ -77,6 +78,7 @@ export default function Result({ inputGeometry, result }) {
                             </div> :
                             null
                     }
+                    
                     <div className={styles.expandables}>
                         {
                             result.runOnDataset && <AboutDataset result={result} />
@@ -84,6 +86,8 @@ export default function Result({ inputGeometry, result }) {
                         <QualityMeasurement result={result} />
                         <AboutAnalysis result={result} />
                     </div>
+
+                    <DatafunnButton className={styles.buttonContainer} inputGeometry={inputGeometry} />
                 </div>
                 <div>
                     {
