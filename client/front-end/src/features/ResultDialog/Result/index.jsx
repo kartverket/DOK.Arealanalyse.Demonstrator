@@ -90,7 +90,10 @@ export default function Result({ inputGeometry, result }) {
                         result.cartography !== null ?
                             <div className="paper">
                                 <h3>Tegneregler</h3>
-                                <img src={result.cartography} alt="Tegneregler" />
+
+                                <div className={styles.cartography}>
+                                    <img src={result.cartography} alt="Tegneregler" />
+                                </div>
                             </div> :
                             null
                     }

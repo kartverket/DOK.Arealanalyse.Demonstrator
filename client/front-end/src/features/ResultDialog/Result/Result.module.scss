@@ -2,7 +2,7 @@
     display: flex;
     gap: 24px;
 
-    > div {
+    >div {
         display: flex;
         flex-direction: column;
         flex: 1;
@@ -42,5 +42,10 @@
 }
 
 .content {
-        margin: 2px;
-    }
+    margin: 2px;
+}
+
+.cartography {
+    max-height: 264px;
+    overflow: auto;
+}
