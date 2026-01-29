@@ -9,14 +9,13 @@ export default function Map({ rasterResult, inputGeometry }) {
 
    return (
       <Paper className={styles.mapImage}>
-         <div>
+         <div className={styles.mapFrame}>
             <img src={rasterResult} alt="Kartutsnitt" />
+            <DatafunnButton
+               className={styles.buttonContainer}
+               inputGeometry={inputGeometry}
+            />
          </div>
-
-         <DatafunnButton
-            className={styles.buttonContainer}
-            inputGeometry={inputGeometry}
-         />
       </Paper>
    );
 }

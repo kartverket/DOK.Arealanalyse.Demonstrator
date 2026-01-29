@@ -29,8 +29,20 @@
 }
 
 .buttonContainer {
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
     display: flex;
     justify-content: right;
+    z-index: 1;
+}
+
+.mapFrame {
+    position: relative;
+}
+
+.mapFrame > img {
+    display: block;
 }
 
 .loading {

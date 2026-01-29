@@ -31,7 +31,7 @@ export default function DatafunnButton({ className, inputGeometry }) {
                rel="noopener noreferrer"
             >
                <img className={styles.image} src={datafunn} /> Meld feil i
-               kartet (test)
+               kartet
             </Button>
          </Tooltip>
       </div>
