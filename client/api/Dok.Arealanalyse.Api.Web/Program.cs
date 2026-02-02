@@ -18,7 +18,6 @@ services.AddResponseCaching();
 services.AddHttpContextAccessor();
 
 services.Configure<PygeoapiSettings>(configuration.GetSection(PygeoapiSettings.SectionName));
-services.Configure<DatafunnSettings>(configuration.GetSection(DatafunnSettings.SectionName));
 
 services.AddTransient<IMultipartRequestService, MultipartRequestService>();
 services.AddTransient<ISosiConvertService, SosiConvertService>();
