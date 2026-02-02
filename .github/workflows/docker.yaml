@@ -90,11 +90,21 @@ jobs:
          - name: Build image
            if: env.SHOULD_BUILD == 'true'
            run: |
-              IMAGE="${{ secrets.ACR_SERVER }}/${IMAGE_NAME}:${{ github.ref_name }}"
+              if [[ "${GITHUB_REF_NAME}" == "main" ]]; then
+                TAG="v1"
+              else
+                TAG="${GITHUB_REF_NAME}"
+              fi
+              IMAGE="${{ secrets.ACR_SERVER }}/${IMAGE_NAME}:${TAG}"
               docker build -t "$IMAGE" "$APP_DIR"
 
          - name: Push image
            if: env.SHOULD_BUILD == 'true'
            run: |
-              IMAGE="${{ secrets.ACR_SERVER }}/${IMAGE_NAME}:${{ github.ref_name }}"
+              if [[ "${GITHUB_REF_NAME}" == "main" ]]; then
+                TAG="v1"
+              else
+                TAG="${GITHUB_REF_NAME}"
+              fi
+              IMAGE="${{ secrets.ACR_SERVER }}/${IMAGE_NAME}:${TAG}"
               docker push "$IMAGE"
