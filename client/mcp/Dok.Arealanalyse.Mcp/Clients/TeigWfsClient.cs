@@ -84,26 +84,26 @@ public sealed class TeigWfsClient(HttpClient httpClient, ILogger<TeigWfsClient> 
         }
 
         return $"""
-                <?xml version="1.0" encoding="UTF-8"?>
-                <wfs:GetFeature
-                  xmlns:wfs="{WfsNs}"
-                  xmlns:fes="{FesNs}"
-                  xmlns:app="{AppNs}"
-                  xmlns:gml="{GmlNs}"
-                  service="WFS"
-                  version="2.0.0"
-                  outputFormat="application/gml+xml; version=3.2"
-                  srsName="urn:ogc:def:crs:EPSG::4326"
-                  count="100">
-                  <wfs:Query typeNames="app:Teig">
-                    <fes:Filter>
-                      <fes:And>
-                        {filters}
-                      </fes:And>
-                    </fes:Filter>
-                  </wfs:Query>
-                </wfs:GetFeature>
-            """;
+            <?xml version="1.0" encoding="UTF-8"?>
+            <wfs:GetFeature
+              xmlns:wfs="{WfsNs}"
+              xmlns:fes="{FesNs}"
+              xmlns:app="{AppNs}"
+              xmlns:gml="{GmlNs}"
+              service="WFS"
+              version="2.0.0"
+              outputFormat="application/gml+xml; version=3.2"
+              srsName="urn:ogc:def:crs:EPSG::4326"
+              count="100">
+              <wfs:Query typeNames="app:Teig">
+                <fes:Filter>
+                  <fes:And>
+                    {filters}
+                  </fes:And>
+                </fes:Filter>
+              </wfs:Query>
+            </wfs:GetFeature>
+            """.TrimStart();
     }
 
     private static TeigResult? ParseWfsResponse(string xml)
