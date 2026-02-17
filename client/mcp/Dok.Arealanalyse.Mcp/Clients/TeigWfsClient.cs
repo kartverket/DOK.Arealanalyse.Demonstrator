@@ -84,7 +84,6 @@ public sealed class TeigWfsClient(HttpClient httpClient, ILogger<TeigWfsClient> 
         }
 
         return $"""
-            <?xml version="1.0" encoding="UTF-8"?>
             <wfs:GetFeature
               xmlns:wfs="{WfsNs}"
               xmlns:fes="{FesNs}"
@@ -103,7 +102,7 @@ public sealed class TeigWfsClient(HttpClient httpClient, ILogger<TeigWfsClient> 
                 </fes:Filter>
               </wfs:Query>
             </wfs:GetFeature>
-            """.TrimStart();
+            """;
     }
 
     private static TeigResult? ParseWfsResponse(string xml)
