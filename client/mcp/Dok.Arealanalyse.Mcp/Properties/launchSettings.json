@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "Dok.Arealanalyse.Api.Mcp": {
+    "Dok.Arealanalyse.Mcp": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {

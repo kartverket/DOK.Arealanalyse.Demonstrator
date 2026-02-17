@@ -18,7 +18,7 @@ jobs:
       strategy:
          fail-fast: false
          matrix:
-            app: [frontend, api, socket-io]
+            app: [frontend, api, mcp, socket-io]
 
       steps:
          - name: Checkout
@@ -34,6 +34,8 @@ jobs:
                    - 'client/front-end/**'
                  webapi:
                    - 'client/api/**'
+                 mcp:
+                   - 'client/mcp/**'
                  socket:
                    - 'socket-io/**'
 
@@ -57,6 +59,13 @@ jobs:
                     SHOULD_BUILD="${{ steps.changes.outputs.webapi }}"
                   fi
                   ;;
+                mcp)
+                  APP_DIR="client/mcp"
+                  IMAGE_NAME="dokanalyse-mcp-server"
+                  if [[ "${GITHUB_EVENT_NAME}" == "push" ]]; then
+                    SHOULD_BUILD="${{ steps.changes.outputs.mcp }}"
+                  fi
+                  ;;
                 socket-io)
                   APP_DIR="socket-io"
                   IMAGE_NAME="dokanalyse-socket-io"
@@ -77,6 +86,7 @@ jobs:
 
               echo "APP_DIR=$APP_DIR" >> "$GITHUB_ENV"
               echo "IMAGE_NAME=$IMAGE_NAME" >> "$GITHUB_ENV"
+              echo "DOCKERFILE=${DOCKERFILE:-$APP_DIR/Dockerfile}" >> "$GITHUB_ENV"
               echo "SHOULD_BUILD=$SHOULD_BUILD" >> "$GITHUB_ENV"
 
          - name: Docker Login
@@ -96,7 +106,7 @@ jobs:
                 TAG="${GITHUB_REF_NAME}"
               fi
               IMAGE="${{ secrets.ACR_SERVER }}/${IMAGE_NAME}:${TAG}"
-              docker build -t "$IMAGE" "$APP_DIR"
+              docker build -t "$IMAGE" -f "$DOCKERFILE" "$APP_DIR"
 
          - name: Push image
            if: env.SHOULD_BUILD == 'true'

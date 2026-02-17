@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dok.Arealanalyse.Api.Web", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dok.Arealanalyse.Api.Application", "Dok.Arealanalyse.Api.Application\Dok.Arealanalyse.Api.Application.csproj", "{56027F6F-6741-49EA-A119-8237D044B8D2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dok.Arealanalyse.Api.Mcp", "Dok.Arealanalyse.Api.Mcp\Dok.Arealanalyse.Api.Mcp.csproj", "{D8EABF04-B92B-4F13-B3EF-20C9ADBE15CB}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,11 +21,7 @@ Global
 		{56027F6F-6741-49EA-A119-8237D044B8D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{56027F6F-6741-49EA-A119-8237D044B8D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{56027F6F-6741-49EA-A119-8237D044B8D2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D8EABF04-B92B-4F13-B3EF-20C9ADBE15CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D8EABF04-B92B-4F13-B3EF-20C9ADBE15CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D8EABF04-B92B-4F13-B3EF-20C9ADBE15CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D8EABF04-B92B-4F13-B3EF-20C9ADBE15CB}.Release|Any CPU.Build.0 = Release|Any CPU
-	EndGlobalSection
+EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection

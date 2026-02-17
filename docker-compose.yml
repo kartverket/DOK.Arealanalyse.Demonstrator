@@ -35,8 +35,7 @@ services:
   mcp-server:
     container_name: dokanalyse-mcp-server
     build:
-      context: ./client/api
-      dockerfile: Dok.Arealanalyse.Api.Mcp/Dockerfile
+      context: ./client/mcp
     environment:
       - DOK_API_BASE_URL=http://web-api:5001/api
       - MCP_ENDPOINT=/mcp

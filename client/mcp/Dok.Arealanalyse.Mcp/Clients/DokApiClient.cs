@@ -3,7 +3,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
-namespace Dok.Arealanalyse.Api.Mcp.Clients;
+namespace Dok.Arealanalyse.Mcp.Clients;
 
 public sealed class DokApiClient(HttpClient httpClient, ILogger<DokApiClient> logger)
 {

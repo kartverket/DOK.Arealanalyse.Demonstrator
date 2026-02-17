@@ -1,5 +1,6 @@
-using Dok.Arealanalyse.Api.Mcp;
-using Dok.Arealanalyse.Api.Mcp.Clients;
+using System.Net.Http.Headers;
+using Dok.Arealanalyse.Mcp;
+using Dok.Arealanalyse.Mcp.Clients;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -13,8 +14,12 @@ services.AddHttpClient<DokApiClient>(client =>
 
 services.AddHttpClient<PlanDataClient>(client =>
 {
-    client.BaseAddress = new Uri($"{configuration["PLAN_DATA_BASE_URL"]}/");
+    client.BaseAddress = new Uri($"{configuration["PlanData:BaseUrl"]}/");
     client.Timeout = TimeSpan.FromSeconds(30);
+
+    var basicAuthToken = configuration["PlanData:BasicAuthToken"];
+    if (!string.IsNullOrWhiteSpace(basicAuthToken))
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", basicAuthToken);
 });
 
 services.AddHttpClient<TeigWfsClient>(client =>

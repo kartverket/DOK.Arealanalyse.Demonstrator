@@ -3,7 +3,7 @@ using System.Text;
 using System.Text.Json.Nodes;
 using System.Xml.Linq;
 
-namespace Dok.Arealanalyse.Api.Mcp.Clients;
+namespace Dok.Arealanalyse.Mcp.Clients;
 
 public sealed class TeigWfsClient(HttpClient httpClient, ILogger<TeigWfsClient> logger)
 {

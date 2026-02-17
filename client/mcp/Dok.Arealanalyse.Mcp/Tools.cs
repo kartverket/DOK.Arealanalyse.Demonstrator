@@ -1,9 +1,9 @@
-using Dok.Arealanalyse.Api.Mcp.Clients;
+using Dok.Arealanalyse.Mcp.Clients;
 using ModelContextProtocol.Server;
 using System.ComponentModel;
 using System.Text.Json.Nodes;
 
-namespace Dok.Arealanalyse.Api.Mcp;
+namespace Dok.Arealanalyse.Mcp;
 
 [McpServerToolType]
 public static class Tools
