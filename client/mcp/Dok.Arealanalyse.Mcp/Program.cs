@@ -25,7 +25,7 @@ services.AddHttpClient<PlanDataClient>(client =>
 services.AddHttpClient<TeigWfsClient>(client =>
 {
     client.BaseAddress = new Uri($"{configuration["TEIG_WFS_URL"]}");
-    client.Timeout = TimeSpan.FromSeconds(30);
+    client.Timeout = TimeSpan.FromMinutes(2);
 });
 
 services
