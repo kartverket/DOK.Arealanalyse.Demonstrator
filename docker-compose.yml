@@ -32,6 +32,25 @@ services:
       - internal      
     restart: always
 
+  mcp-server:
+    container_name: dokanalyse-mcp-server
+    build:
+      context: ./client/api
+      dockerfile: Dok.Arealanalyse.Api.Mcp/Dockerfile
+    environment:
+      - DOK_API_BASE_URL=http://web-api:5001/api
+      - MCP_ENDPOINT=/mcp
+      - ASPNETCORE_URLS=http://+:5003
+    ports:
+      - "5003:5003"
+    expose:
+      - "5003"
+    networks:
+      - internal
+    depends_on:
+      - web-api
+    restart: always
+
   socket-io:
     container_name: dokanalyse-socket-io
     build:
