@@ -16,8 +16,12 @@ public static class Tools
         [Description("Municipality number (kommunenummer), e.g. '3228'")] string kommunenummer,
         [Description("Buffer in meters. Defaults to 0")] int requestedBuffer = 0,
         [Description("Lifecycle stage: 'planleggingigangsatt', 'offentligettersyn', 'vedtattplan'. Searches all if omitted.")] string? lifecycleStage = null,
+        [Description("Use case context: 'Reguleringsplan', 'Kommuneplan', or 'Byggesak'. Defaults to null (all).")] string? context = null,
+        [Description("Theme filter: 'Geologi', 'Kulturminner', 'Klima', 'Kyst og fiskeri', 'Landbruk', 'Natur', 'Plan', 'Samferdsel', or 'Samfunnssikkerhet'. Defaults to null (all).")] string? theme = null,
         [Description("Include guidance from Geolett")] bool includeGuidance = true,
         [Description("Include quality measurement")] bool includeQualityMeasurement = true,
+        [Description("Only include the municipality's chosen DOK data")] bool includeFilterChosenDOK = false,
+        [Description("Include factual information")] bool includeFacts = true,
         CancellationToken cancellationToken = default)
     {
         var plan = await planDataClient.GetPlanAsync(kommunenummer, planId, lifecycleStage, cancellationToken);
@@ -25,7 +29,7 @@ public static class Tools
         if (plan is null)
             return $"No plan found with planId '{planId}' in kommune '{kommunenummer}'.";
 
-        var payload = BuildAnalysisPayload(plan.Geometry, "EPSG::4326", requestedBuffer, includeGuidance, includeQualityMeasurement);
+        var payload = BuildAnalysisPayload(plan.Geometry, "EPSG::4326", requestedBuffer, context, theme, includeGuidance, includeQualityMeasurement, includeFilterChosenDOK, includeFacts);
         var response = await apiClient.AnalyzeAsync(payload, null, cancellationToken);
 
         var summary = new JsonObject
@@ -49,8 +53,12 @@ public static class Tools
         [Description("Lease number (festenummer), optional")] int? festenummer = null,
         [Description("Section number (seksjonsnummer), optional")] int? seksjonsnummer = null,
         [Description("Buffer in meters. Defaults to 0")] int requestedBuffer = 0,
+        [Description("Use case context: 'Reguleringsplan', 'Kommuneplan', or 'Byggesak'. Defaults to null (all).")] string? context = null,
+        [Description("Theme filter: 'Geologi', 'Kulturminner', 'Klima', 'Kyst og fiskeri', 'Landbruk', 'Natur', 'Plan', 'Samferdsel', or 'Samfunnssikkerhet'. Defaults to null (all).")] string? theme = null,
         [Description("Include guidance from Geolett")] bool includeGuidance = true,
         [Description("Include quality measurement")] bool includeQualityMeasurement = true,
+        [Description("Only include the municipality's chosen DOK data")] bool includeFilterChosenDOK = false,
+        [Description("Include factual information")] bool includeFacts = true,
         CancellationToken cancellationToken = default)
     {
         var teig = await teigWfsClient.GetTeigAsync(kommunenummer, gardsnummer, bruksnummer, festenummer, seksjonsnummer, cancellationToken);
@@ -58,7 +66,7 @@ public static class Tools
         if (teig is null)
             return $"No teig found for eiendom {kommunenummer}/{gardsnummer}/{bruksnummer}.";
 
-        var payload = BuildAnalysisPayload(teig.Geometry, $"EPSG::{teig.Epsg}", requestedBuffer, includeGuidance, includeQualityMeasurement);
+        var payload = BuildAnalysisPayload(teig.Geometry, $"EPSG::{teig.Epsg}", requestedBuffer, context, theme, includeGuidance, includeQualityMeasurement, includeFilterChosenDOK, includeFacts);
         var response = await apiClient.AnalyzeAsync(payload, null, cancellationToken);
 
         var summary = new JsonObject
@@ -147,8 +155,12 @@ public static class Tools
         JsonNode geometry,
         string crsEpsg,
         int requestedBuffer,
+        string? context,
+        string? theme,
         bool includeGuidance,
-        bool includeQualityMeasurement)
+        bool includeQualityMeasurement,
+        bool includeFilterChosenDOK,
+        bool includeFacts)
     {
         var inputGeometry = geometry.DeepClone();
 
@@ -167,12 +179,12 @@ public static class Tools
             {
                 ["inputGeometry"] = inputGeometry,
                 ["requestedBuffer"] = requestedBuffer,
-                ["context"] = "Reguleringsplan",
-                ["theme"] = null,
+                ["context"] = context,
+                ["theme"] = theme,
                 ["includeGuidance"] = includeGuidance,
                 ["includeQualityMeasurement"] = includeQualityMeasurement,
-                ["includeFilterChosenDOK"] = false,
-                ["includeFacts"] = true
+                ["includeFilterChosenDOK"] = includeFilterChosenDOK,
+                ["includeFacts"] = includeFacts
             }
         };
     }
