@@ -58,7 +58,7 @@ public static class Tools
         if (teig is null)
             return $"No teig found for eiendom {kommunenummer}/{gardsnummer}/{bruksnummer}.";
 
-        var payload = BuildAnalysisPayload(teig.Geometry, "EPSG::4326", requestedBuffer, includeGuidance, includeQualityMeasurement);
+        var payload = BuildAnalysisPayload(teig.Geometry, $"EPSG::{teig.Epsg}", requestedBuffer, includeGuidance, includeQualityMeasurement);
         var response = await apiClient.AnalyzeAsync(payload, null, cancellationToken);
 
         var summary = new JsonObject

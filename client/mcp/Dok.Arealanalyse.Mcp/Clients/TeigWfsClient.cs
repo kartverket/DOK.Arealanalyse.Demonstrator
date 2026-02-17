@@ -115,6 +115,7 @@ public sealed class TeigWfsClient(HttpClient httpClient, ILogger<TeigWfsClient> 
 
         var polygons = new List<JsonArray>();
         string? matrikkelnummerTekst = null;
+        int epsg = 25833;
 
         foreach (var teig in teigElements)
         {
@@ -126,6 +127,14 @@ public sealed class TeigWfsClient(HttpClient httpClient, ILogger<TeigWfsClient> 
 
             foreach (var gmlPolygon in omraade.Descendants(Gml + "Polygon"))
             {
+                var srsName = gmlPolygon.Attribute("srsName")?.Value;
+                if (srsName is not null && srsName.Contains("EPSG::"))
+                {
+                    var code = srsName[(srsName.LastIndexOf("EPSG::", StringComparison.Ordinal) + 6)..];
+                    if (int.TryParse(code, out var parsed))
+                        epsg = parsed;
+                }
+
                 var rings = ParsePolygonRings(gmlPolygon);
                 if (rings is not null)
                     polygons.Add(rings);
@@ -158,7 +167,7 @@ public sealed class TeigWfsClient(HttpClient httpClient, ILogger<TeigWfsClient> 
             };
         }
 
-        return new TeigResult(geometry, matrikkelnummerTekst ?? "Unknown", teigElements.Count);
+        return new TeigResult(geometry, matrikkelnummerTekst ?? "Unknown", teigElements.Count, epsg);
     }
 
     private static JsonArray? ParsePolygonRings(XElement gmlPolygon)
@@ -216,4 +225,4 @@ public sealed class TeigWfsClient(HttpClient httpClient, ILogger<TeigWfsClient> 
     }
 }
 
-public record TeigResult(JsonNode Geometry, string MatrikkelnummerTekst, int TeigCount);
+public record TeigResult(JsonNode Geometry, string MatrikkelnummerTekst, int TeigCount, int Epsg);
