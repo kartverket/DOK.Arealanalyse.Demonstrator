@@ -18,7 +18,8 @@ export default function Form({ fetching, onSubmit }) {
             includeGuidance: true,
             includeQualityMeasurement: true,
             includeFilterChosenDOK: false,
-            includeFacts: true
+            includeFacts: true,
+            createBinaries: false
         };
     }
 
@@ -31,7 +32,7 @@ export default function Form({ fetching, onSubmit }) {
     }
 
     function handleGeometryDialogOk(polygon) {
-        setState({ ...state, inputGeometry: polygon });        
+        setState({ ...state, inputGeometry: polygon });
     }
 
     function handleSubmit() {
@@ -125,7 +126,7 @@ export default function Form({ fetching, onSubmit }) {
                                 <MenuItem value="Geologi">Geologi</MenuItem>
                                 <MenuItem value="Kulturminner">Kulturminner</MenuItem>
                                 <MenuItem value="Klima">Klima</MenuItem>
-                                <MenuItem value="Kyst og fiskeri">Kyst og fiskeri</MenuItem>                                
+                                <MenuItem value="Kyst og fiskeri">Kyst og fiskeri</MenuItem>
                                 <MenuItem value="Landbruk">Landbruk</MenuItem>
                                 <MenuItem value="Natur">Natur</MenuItem>
                                 <MenuItem value="Plan">Plan</MenuItem>
@@ -167,6 +168,17 @@ export default function Form({ fetching, onSubmit }) {
                                     />
                                 }
                                 label="Inkluder kvalitetsinformasjon" />
+                        </div>
+                        <div>
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        name="createBinaries"
+                                        checked={state.createBinaries}
+                                        onChange={handleChange}
+                                    />
+                                }
+                                label="Lag kartbilder og PDF-rapport" />
                         </div>
                         <div>
                             <FormControlLabel
