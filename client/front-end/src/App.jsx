@@ -1,16 +1,17 @@
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setErrorMessage } from 'store/slices/appSlice';
-import { resetProgress, setTotalSteps } from 'store/slices/datasetSlice';
+import { resetState } from 'store/slices/analysisSlice';
 import { useMap } from 'context/MapContext';
 import { analyze } from 'utils/api';
 import { createRandomId } from 'utils/helpers';
 import { General, Form, ResultDialog, ResultList } from 'features';
-import { Heading, ProgressBar, Toaster } from 'components';
+import { Heading, Progress, Toaster } from 'components';
 import groupBy from 'lodash.groupby';
 import useSocketIO from 'hooks/useSocketIO';
 import messageHandlers from 'config/messageHandlers';
 import styles from './App.module.scss';
+import { CheckmarkIcon } from '@navikt/aksel-icons';
 
 export default function App() {
     useSocketIO(messageHandlers);
@@ -18,21 +19,16 @@ export default function App() {
     const [fetching, setFetching] = useState(false);
     const dispatch = useDispatch();
     const correlationId = useSelector(state => state.app.correlationId);
-    const status = useSelector(state => state.dataset.status);
     const { clearCache } = useMap();
 
-    function resetState() {
+    function _resetState() {
         setData(null);
         clearCache();
-        dispatch(resetProgress());
+        dispatch(resetState());
     }
 
     async function start(payload) {
-        resetState();
-        
-        if (!payload.inputs.includeFacts) {
-            dispatch(setTotalSteps(-1));
-        }
+        _resetState();
 
         try {
             setFetching(true);
@@ -62,14 +58,26 @@ export default function App() {
             <Heading />
 
             <div className={styles.content}>
+                {/* <div className={styles.prog}>
+                    <div>
+                        <div className={styles.statusText}>
+                            Starter opp
+                        </div>
+                        <div className={styles.progress}>
+                            <CheckmarkIcon fontSize="24px" />
+                        </div>
+                    </div>
+                    <div>
+                        <div className={styles.statusText}>
+                            Analyserer datasett 5 av 41
+                        </div>
+                        <div className={styles.progress}>41 %</div>
+                    </div>
+                </div> */}
+
                 <Form onSubmit={start} fetching={fetching} />
                 {
-                    fetching && (
-                        <div className={styles.progress}>
-                            <span className={styles.status}>{status}</span>
-                            <ProgressBar />
-                        </div>
-                    )
+                    fetching && <Progress />
                 }
                 {
                     data !== null && (
