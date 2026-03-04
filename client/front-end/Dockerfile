@@ -1,11 +1,11 @@
 FROM node:22-alpine AS build
 WORKDIR /app
 COPY . .
-RUN corepack enable && corepack prepare yarn@4.9.2 \
+RUN corepack enable && corepack prepare yarn@4.12.0 \
     && yarn install --immutable \
     && yarn build
-	
-FROM nginx:1.27.3-alpine-slim
+
+FROM nginx:latest
 COPY --from=build /app/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 

@@ -12,11 +12,13 @@ export default function DatafunnButton({ className, inputGeometry }) {
    const extent = bbox(inputGeometry);
 
    let queryString = `?extent=${extent.join(",")}`;
+   const systemName = "DOK Arealanalyse Demonstrator";
 
    const crsName = getCrsName(inputGeometry);
    const epsgCode = getEpsgCode(crsName);
 
    if (epsgCode) queryString += `&epsg=${epsgCode}`;
+   queryString += `&system=${encodeURIComponent(systemName)}`;
 
    return (
       <div className={className}>
