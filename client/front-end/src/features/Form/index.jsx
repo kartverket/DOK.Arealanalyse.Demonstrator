@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { Button, Checkbox, CircularProgress, FormControl, FormControlLabel, InputAdornment, InputLabel, MenuItem, Paper, Select } from '@mui/material';
 import { GeometryDialog } from 'features';
 import { IntegerField } from 'components';
@@ -8,6 +9,7 @@ import styles from './Form.module.scss';
 export default function Form({ fetching, onSubmit }) {
     const [state, setState] = useState(getDefaultValues());
     const geometryDialogRef = useRef(null);
+    const correlationId = useSelector(state => state.app.correlationId);
 
     function getDefaultValues() {
         return {
@@ -45,15 +47,11 @@ export default function Form({ fetching, onSubmit }) {
     }
 
     function getPayload() {
-        const inputs = { ...state };
+        const inputs = { ...state, };
 
-        if (inputs.context === '') {
-            inputs.context = null;
-        }
-
-        if (inputs.theme === '') {
-            inputs.theme = null;
-        }
+        inputs.context = inputs.context !== '' ? inputs.context : null;
+        inputs.theme = inputs.theme !== '' ? inputs.theme : null;
+        inputs.correlationId = correlationId;
 
         return {
             inputs

@@ -878,6 +878,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@navikt/aksel-icons@npm:^8.6.0":
+  version: 8.6.0
+  resolution: "@navikt/aksel-icons@npm:8.6.0"
+  checksum: 10c0/fb6b54edb594f440db8d3ba93822f31e7c589ca1c2a8ccb49b5ff2f699a52faa77e692a981e0f5a98b339df7a8e130654517ff00e278c98953570a36ca3c2089
+  languageName: node
+  linkType: hard
+
 "@npmcli/agent@npm:^4.0.0":
   version: 4.0.0
   resolution: "@npmcli/agent@npm:4.0.0"
@@ -2139,6 +2146,7 @@ __metadata:
     "@eslint/js": "npm:^9.39.2"
     "@mui/icons-material": "npm:^7.3.7"
     "@mui/material": "npm:^7.3.7"
+    "@navikt/aksel-icons": "npm:^8.6.0"
     "@reduxjs/toolkit": "npm:^2.11.2"
     "@turf/bbox": "npm:^7.3.3"
     "@types/react": "npm:^19.2.10"
@@ -2158,6 +2166,7 @@ __metadata:
     marked: "npm:^17.0.1"
     ol: "npm:^10.7.0"
     pretty-print-json: "npm:^3.0.6"
+    progressbar.js: "npm:^1.1.1"
     proj4: "npm:^2.20.2"
     react: "npm:^19.2.4"
     react-chartjs-2: "npm:^5.3.1"
@@ -2802,7 +2811,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fsevents@npm:~2.3.2, fsevents@npm:~2.3.3":
+"fsevents@npm:^2.3.2, fsevents@npm:~2.3.2, fsevents@npm:~2.3.3":
   version: 2.3.3
   resolution: "fsevents@npm:2.3.3"
   dependencies:
@@ -2812,7 +2821,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fsevents@patch:fsevents@npm%3A~2.3.2#optional!builtin<compat/fsevents>, fsevents@patch:fsevents@npm%3A~2.3.3#optional!builtin<compat/fsevents>":
+"fsevents@patch:fsevents@npm%3A^2.3.2#optional!builtin<compat/fsevents>, fsevents@patch:fsevents@npm%3A~2.3.2#optional!builtin<compat/fsevents>, fsevents@patch:fsevents@npm%3A~2.3.3#optional!builtin<compat/fsevents>":
   version: 2.3.3
   resolution: "fsevents@patch:fsevents@npm%3A2.3.3#optional!builtin<compat/fsevents>::version=2.3.3&hash=df0bf1"
   dependencies:
@@ -4152,6 +4161,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"progressbar.js@npm:^1.1.1":
+  version: 1.1.1
+  resolution: "progressbar.js@npm:1.1.1"
+  dependencies:
+    lodash.merge: "npm:^4.6.2"
+    shifty: "npm:^2.8.3"
+  checksum: 10c0/cb120fdfea2ab7b40b57435841ee76f14cae986f7fcfe8df0844faecd2b12798c5fc7ed8699c8074d071e28cd4ed18f7ecf15136eed09ada616aaadbf3b3f146
+  languageName: node
+  linkType: hard
+
 "proj4@npm:^2.20.2":
   version: 2.20.3
   resolution: "proj4@npm:2.20.3"
@@ -4910,6 +4929,18 @@ __metadata:
   version: 3.0.0
   resolution: "shebang-regex@npm:3.0.0"
   checksum: 10c0/1dbed0726dd0e1152a92696c76c7f06084eb32a90f0528d11acd764043aacf76994b2fb30aa1291a21bd019d6699164d048286309a278855ee7bec06cf6fb690
+  languageName: node
+  linkType: hard
+
+"shifty@npm:^2.8.3":
+  version: 2.20.4
+  resolution: "shifty@npm:2.20.4"
+  dependencies:
+    fsevents: "npm:^2.3.2"
+  dependenciesMeta:
+    fsevents:
+      optional: true
+  checksum: 10c0/e7d5464068eac020928436b9c99f6ef9295988b517b41281cf5f4cee128bb76a17e7c5aace3b3c3217b68e7137f0837428c499464a70d860cb7ad9203de8402f
   languageName: node
   linkType: hard
 

@@ -13,6 +13,6 @@ RUN apk add --update-cache curl \
     && . activate \
     && uv sync --frozen
 
-EXPOSE 5002
+EXPOSE 5004
 
 CMD ["uv", "run", "./main.py"]
