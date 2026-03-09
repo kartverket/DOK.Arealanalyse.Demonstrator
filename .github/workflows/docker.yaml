@@ -18,7 +18,7 @@ jobs:
       strategy:
          fail-fast: false
          matrix:
-            app: [frontend, api, mcp, socket-io]
+            app: [frontend, api, mcp, socket-io, file-server]
 
       steps:
          - name: Checkout
@@ -38,6 +38,8 @@ jobs:
                    - 'client/mcp/**'
                  socket:
                    - 'socket-io/**'
+                 fileserver:
+                   - 'file-server/**'                   
 
          - name: Resolve app config & decide if this app should be built
            run: |
@@ -73,6 +75,13 @@ jobs:
                     SHOULD_BUILD="${{ steps.changes.outputs.socket }}"
                   fi
                   ;;
+                file-server)
+                  APP_DIR="file-server"
+                  IMAGE_NAME="dokanalyse-file-server"
+                  if [[ "${GITHUB_EVENT_NAME}" == "push" ]]; then
+                    SHOULD_BUILD="${{ steps.changes.outputs.socket }}"
+                  fi
+                  ;;                  
                 *)
                   echo "Unknown app: $app"
                   exit 1

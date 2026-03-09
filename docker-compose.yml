@@ -62,21 +62,21 @@ services:
       - internal      
     restart: on-failure  
 
-  # file-server:
-  #   container_name: dokanalyse-file-server
-  #   build:
-  #     context: ./file-server
-  #   ports:
-  #     - "5004:5004"   
-  #   expose:
-  #     - "5004"
-  #   environment:
-  #     - FILE_SHARE_DIR=/mnt/files
-  #   volumes:
-  #     - /home/toranders/dev/dokanalyse/files:/mnt/files
-  #   networks:
-  #     - internal 
-  #   restart: on-failure
+  file-server:
+    container_name: dokanalyse-file-server
+    build:
+      context: ./file-server
+    ports:
+      - "5004:5004"   
+    expose:
+      - "5004"
+    environment:
+      - FILE_SHARE_DIR=/mnt/files
+    volumes:
+      - ${DOKANALYSE_LOCAL_FILE_SHARE_DIR}:/mnt/files
+    networks:
+      - internal 
+    restart: on-failure
 
 volumes:
   dokanalyse:
