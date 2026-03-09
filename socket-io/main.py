@@ -33,9 +33,6 @@ async def connect(sid: str, *args) -> None:
     correlation_id = str(uuid4())
     _sids[correlation_id] = sid
 
-    print('SID: ' + sid)
-    print('Correlation-ID: ' + correlation_id)
-
     await sio.emit('client_connected', correlation_id, sid)
     print(f'Client connected: {sid}')
 
@@ -50,11 +47,8 @@ async def disconnect(sid: str) -> None:
 async def state_updated_api(_, data: Dict[str, Any]) -> None:
     recipient: str = data['recipient']
     sid = _get_sid_from_correlation_id(recipient)
-    print('state_updated_api')
-    print('Correlation-ID: ' + recipient)    
 
     if sid:
-        print('SID: ' + sid)        
         await sio.emit('state_updated', data, sid)
 
 
