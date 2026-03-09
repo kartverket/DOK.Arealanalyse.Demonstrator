@@ -1,7 +1,7 @@
 FROM node:22-alpine AS build
 WORKDIR /app
 COPY . .
-RUN corepack enable && corepack prepare yarn@4.12.0 \
+RUN corepack enable && corepack prepare yarn@4.13.0 \
     && yarn install --immutable \
     && yarn build
 
