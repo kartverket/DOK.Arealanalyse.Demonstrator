@@ -1,4 +1,4 @@
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { inPlaceSort } from 'fast-sort';
 import { setSelectedResult } from 'store/slices/appSlice';
 import { getDistance, getHitAreaPercent, getResultClassNames, getResultTitle } from './helpers';
@@ -6,6 +6,7 @@ import { Tooltip, Paper } from '@mui/material';
 import styles from './ResultList.module.scss';
 
 export default function ResultList({ data }) {
+    const statusFilters = useSelector(state => state.app.statusFilters);
     const dispatch = useDispatch();
 
     function selectResult(result) {
@@ -115,6 +116,13 @@ export default function ResultList({ data }) {
             ]);
         }
 
+        if (resultStatus === 'NOT-IMPLEMENTED') {
+            inPlaceSort(resultList).asc([                
+                result => result.themes[0],
+                result => result.runOnDataset?.title || result.title
+            ]);
+        }        
+
         return (
             <div className={styles.resultGroup}>
                 <Paper sx={{ marginBottom: '18px' }}>
@@ -182,15 +190,33 @@ export default function ResultList({ data }) {
         );
     }
 
+    function renderMustHandle() {
+
+    }
+
     return (
         <div className={styles.container}>
             <div>
-                {renderResults('HIT-RED')}
-                {renderResults('HIT-YELLOW')}
-                {renderResults('NO-HIT-YELLOW')}
-                {renderResults('NO-HIT-GREEN')}
-                {renderErrorResults('TIMEOUT')}
-                {renderErrorResults('ERROR')}
+                {
+                    statusFilters.includes('mustHandle') && renderResults('HIT-RED')
+                }
+                {
+                    statusFilters.includes('mustCheck') && (
+                        <>
+                            {renderResults('HIT-YELLOW')}
+                            {renderResults('NO-HIT-YELLOW')}
+                            {renderResults('TIMEOUT')}
+                            {renderResults('ERROR')}
+                            {renderResults('NOT-IMPLEMENTED')}
+                        </>
+                    )
+                }
+                {
+                    statusFilters.includes('nearby') && renderResults('NO-HIT-GREEN')
+                }
+                {
+                    statusFilters.includes('notAnalyzed') && renderResults('NOT-RELEVANT')
+                }
             </div>
 
             {renderNotRelevant()}

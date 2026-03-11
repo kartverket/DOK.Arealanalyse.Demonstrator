@@ -59,7 +59,7 @@ export default function Form({ fetching, onSubmit }) {
     }
 
     return (
-        <Paper sx={{ marginBottom: '24px' }}>
+        <section className={styles.form}>
             <div className={styles.input}>
                 <div className={styles.row}>
                     <div className={styles.addGeometry}>
@@ -196,7 +196,7 @@ export default function Form({ fetching, onSubmit }) {
                         <Button
                             onClick={handleSubmit}
                             variant="contained"
-                            disabled={!canSubmit()}
+                        // disabled={!canSubmit()}
                         >
                             Start DOK-analyse
                         </Button>
@@ -206,6 +206,6 @@ export default function Form({ fetching, onSubmit }) {
                     </div>
                 </div>
             </div>
-        </Paper>
+        </section>
     );
 }

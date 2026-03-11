@@ -88,12 +88,6 @@ export default function General({ inputGeometryArea, inputGeometry, municipality
     return (
         <>
             <div className={styles.factSheet}>
-                <GeneralInfo
-                    municipalityNumber={municipalityNumber}
-                    municipalityName={municipalityName}
-                    area={inputGeometryArea}
-                />
-
                 {
                     factList.length > 0 && (
                         <Button

@@ -1,9 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { clone } from 'ol/extent';
 
 const initialState = {
     correlationId: null,
     selectedResult: null,
-    errorMessage: null
+    errorMessage: null,
+    statusFilters: ['mustHandle']
 };
 
 export const appSlice = createSlice({
@@ -22,6 +24,28 @@ export const appSlice = createSlice({
                 selectedResult: action.payload
             };
         },
+        setStatusFilter: (state, action) => {
+            const status = action.payload;
+            const index = state.statusFilters.indexOf(status);
+
+            if (index === -1) {
+                return {
+                    ...state,
+                    statusFilters: [
+                        ...state.statusFilters,
+                        status
+                    ]
+                };
+            }
+
+            const clone = [...state.statusFilters]
+            clone.splice(index, 1);
+
+            return {
+                ...state,
+                statusFilters: clone
+            }
+        },
         setErrorMessage: (state, action) => {
             return {
                 ...state,
@@ -31,6 +55,11 @@ export const appSlice = createSlice({
     }
 });
 
-export const { setCorrelationId, setSelectedResult, setErrorMessage } = appSlice.actions;
+export const {
+    setCorrelationId,
+    setSelectedResult,
+    setStatusFilter,
+    setErrorMessage
+} = appSlice.actions;
 
 export default appSlice.reducer;

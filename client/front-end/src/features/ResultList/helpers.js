@@ -19,24 +19,18 @@ export function getResultClassNames(result, styles) {
 
 export function getResultTitle(result) {
     const datasetTitle = result.runOnDataset ?
-        `«${result.runOnDataset.title}»${result.title !== null ? `\r\n(${result.title})` : ''}` :
-        `«${result.title}»`
+        `${result.runOnDataset.title}${result.title !== null ? `\r\n(${result.title})` : ''}` :
+        result.title
 
     switch (result.resultStatus) {
-        case 'NO-HIT-GREEN':
-            return `Området er utenfor ${datasetTitle}`;
-        case 'NO-HIT-YELLOW':
-            return `Området har ikke treff for ${datasetTitle}`;
-        case 'HIT-YELLOW':
-            return `Området har treff i ${datasetTitle}`;
-        case 'HIT-RED':
-            return `Området er i konflikt med ${datasetTitle}`;
         case 'TIMEOUT':
-            return `Tidsavbrudd: ${datasetTitle}`
+            return `Tidsavbrudd: ${datasetTitle}`;
         case 'ERROR':
-            return `En feil har oppstått: ${datasetTitle}`
+            return `En feil har oppstått: ${datasetTitle}`;
+        case 'NOT-IMPLEMENTED':
+            return `Ikke implementert: ${datasetTitle}`;
         default:
-            return '';
+            return datasetTitle;
     }
 }
 

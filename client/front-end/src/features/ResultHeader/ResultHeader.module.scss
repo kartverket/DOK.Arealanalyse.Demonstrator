@@ -1,0 +1,136 @@
+.resultHeader {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 80px;
+}
+
+.inputArea {
+    font-family: 'Inter';
+    font-size: 21px;
+    font-weight: 500;
+    color: #4A5565;
+    line-height: 1;
+
+    h2 {
+        font-family: 'Manrope';
+        font-size: 41px;
+        font-weight: 700;
+        color: #344054;
+        margin: 9px 0 18px 0;
+        line-height: 1;
+    }
+
+    &>div {
+        display: flex;
+        align-items: center;
+
+        &>span {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            &:first-child {
+                margin-right: 36px;
+            }
+        }
+    }
+}
+
+.cards {
+    display: flex;
+    gap: 12px;
+
+    .card {
+        user-select: none;
+        
+        input {
+            position: absolute;
+            opacity: 0;
+            height: 0;
+            width: 0;
+
+            &:not(:checked)+label {
+                .heading {
+                    color: #8E8E8E;
+                }
+
+                .count {
+                    color: #344054;
+                }
+            }
+
+            &:checked+label {
+                &.mustHandle {
+                    color: #B42318;
+                    border-color: #F0443866;
+                    background-color: #FEF3F2;
+
+                    svg {
+                        stroke: #F04438;
+                    }
+                }
+
+                &.mustCheck {
+                    color: #B54708;
+                    border-color: #F7900966;
+                    background-color: #FEE9CE;
+
+                    svg {
+                        stroke: #F79009;
+                    }
+                }
+
+                &.nearby {
+                    color: #027A48;
+                    border-color: #12B76A66;
+                    background-color: #ECFDF3;
+
+                    svg {
+                        stroke: #12B76A;
+                    }
+                }
+
+                &.notAnalyzed {
+                    color: #344054;
+                    border-color: #66708566;
+                    background-color: #F2F4F7;
+
+                    svg {
+                        stroke: #344054;
+                    }
+                }
+            }
+        }
+
+        label {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 240px;
+            height: 142px;
+            border: 1.5px solid #8E8E8E;
+            border-radius: 16px;
+            padding: 18px 24px;
+            cursor: pointer;
+
+            .heading {
+                display: flex;
+                align-items: center;
+                font-size: 21px;
+
+                svg {
+                    stroke: #8E8E8E;
+                    margin-right: 6px;
+                }
+            }
+
+            .count {
+                font-family: 'Manrope';
+                font-weight: 700;
+                font-size: 41px;
+                line-height: 1;
+            }
+        }
+    }
+}

@@ -1,0 +1,60 @@
+.tableHeader {
+    margin-bottom: 40px;
+}
+
+.statusFilters {
+    display: flex;
+    gap: 3px;
+    padding: 2px;
+    border: 1px solid #F3F4F6;
+    border-radius: 16px;
+    width: fit-content;
+
+    .filter {
+        display: flex;
+        user-select: none;
+
+        input {
+            position: absolute;
+            opacity: 0;
+            height: 0;
+            width: 0;
+
+            &:not(:checked)+label {
+                color: #344054;
+            }
+
+            &:checked+label {
+                &.mustHandle {
+                    color: #B42318;
+                    background-color: #FEF3F2;
+                }
+
+                &.mustCheck {
+                    color: #B54708;
+                    background-color: #FEE9CE;
+                }
+
+                &.nearby {
+                    color: #027A48;
+                    background-color: #ECFDF3;
+                }
+
+                &.notAnalyzed {
+                    color: #344054;
+                    background-color: #F2F4F7;
+                }
+            }
+        }
+
+        label {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border: 1px solid #F3F4F6;
+            border-radius: 16px;
+            cursor: pointer;
+        }
+    }
+}
