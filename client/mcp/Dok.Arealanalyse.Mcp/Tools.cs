@@ -8,7 +8,7 @@ namespace Dok.Arealanalyse.Mcp;
 [McpServerToolType]
 public static class Tools
 {
-    [McpServerTool, Description("Run DOK arealanalyse for a reguleringsplan. Fetches plan geometry from plandata.ft.dibk.no and passes it to DOK analysis.")]
+    [McpServerTool, Description("Run DOK arealanalyse for a reguleringsplan. Fetches plan geometry from plandata.ft.dibk.no and passes it to DOK analysis. Returns analysis results with a reportUrl field containing a link to the generated PDF report.")]
     public static async Task<string> AnalyzeByPlan(
         DokApiClient apiClient,
         PlanDataClient planDataClient,
@@ -31,19 +31,21 @@ public static class Tools
 
         var payload = BuildAnalysisPayload(plan.Geometry, "EPSG::4326", requestedBuffer, context, theme, includeGuidance, includeQualityMeasurement, includeFilterChosenDOK, includeFacts);
         var response = await apiClient.AnalyzeAsync(payload, null, cancellationToken);
+        var analysisNode = JsonNode.Parse(response);
 
         var summary = new JsonObject
         {
             ["planName"] = plan.PlanName,
             ["planType"] = plan.PlanType,
             ["lifecycleStage"] = plan.LifecycleStage,
-            ["analysis"] = JsonNode.Parse(response)
+            ["reportUrl"] = analysisNode?["report"]?.GetValue<string>(),
+            ["analysis"] = analysisNode
         };
 
         return DokApiClient.PrettyJson(summary.ToJsonString());
     }
 
-    [McpServerTool, Description("Run DOK arealanalyse for a property (eiendom). Fetches teig geometry from WFS and passes it to DOK analysis.")]
+    [McpServerTool, Description("Run DOK arealanalyse for a property (eiendom). Fetches teig geometry from WFS and passes it to DOK analysis. Returns analysis results with a reportUrl field containing a link to the generated PDF report.")]
     public static async Task<string> AnalyzeByEiendom(
         DokApiClient apiClient,
         TeigWfsClient teigWfsClient,
@@ -68,12 +70,14 @@ public static class Tools
 
         var payload = BuildAnalysisPayload(teig.Geometry, $"EPSG::{teig.Epsg}", requestedBuffer, context, theme, includeGuidance, includeQualityMeasurement, includeFilterChosenDOK, includeFacts);
         var response = await apiClient.AnalyzeAsync(payload, null, cancellationToken);
+        var analysisNode = JsonNode.Parse(response);
 
         var summary = new JsonObject
         {
             ["matrikkelnummer"] = teig.MatrikkelnummerTekst,
             ["teigCount"] = teig.TeigCount,
-            ["analysis"] = JsonNode.Parse(response)
+            ["reportUrl"] = analysisNode?["report"]?.GetValue<string>(),
+            ["analysis"] = analysisNode
         };
 
         return DokApiClient.PrettyJson(summary.ToJsonString());
