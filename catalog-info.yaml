@@ -1,11 +1,9 @@
-# nonk8s
-apiVersion: "backstage.io/v1alpha1"
-kind: "Component"
+apiVersion: backstage.io/v1alpha1
+kind: Component
 metadata:
-  name: "DOK.Arealanalyse.demonstrator"
-  tags: []
+  name: DOK.Arealanalyse.demonstrator
 spec:
-  type: "experiment"
-  lifecycle: "experimental"
-  owner: "datadeling_og_distribusjon"
-  system: "geonorge"
+  type: website
+  lifecycle: experimental
+  owner: datadeling_og_distribusjon
+  system: system:default/geonorge
