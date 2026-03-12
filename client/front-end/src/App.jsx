@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { setErrorMessage } from 'store/slices/appSlice';
 import { resetState } from 'store/slices/analysisSlice';
 import { useMap } from 'context/MapContext';
 import { analyze } from 'utils/api';
 import { createRandomId } from 'utils/helpers';
-import { General, Form, ResultDialog, ResultList } from 'features';
+import { General, Form, ResultDialog, ResultList, Result } from 'features';
 import { Heading, Progress, Toaster } from 'components';
 import groupBy from 'lodash.groupby';
 import useSocketIO from 'hooks/useSocketIO';
@@ -13,7 +13,9 @@ import messageHandlers from 'utils/messageHandlers';
 import styles from './App.module.scss';
 import { CheckmarkIcon } from '@navikt/aksel-icons';
 import ResultHeader from 'features/ResultHeader';
-import TableHeader from 'features/TableHeader';
+import TableHeader from 'features/ResultTableHeader';
+import ResultTable from 'features/ResultTable';
+import ResultTableHeader from 'features/ResultTableHeader';
 
 export default function App() {
     useSocketIO(messageHandlers);
@@ -21,6 +23,15 @@ export default function App() {
     const [fetching, setFetching] = useState(false);
     const dispatch = useDispatch();
     const { clearCache } = useMap();
+    const [selectedThemes, setSelectedThemes] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
+
+    useEffect(
+        () => {
+            console.log(selectedThemes, searchTerm)
+        },
+        [selectedThemes, searchTerm]
+    )
 
     function _resetState() {
         setData(null);
@@ -83,9 +94,18 @@ export default function App() {
                 {
                     data !== null && (
                         <>
-                            <ResultHeader result={data} />
+                            {/* <ResultHeader result={data} />
                             
-                            <TableHeader result={data} />
+                            <ResultTableHeader 
+                                result={data} 
+                                onThemeChecked={setSelectedThemes}
+                                onSearchChange={setSearchTerm}
+                            />
+                             */}
+
+                            <Result result={data} />
+
+                            
                             
                             <General
                                 inputGeometryArea={data.inputGeometryArea}
@@ -97,7 +117,7 @@ export default function App() {
                                 factList={data.factList}
                                 report={data.report}
                             />
-                            <ResultList data={data} />
+                            {/* <ResultList data={data} /> */}
                             <ResultDialog inputGeometry={data.inputGeometry} />
                         </>
                     )

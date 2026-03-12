@@ -1,5 +1,4 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { clone } from 'ol/extent';
 
 const initialState = {
     correlationId: null,

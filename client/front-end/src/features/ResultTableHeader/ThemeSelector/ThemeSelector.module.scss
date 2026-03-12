@@ -1,0 +1,28 @@
+.dropdown {
+    min-width: 252px;
+
+    ul {
+        max-height: 360px;
+        overflow-y: auto;
+    }
+}
+
+.dropdownTrigger {
+    display: flex;
+    justify-content: space-between;
+    width: 252px;    
+}
+
+.dropdownItemWrapper {
+    padding: 6px 12px;
+
+    &:first-child {
+        border-bottom: 1px solid #dbdbdb;
+        margin-bottom: 2px;
+        padding-bottom: 8px;
+    }
+
+    ds-field {
+        width: 100%;
+    }
+}

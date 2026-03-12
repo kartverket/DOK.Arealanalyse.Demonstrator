@@ -1,5 +1,3 @@
-import { useDispatch, useSelector } from 'react-redux';
-import { setStatusFilter } from 'store/slices/appSlice';
 import PointIcon from 'assets/gfx/icon-point.svg?react';
 import AreaIcon from 'assets/gfx/icon-area.svg?react'
 import MustHandleIcon from 'assets/gfx/icon-must-handle.svg?react'
@@ -8,20 +6,12 @@ import NearbyIcon from 'assets/gfx/icon-nearby.svg?react'
 import NotAnalyzedIcon from 'assets/gfx/icon-not-analyzed-2.svg?react'
 import styles from './ResultHeader.module.scss';
 
-export default function ResultHeader({ result }) {
-    const statusFilters = useSelector(state => state.app.statusFilters);
-    const dispatch = useDispatch();
-
+export default function ResultHeader({ result, statusFilters, onStatusFilterSelected  }) {
     function getCount(restultStatuses) {
         return restultStatuses.reduce((accumulator, resultStatus) => {
             const grouping = result.resultList[resultStatus];
             return grouping ? accumulator + grouping.length : accumulator + 0;
         }, 0);
-    }
-
-    function handleFilterChecked(event) {
-        const { name } = event.target;
-        dispatch(setStatusFilter(name));
     }
 
     return (
@@ -49,7 +39,7 @@ export default function ResultHeader({ result }) {
                         type="checkbox"
                         name="mustHandle"
                         checked={statusFilters.includes('mustHandle')}
-                        onChange={handleFilterChecked}
+                        onChange={event => onStatusFilterSelected(event.target.name)}
                     />
 
                     <label htmlFor="must-handle" className={styles.mustHandle}>
@@ -67,7 +57,7 @@ export default function ResultHeader({ result }) {
                         type="checkbox"
                         name="mustCheck"
                         checked={statusFilters.includes('mustCheck')}
-                        onChange={handleFilterChecked}
+                        onChange={event => onStatusFilterSelected(event.target.name)}
                     />
 
                     <label htmlFor="must-check" className={styles.mustCheck}>
@@ -85,7 +75,7 @@ export default function ResultHeader({ result }) {
                         type="checkbox"
                         name="nearby"
                         checked={statusFilters.includes('nearby')}                        
-                        onChange={handleFilterChecked}
+                        onChange={event => onStatusFilterSelected(event.target.name)}
                     />
 
                     <label htmlFor="nearby" className={styles.nearby}>
@@ -103,7 +93,7 @@ export default function ResultHeader({ result }) {
                         type="checkbox"
                         name="notAnalyzed"
                         checked={statusFilters.includes('notAnalyzed')}                        
-                        onChange={handleFilterChecked}
+                        onChange={event => onStatusFilterSelected(event.target.name)}
                     />
 
                     <label htmlFor="not-analyzed" className={styles.notAnalyzed}>

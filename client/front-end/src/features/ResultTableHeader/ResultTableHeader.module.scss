@@ -1,4 +1,7 @@
 .tableHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     margin-bottom: 40px;
 }
 
@@ -57,4 +60,37 @@
             cursor: pointer;
         }
     }
+}
+
+.themeAndSearch {
+    display: flex;
+    gap: 9px;
+
+    .themes {
+        min-width: 240px;
+
+        ul {
+            max-height: 360px;
+            overflow-y: auto;
+        }
+    }
+}
+
+.itemWrapper {
+    padding: 6px 12px;
+
+    &:first-child {
+        border-bottom: 1px solid #dbdbdb;
+        margin-bottom: 2px;
+        padding-bottom: 8px;
+    }
+
+    ds-field {
+        width: 100%;
+    }
+}
+
+.report {
+    display: flex;
+    gap: 9px;
 }

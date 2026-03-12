@@ -36,3 +36,23 @@ export function parseJson(json) {
 export function createRandomId() {
     return `_${Math.floor(Math.random() * Math.floor(Math.random() * Date.now()))}`;
 }
+
+export function debounce(func, delay) {
+    let timeoutId;
+
+    return function (...args) {
+        clearTimeout(timeoutId);
+
+        timeoutId = setTimeout(() => {
+            func.apply(this, args);
+        }, delay);
+    };
+}
+
+export function capitalizeFirstLetter(str) {
+    if (!str || typeof str !== 'string') {
+        return '';
+    }
+
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}

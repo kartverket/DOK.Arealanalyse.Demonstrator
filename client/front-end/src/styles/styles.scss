@@ -1,3 +1,5 @@
+@use '@digdir/designsystemet-css';
+@use './theme.css';
 @use './reset';
 @use '../../node_modules/ol/ol.css';
 @use '../../node_modules/pretty-print-json/dist/css/pretty-print-json.css';
@@ -6,7 +8,7 @@
 
 html {
     font-family: 'Inter';
-    font-size: 14px;
+    font-size: 12px;
 }
 
 body {

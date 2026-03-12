@@ -1,19 +1,15 @@
-import { useDispatch, useSelector } from 'react-redux';
-import { setStatusFilter } from 'store/slices/appSlice';
-import MustHandleIcon from 'assets/gfx/icon-must-handle.svg?react'
-import MustCheckIcon from 'assets/gfx/icon-must-check.svg?react'
-import NearbyIcon from 'assets/gfx/icon-nearby.svg?react'
-import NotAnalyzedIcon from 'assets/gfx/icon-not-analyzed.svg?react'
-import styles from './TableHeader.module.scss';
+import { Button, Search } from '@digdir/designsystemet-react';
+import ThemeSelector from './ThemeSelector';
+import MustHandleIcon from 'assets/gfx/icon-must-handle.svg?react';
+import MustCheckIcon from 'assets/gfx/icon-must-check.svg?react';
+import NearbyIcon from 'assets/gfx/icon-nearby.svg?react';
+import NotAnalyzedIcon from 'assets/gfx/icon-not-analyzed.svg?react';
+import ReportIcon from 'assets/gfx/icon-report.svg?react';
+import DownloadIcon from 'assets/gfx/icon-download.svg?react';
+import styles from './ResultTableHeader.module.scss';
 
-export default function TableHeader({ result }) {
-    const statusFilters = useSelector(state => state.app.statusFilters);
-    const dispatch = useDispatch();
-
-    function handleFilterChecked(event) {
-        const { name } = event.target;
-        dispatch(setStatusFilter(name));
-    }
+export default function ResultTableHeader({ 
+    statusFilters, themes, selectedThemes, searchTerm, onStatusFilterSelected, onThemeSelected, onSearchChange }) {
 
     return (
         <div className={styles.tableHeader}>
@@ -24,7 +20,7 @@ export default function TableHeader({ result }) {
                         type="checkbox"
                         name="mustHandle"
                         checked={statusFilters.includes('mustHandle')}
-                        onChange={handleFilterChecked}
+                        onChange={event => onStatusFilterSelected(event.target.name)}
                     />
 
                     <label htmlFor="must-handle-f" className={styles.mustHandle}>
@@ -39,7 +35,7 @@ export default function TableHeader({ result }) {
                         type="checkbox"
                         name="mustCheck"
                         checked={statusFilters.includes('mustCheck')}
-                        onChange={handleFilterChecked}
+                        onChange={event => onStatusFilterSelected(event.target.name)}
                     />
 
                     <label htmlFor="must-check-f" className={styles.mustCheck}>
@@ -54,7 +50,7 @@ export default function TableHeader({ result }) {
                         type="checkbox"
                         name="nearby"
                         checked={statusFilters.includes('nearby')}
-                        onChange={handleFilterChecked}
+                        onChange={event => onStatusFilterSelected(event.target.name)}
                     />
 
                     <label htmlFor="nearby-f" className={styles.nearby}>
@@ -69,7 +65,7 @@ export default function TableHeader({ result }) {
                         type="checkbox"
                         name="notAnalyzed"
                         checked={statusFilters.includes('notAnalyzed')}
-                        onChange={handleFilterChecked}
+                        onChange={event => onStatusFilterSelected(event.target.name)}
                     />
 
                     <label htmlFor="not-analyzed-f" className={styles.notAnalyzed}>
@@ -79,12 +75,40 @@ export default function TableHeader({ result }) {
                 </div>
             </div>
 
-            <div className={styles.themeFilter}>
+            <div className={styles.themeAndSearch}>
+                <ThemeSelector
+                    themes={themes}
+                    selectedThemes={selectedThemes}
+                    onThemeSelected={onThemeSelected}
+                />
 
+                <Search>
+                    <Search.Input
+                        name="search"
+                        value={searchTerm}
+                        onChange={event => onSearchChange(event.target.value)}
+                        aria-label="Søk i tabell"
+                        placeholder="Søk i tabell"
+                        width={320}
+                    />
+                    <Search.Clear />
+                </Search>
             </div>
 
-            <div className={styles.tableSearch}>
-
+            <div className={styles.report}>
+                <Button
+                    data-size="sm"
+                >
+                    <ReportIcon aria-hidden />
+                    Rapport
+                </Button>
+                <Button
+                    variant="secondary"
+                    data-size="sm"
+                >
+                    <DownloadIcon aria-hidden />
+                    Last ned PDF
+                </Button>
             </div>
         </div>
     )
