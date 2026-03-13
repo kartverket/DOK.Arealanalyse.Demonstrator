@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { setErrorMessage } from 'store/slices/appSlice';
 import { resetState } from 'store/slices/analysisSlice';
 import { useMap } from 'context/MapContext';
@@ -16,6 +16,8 @@ import ResultHeader from 'features/ResultHeader';
 import TableHeader from 'features/ResultTableHeader';
 import ResultTable from 'features/ResultTable';
 import ResultTableHeader from 'features/ResultTableHeader';
+import Drawer from 'rc-drawer'
+import { Button } from '@digdir/designsystemet-react';
 
 export default function App() {
     useSocketIO(messageHandlers);
@@ -23,15 +25,42 @@ export default function App() {
     const [fetching, setFetching] = useState(false);
     const dispatch = useDispatch();
     const { clearCache } = useMap();
-    const [selectedThemes, setSelectedThemes] = useState([]);
-    const [searchTerm, setSearchTerm] = useState('');
+    const [drawerOpen, setDrawerOpen] = useState(false)
+    const selectedResultId = useSelector(state => state.app.selectedResultId);
+    const appRef = useRef(null)
+
+    const selectedResult = useMemo(
+        () => {
+            return null;
+        },
+        [selectedResultId, data]
+    );    
+
+    const maskMotion = {
+        motionAppear: true,
+        motionName: 'mask-motion',
+        onAppearEnd: console.warn,
+    };
+
+    
+
+    const motion = placement => ({
+        motionAppear: true,
+        motionName: `panel-motion-${placement}`,
+        motionDeadline: 1000
+    });
+
+    const motionProps = {
+        maskMotion,
+        motion,
+    };
 
     useEffect(
         () => {
-            console.log(selectedThemes, searchTerm)
+            setDrawerOpen(selectedResultId !== null)
         },
-        [selectedThemes, searchTerm]
-    )
+        [selectedResultId]
+    );
 
     function _resetState() {
         setData(null);
@@ -66,7 +95,7 @@ export default function App() {
     }
 
     return (
-        <div className={styles.app}>
+        <div className={styles.app} ref={appRef}>
             <Heading />
 
             <div className={styles.content}>
@@ -91,6 +120,7 @@ export default function App() {
                 {
                     fetching && <Progress />
                 }
+                <Button onClick={() => setDrawerOpen(!drawerOpen)}>Klikk her</Button>
                 {
                     data !== null && (
                         <>
@@ -105,9 +135,8 @@ export default function App() {
 
                             <Result result={data} />
 
-                            
-                            
-                            <General
+
+                            {/* <General
                                 inputGeometryArea={data.inputGeometryArea}
                                 inputGeometry={data.inputGeometry}
                                 municipalityNumber={data.municipalityNumber}
@@ -117,12 +146,23 @@ export default function App() {
                                 factList={data.factList}
                                 report={data.report}
                             />
-                            {/* <ResultList data={data} /> */}
-                            <ResultDialog inputGeometry={data.inputGeometry} />
+                            <ResultList data={data} />
+                            <ResultDialog inputGeometry={data.inputGeometry} /> */}
                         </>
                     )
                 }
                 <Toaster />
+
+                <Drawer
+                    open={drawerOpen}
+                    placement="right"
+                    width="50%"
+                    // getContainer={false}
+                    {...motionProps}
+                >
+                    <h1>Test</h1>
+                    <Button onClick={() => setDrawerOpen(false)}>Lukk</Button>
+                </Drawer>
             </div>
         </div>
     );

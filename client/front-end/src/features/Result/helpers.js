@@ -19,7 +19,7 @@ export function mapResultList(resultList) {
     const mappedResultList = {};
 
     for (const [status, results] of Object.entries(resultList)) {
-        const mappedResults = results.map(resultItem => {            
+        const mappedResults = results.map(resultItem => {
             return {
                 _id: resultItem._tempId,
                 status,
@@ -60,6 +60,50 @@ export function mapResultList(resultList) {
     return mappedResultList;
 }
 
+export function filterResults(results, statusFilters, selectedThemes, searchTerm) {
+    let filtered = [];
+
+    if (statusFilters.includes('mustHandle')) {
+        const resultsByStatus = getResultsByStatuses(results, ['HIT-RED']);
+        filtered.push(...resultsByStatus)
+    }
+
+    if (statusFilters.includes('mustCheck')) {
+        const resultsByStatus = getResultsByStatuses(results, [
+            'HIT-YELLOW',
+            'NO-HIT-YELLOW',
+            'TIMEOUT',
+            'ERROR',
+            'NOT-IMPLEMENTED'
+        ]);
+
+        filtered.push(...resultsByStatus)
+    }
+
+    if (statusFilters.includes('nearby')) {
+        const resultsByStatus = getResultsByStatuses(results, ['NO-HIT-GREEN']);
+        filtered.push(...resultsByStatus)
+    }
+
+    if (statusFilters.includes('notAnalyzed')) {
+        const resultsByStatus = getResultsByStatuses(results, ['NOT-RELEVANT']);
+        filtered.push(...resultsByStatus)
+    }
+
+    filtered = filtered
+        .filter(resultItem => resultItem.themes
+            .some(theme => selectedThemes.includes(theme)));
+
+    const normalized = searchTerm.trim().toLowerCase();
+
+    if (normalized !== '') {
+        filtered = filtered
+            .filter(resultItem => resultItem.description.toLowerCase().includes(normalized));
+    }
+
+    return filtered;
+}
+
 export function getResultsByStatuses(resultList, statuses) {
     const results = [];
 
@@ -95,7 +139,7 @@ export function getDistanceFormatted(result) {
     if (result.distanceToObject === 0) {
         return null;
     }
-    
+
     let distance = result.distanceToObject;
 
     if (distance >= 20_000) {

@@ -1,14 +1,103 @@
+.tableContainer {
+    border: 1px solid #E5E7EB;
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 120px;
+
+    &>div {
+        overflow-y: auto;
+        height: 640px;
+    }
+
+    th {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+}
+
 .resultTable {
+    table-layout: fixed;
+    width: 100%;
+
+    tr {
+        cursor: pointer;
+
+        &:last-child td {
+            border-bottom: 1px solid transparent;
+        }
+    }
+
     th {
         font-size: 12px;
         font-weight: 600;
         text-transform: uppercase;
+        background-color: rgb(252 252 253);
+        border-bottom: 1px solid #E5E7EB;
         color: #6A7282;
+        padding: 16px;
+        line-height: 1.25;
+
+        &:nth-child(1) {
+            width: 90px;
+        }
+
+        &:nth-child(2) {
+            width: 192px;
+        }
     }
 
     td {
-        font-size: 16px;
-        height: 72px;
+        color: #101828;
+        border-bottom: 1px solid #E5E7EB;
+        padding: 24px 16px;
+        line-height: 1.25;
+    }
+}
+
+.status span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+
+    svg {
+        width: 14px;
+        height: 14px;
+    }
+
+    &.mustHandle {
+        background-color: #FEF3F2;
+
+        svg {
+            stroke: #F04438;
+        }
+    }
+
+    &.mustCheck {
+        background-color: #FFFAEB;
+
+        svg {
+            stroke: #F79009;
+        }
+    }
+
+    &.nearby {
+        background-color: #ECFDF3;
+
+        svg {
+            stroke: #12B76A;
+        }
+    }
+
+    &.notAnalyzed {
+        background-color: #F2F4F7;
+
+        svg {
+            stroke: #344054;
+        }
     }
 }
 
@@ -23,8 +112,14 @@
     background-color: #F3F4F6;
     color: #4A5565;
     font-size: 12px;
+    font-weight: 500;
     padding: 6px 9px;
     line-height: 1;
+}
+
+.description {
+    font-size: 16px;
+    font-weight: 500;
 }
 
 .hitAreaOrDistance {

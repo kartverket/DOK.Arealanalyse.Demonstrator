@@ -4,12 +4,12 @@ import MustHandleIcon from 'assets/gfx/icon-must-handle.svg?react';
 import MustCheckIcon from 'assets/gfx/icon-must-check.svg?react';
 import NearbyIcon from 'assets/gfx/icon-nearby.svg?react';
 import NotAnalyzedIcon from 'assets/gfx/icon-not-analyzed.svg?react';
-import ReportIcon from 'assets/gfx/icon-report.svg?react';
+import FactInfoIcon from 'assets/gfx/icon-fact-info.svg?react';
 import DownloadIcon from 'assets/gfx/icon-download.svg?react';
 import styles from './ResultTableHeader.module.scss';
 
-export default function ResultTableHeader({ 
-    statusFilters, themes, selectedThemes, searchTerm, onStatusFilterSelected, onThemeSelected, onSearchChange }) {
+export default function ResultTableHeader({
+    result, statusFilters, themes, selectedThemes, searchTerm, onStatusFilterSelected, onThemeSelected, onSearchChange }) {
 
     return (
         <div className={styles.tableHeader}>
@@ -94,22 +94,33 @@ export default function ResultTableHeader({
                     <Search.Clear />
                 </Search>
             </div>
-
-            <div className={styles.report}>
-                <Button
-                    data-size="sm"
-                >
-                    <ReportIcon aria-hidden />
-                    Rapport
-                </Button>
-                <Button
-                    variant="secondary"
-                    data-size="sm"
-                >
-                    <DownloadIcon aria-hidden />
-                    Last ned PDF
-                </Button>
-            </div>
+            {
+                result.factList.length > 0 || result.report !== null ?
+                    <div className={styles.buttons}>
+                        {
+                            result.factList.length > 0 && (
+                                <Button
+                                    data-size="sm"
+                                >
+                                    <FactInfoIcon aria-hidden />
+                                    Faktainformasjon
+                                </Button>
+                            )
+                        }
+                        {
+                            result.report !== null && (
+                                <Button
+                                    variant="secondary"
+                                    data-size="sm"
+                                >
+                                    <DownloadIcon aria-hidden />
+                                    Last ned rapport
+                                </Button>
+                            )
+                        }
+                    </div> :
+                    null
+            }
         </div>
     )
 }

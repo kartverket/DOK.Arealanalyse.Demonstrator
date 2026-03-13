@@ -3,8 +3,10 @@
 @use './reset';
 @use '../../node_modules/ol/ol.css';
 @use '../../node_modules/pretty-print-json/dist/css/pretty-print-json.css';
+@use '../../node_modules/rc-drawer/assets/index.css';
 @use './fonts';
 @use './overrides';
+@use './drawer';
 
 html {
     font-family: 'Inter';
@@ -13,7 +15,7 @@ html {
 
 body {
     background-color: #ffffff;
-    overflow-y: scroll;
+    // overflow-y: scroll;
 }
 
 h1 {

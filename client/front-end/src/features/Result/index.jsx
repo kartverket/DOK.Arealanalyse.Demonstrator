@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDebounce } from 'hooks';
-import { getResultsByStatuses, getThemes, mapResultList } from './helpers';
+import { filterResults, getResultsByStatuses, getThemes, mapResultList } from './helpers';
 import { ResultHeader, ResultTable, ResultTableHeader } from 'features';
 import styles from './Result.module.scss';
 
@@ -13,49 +13,7 @@ export default function Result({ result }) {
     const mappedResults = useMemo(() => mapResultList(result.resultList), [result.resultList]);
 
     const filteredResult = useMemo(
-        () => {
-            let filtered = [];
-
-            if (statusFilters.includes('mustHandle')) {
-                const results = getResultsByStatuses(mappedResults, ['HIT-RED']);
-                filtered.push(...results)
-            }
-
-            if (statusFilters.includes('mustCheck')) {
-                const results = getResultsByStatuses(mappedResults, [
-                    'HIT-YELLOW',
-                    'NO-HIT-YELLOW',
-                    'TIMEOUT',
-                    'ERROR',
-                    'NOT-IMPLEMENTED'
-                ]);
-
-                filtered.push(...results)
-            }
-
-            if (statusFilters.includes('nearby')) {
-                const results = getResultsByStatuses(mappedResults, ['NO-HIT-GREEN']);
-                filtered.push(...results)
-            }
-
-            if (statusFilters.includes('notAnalyzed')) {
-                const results = getResultsByStatuses(mappedResults, ['NOT-RELEVANT']);
-                filtered.push(...results)
-            }
-
-            filtered = filtered
-                .filter(resultItem => resultItem.themes
-                    .some(theme => selectedThemes.includes(theme)));
-
-            const searchTerm = debouncedSearchTerm.trim().toLowerCase();
-
-            if (searchTerm !== '') {
-                filtered = filtered
-                    .filter(resultItem => resultItem.description.toLowerCase().includes(searchTerm));
-            }
-
-            return filtered;
-        },
+        () => filterResults(mappedResults, statusFilters, selectedThemes, debouncedSearchTerm),
         [statusFilters, selectedThemes, debouncedSearchTerm, mappedResults]
     );
 
@@ -80,6 +38,7 @@ export default function Result({ result }) {
             />
 
             <ResultTableHeader
+                result={result}
                 statusFilters={statusFilters}
                 themes={themes}
                 selectedThemes={selectedThemes}
@@ -89,7 +48,9 @@ export default function Result({ result }) {
                 onSearchChange={setSearchTerm}
             />
 
-            <ResultTable result={filteredResult} />
+            <ResultTable 
+                result={filteredResult} 
+            />
         </div>
     );
 }
