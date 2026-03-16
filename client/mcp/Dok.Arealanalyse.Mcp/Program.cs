@@ -30,7 +30,7 @@ services.AddHttpClient<EiendomClient>(client =>
 
 services
     .AddMcpServer()
-    .WithHttpTransport()
+    .WithHttpTransport(options => options.Stateless = true)
     .WithToolsFromAssembly(typeof(Tools).Assembly);
 
 var app = builder.Build();
