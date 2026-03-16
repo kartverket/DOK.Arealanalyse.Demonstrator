@@ -1,3 +1,4 @@
+using Dok.Arealanalyse.Mcp.Models;
 using System.Text.Json.Nodes;
 
 namespace Dok.Arealanalyse.Mcp.Clients;
@@ -39,8 +40,7 @@ public sealed class PlanDataClient(HttpClient httpClient, ILogger<PlanDataClient
 
         if (!response.IsSuccessStatusCode)
         {
-            logger.LogDebug("Server-side filter returned {StatusCode} for stage {Stage}, falling back to client-side",
-                (int)response.StatusCode, stage);
+            logger.LogDebug("Server-side filter returned {StatusCode} for stage {Stage}, falling back to client-side", (int)response.StatusCode, stage);
             return await TryGetPlanClientSideAsync(stage, kommunenummer, planId, ct);
         }
 
@@ -113,5 +113,3 @@ public sealed class PlanDataClient(HttpClient httpClient, ILogger<PlanDataClient
         return null;
     }
 }
-
-public record PlanResult(JsonNode Geometry, string PlanName, string PlanType, string LifecycleStage);

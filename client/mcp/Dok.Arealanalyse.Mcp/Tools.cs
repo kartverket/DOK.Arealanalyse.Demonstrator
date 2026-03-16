@@ -1,4 +1,5 @@
 using Dok.Arealanalyse.Mcp.Clients;
+using Dok.Arealanalyse.Mcp.Models;
 using ModelContextProtocol.Server;
 using System.ComponentModel;
 using System.Text.Json.Nodes;
@@ -72,10 +73,10 @@ public static class Tools
         return DokApiClient.PrettyJson(summary.ToJsonString());
     }
 
-    [McpServerTool, Description("Run DOK arealanalyse for a property (eiendom). Fetches teig geometry from WFS and passes it to DOK analysis. Returns analysis results with a reportUrl field containing a link to the generated PDF report.")]
+    [McpServerTool, Description("Run DOK arealanalyse for a property (eiendom). Fetches property geometry from api.kartverket.no/eiendom and passes it to DOK analysis. Returns analysis results with a reportUrl field containing a link to the generated PDF report.")]
     public static async Task<string> AnalyzeByEiendom(
         DokApiClient apiClient,
-        TeigWfsClient teigWfsClient,
+        EiendomClient eiendomClient,
         [Description("Municipality number (kommunenummer), e.g. '4020'")] string kommunenummer,
         [Description("Farm number (gårdsnummer), e.g. 56")] int gardsnummer,
         [Description("Property number (bruksnummer), e.g. 65")] int bruksnummer,
@@ -90,46 +91,45 @@ public static class Tools
         [Description("Include factual information")] bool includeFacts = true,
         CancellationToken cancellationToken = default)
     {
-        TeigResult? teig;
+        EiendomResult? eiendom;
 
         try
         {
-            teig = await teigWfsClient.GetTeigAsync(kommunenummer, gardsnummer, bruksnummer, festenummer, seksjonsnummer, cancellationToken);
+            eiendom = await eiendomClient.GetEiendomAsync(kommunenummer, gardsnummer, bruksnummer, festenummer, seksjonsnummer, cancellationToken);
         }
         catch (HttpRequestException ex)
         {
-            return $"Failed to fetch property geometry from WFS (wfs.geonorge.no): {ex.Message}";
+            return $"Failed to fetch property geometry from Kartverket (api.kartverket.no): {ex.Message}";
         }
         catch (TaskCanceledException)
         {
-            return "Request to WFS (wfs.geonorge.no) timed out while fetching property geometry.";
+            return "Request to Kartverket (api.kartverket.no) timed out while fetching property geometry.";
         }
 
-        if (teig is null)
-            return $"No teig found for eiendom {kommunenummer}/{gardsnummer}/{bruksnummer}.";
+        if (eiendom is null)
+            return $"No property found for eiendom {kommunenummer}/{gardsnummer}/{bruksnummer}.";
 
         string response;
 
         try
         {
-            var payload = BuildAnalysisPayload(teig.Geometry, $"EPSG::{teig.Epsg}", requestedBuffer, context, theme, includeGuidance, includeQualityMeasurement, includeFilterChosenDOK, includeFacts);
+            var payload = BuildAnalysisPayload(eiendom.Geometry, "EPSG::4326", requestedBuffer, context, theme, includeGuidance, includeQualityMeasurement, includeFilterChosenDOK, includeFacts);
             response = await apiClient.AnalyzeAsync(payload, null, cancellationToken);
         }
         catch (HttpRequestException ex)
         {
-            return $"Property {teig.MatrikkelnummerTekst} was found, but the DOK analysis request failed: {ex.Message}";
+            return $"Property {eiendom.MatrikkelnummerTekst} was found, but the DOK analysis request failed: {ex.Message}";
         }
         catch (TaskCanceledException)
         {
-            return $"Property {teig.MatrikkelnummerTekst} was found, but the DOK analysis request timed out.";
+            return $"Property {eiendom.MatrikkelnummerTekst} was found, but the DOK analysis request timed out.";
         }
 
         var analysisNode = JsonNode.Parse(response);
 
         var summary = new JsonObject
         {
-            ["matrikkelnummer"] = teig.MatrikkelnummerTekst,
-            ["teigCount"] = teig.TeigCount,
+            ["matrikkelnummer"] = eiendom.MatrikkelnummerTekst,
             ["reportUrl"] = analysisNode?["report"]?.GetValue<string>(),
             ["analysis"] = analysisNode
         };

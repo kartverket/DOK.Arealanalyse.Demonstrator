@@ -22,10 +22,10 @@ services.AddHttpClient<PlanDataClient>(client =>
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", basicAuthToken);
 });
 
-services.AddHttpClient<TeigWfsClient>(client =>
+services.AddHttpClient<EiendomClient>(client =>
 {
-    client.BaseAddress = new Uri($"{configuration["TEIG_WFS_URL"]}");
-    client.Timeout = TimeSpan.FromMinutes(2);
+    client.BaseAddress = new Uri($"{configuration["Kartverket:EiendomApiUrl"]}/");
+    client.Timeout = TimeSpan.FromSeconds(30);
 });
 
 services
