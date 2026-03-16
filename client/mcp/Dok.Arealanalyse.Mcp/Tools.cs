@@ -24,13 +24,40 @@ public static class Tools
         [Description("Include factual information")] bool includeFacts = true,
         CancellationToken cancellationToken = default)
     {
-        var plan = await planDataClient.GetPlanAsync(kommunenummer, planId, lifecycleStage, cancellationToken);
+        PlanResult? plan;
+
+        try
+        {
+            plan = await planDataClient.GetPlanAsync(kommunenummer, planId, lifecycleStage, cancellationToken);
+        }
+        catch (HttpRequestException ex)
+        {
+            return $"Failed to fetch plan geometry from PlanData (plandata.ft.dibk.no): {ex.Message}";
+        }
+        catch (TaskCanceledException)
+        {
+            return "Request to PlanData (plandata.ft.dibk.no) timed out while fetching plan geometry.";
+        }
 
         if (plan is null)
             return $"No plan found with planId '{planId}' in kommune '{kommunenummer}'.";
 
-        var payload = BuildAnalysisPayload(plan.Geometry, "EPSG::4326", requestedBuffer, context, theme, includeGuidance, includeQualityMeasurement, includeFilterChosenDOK, includeFacts);
-        var response = await apiClient.AnalyzeAsync(payload, null, cancellationToken);
+        string response;
+
+        try
+        {
+            var payload = BuildAnalysisPayload(plan.Geometry, "EPSG::4326", requestedBuffer, context, theme, includeGuidance, includeQualityMeasurement, includeFilterChosenDOK, includeFacts);
+            response = await apiClient.AnalyzeAsync(payload, null, cancellationToken);
+        }
+        catch (HttpRequestException ex)
+        {
+            return $"Plan '{plan.PlanName}' was found, but the DOK analysis request failed: {ex.Message}";
+        }
+        catch (TaskCanceledException)
+        {
+            return $"Plan '{plan.PlanName}' was found, but the DOK analysis request timed out.";
+        }
+
         var analysisNode = JsonNode.Parse(response);
 
         var summary = new JsonObject
@@ -63,13 +90,40 @@ public static class Tools
         [Description("Include factual information")] bool includeFacts = true,
         CancellationToken cancellationToken = default)
     {
-        var teig = await teigWfsClient.GetTeigAsync(kommunenummer, gardsnummer, bruksnummer, festenummer, seksjonsnummer, cancellationToken);
+        TeigResult? teig;
+
+        try
+        {
+            teig = await teigWfsClient.GetTeigAsync(kommunenummer, gardsnummer, bruksnummer, festenummer, seksjonsnummer, cancellationToken);
+        }
+        catch (HttpRequestException ex)
+        {
+            return $"Failed to fetch property geometry from WFS (wfs.geonorge.no): {ex.Message}";
+        }
+        catch (TaskCanceledException)
+        {
+            return "Request to WFS (wfs.geonorge.no) timed out while fetching property geometry.";
+        }
 
         if (teig is null)
             return $"No teig found for eiendom {kommunenummer}/{gardsnummer}/{bruksnummer}.";
 
-        var payload = BuildAnalysisPayload(teig.Geometry, $"EPSG::{teig.Epsg}", requestedBuffer, context, theme, includeGuidance, includeQualityMeasurement, includeFilterChosenDOK, includeFacts);
-        var response = await apiClient.AnalyzeAsync(payload, null, cancellationToken);
+        string response;
+
+        try
+        {
+            var payload = BuildAnalysisPayload(teig.Geometry, $"EPSG::{teig.Epsg}", requestedBuffer, context, theme, includeGuidance, includeQualityMeasurement, includeFilterChosenDOK, includeFacts);
+            response = await apiClient.AnalyzeAsync(payload, null, cancellationToken);
+        }
+        catch (HttpRequestException ex)
+        {
+            return $"Property {teig.MatrikkelnummerTekst} was found, but the DOK analysis request failed: {ex.Message}";
+        }
+        catch (TaskCanceledException)
+        {
+            return $"Property {teig.MatrikkelnummerTekst} was found, but the DOK analysis request timed out.";
+        }
+
         var analysisNode = JsonNode.Parse(response);
 
         var summary = new JsonObject
@@ -108,7 +162,21 @@ public static class Tools
             throw new ArgumentException("payloadJson must be valid JSON.", nameof(payloadJson), ex);
         }
 
-        var response = await apiClient.AnalyzeAsync(payload, correlationId, cancellationToken);
+        string response;
+
+        try
+        {
+            response = await apiClient.AnalyzeAsync(payload, correlationId, cancellationToken);
+        }
+        catch (HttpRequestException ex)
+        {
+            return $"DOK analysis request failed: {ex.Message}";
+        }
+        catch (TaskCanceledException)
+        {
+            return "DOK analysis request timed out.";
+        }
+
         return DokApiClient.PrettyJson(response);
     }
 
