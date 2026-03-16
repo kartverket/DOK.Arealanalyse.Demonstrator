@@ -1,6 +1,6 @@
 .tableContainer {
     border: 1px solid #E5E7EB;
-    border-radius: 16px;
+    border-radius: var(--ds-border-radius-lg);
     overflow: hidden;
     margin-bottom: 120px;
 

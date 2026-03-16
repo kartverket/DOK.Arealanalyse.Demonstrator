@@ -16,7 +16,7 @@ export const appSlice = createSlice({
                 ...state,
                 correlationId: action.payload
             };
-        },
+        },     
         setSelectedResult: (state, action) => {
             return {
                 ...state,

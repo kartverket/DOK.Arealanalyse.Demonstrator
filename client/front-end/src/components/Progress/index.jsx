@@ -1,6 +1,6 @@
 import { useSelector } from 'react-redux';
-import { STATUS } from 'utils/progress';
-import { PROGRESS_VARIANT } from 'components/LinearProgress';
+import { STATE_STATUS } from 'utils/progress';
+import { PROGRESS_VARIANT } from 'features/ResultTable/Progress/LinearProgress';
 import { LinearProgress } from 'components';
 import styles from './Progress.module.scss';
 
@@ -12,13 +12,13 @@ export default function Progress() {
         let variant = PROGRESS_VARIANT.DETERMINATE;
         let value = 0;
 
-        if (state.status === STATUS.ANALYZING_DATASETS) {
+        if (state.status === STATE_STATUS.ANALYZING_DATASETS) {
             value = 1 / state.analysesTotal;
-        } else if (state.status === STATUS.DATASET_ANALYZED) {
+        } else if (state.status === STATE_STATUS.DATASET_ANALYZED) {
             value = state.analysisCount / state.analysesTotal;
-        } else if (state.status === STATUS.CREATING_MAP_IMAGES) {
+        } else if (state.status === STATE_STATUS.CREATING_MAP_IMAGES) {
             value = 1 / state.mapImagesTotal;
-        } else if (state.status === STATUS.MAP_IMAGE_CREATED) {
+        } else if (state.status === STATE_STATUS.MAP_IMAGE_CREATED) {
             value = state.mapImageCount / state.mapImagesTotal;
         } else {
             variant = PROGRESS_VARIANT.INDETERMINATE;

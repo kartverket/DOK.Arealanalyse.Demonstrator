@@ -1,20 +1,23 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useDebounce } from 'hooks';
-import { filterResults, getResultsByStatuses, getThemes, mapResultList } from './helpers';
+import { useAnalyses } from 'context/AnalysesContext';
+import { filterResults, getThemes } from './helpers';
 import { ResultHeader, ResultTable, ResultTableHeader } from 'features';
 import styles from './Result.module.scss';
 
-export default function Result({ result }) {
-    const [statusFilters, setStatusFilters] = useState(['mustHandle']);
-    const [selectedThemes, setSelectedThemes] = useState(['Alle', ...getThemes(result.resultList)]);
+export default function Result() {
+    const analyses = useAnalyses();
+    const result = analyses.result || {}
+    const resultList = analyses.resultList || {};
+    const [statusFilters, setStatusFilters] = useState([]);
+    const [selectedThemes, setSelectedThemes] = useState(['Alle', ...getThemes(resultList)]);
     const [searchTerm, setSearchTerm] = useState('');
     const debouncedSearchTerm = useDebounce(searchTerm, 500);
-    const themes = useMemo(() => getThemes(result.resultList), [result.resultList]);
-    const mappedResults = useMemo(() => mapResultList(result.resultList), [result.resultList]);
+    const themes = useMemo(() => getThemes(resultList), [resultList]);
 
     const filteredResult = useMemo(
-        () => filterResults(mappedResults, statusFilters, selectedThemes, debouncedSearchTerm),
-        [statusFilters, selectedThemes, debouncedSearchTerm, mappedResults]
+        () => filterResults(result, statusFilters, selectedThemes, debouncedSearchTerm),
+        [statusFilters, selectedThemes, debouncedSearchTerm, result]
     );
 
     function handleStatusFilterSelected(filter) {

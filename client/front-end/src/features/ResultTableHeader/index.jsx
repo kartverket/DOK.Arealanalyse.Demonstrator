@@ -1,3 +1,5 @@
+import { useAnalyses } from 'context/AnalysesContext';
+import { isEmptyObject } from 'utils/helpers';
 import { Button, Search } from '@digdir/designsystemet-react';
 import ThemeSelector from './ThemeSelector';
 import MustHandleIcon from 'assets/gfx/icon-must-handle.svg?react';
@@ -10,6 +12,16 @@ import styles from './ResultTableHeader.module.scss';
 
 export default function ResultTableHeader({
     result, statusFilters, themes, selectedThemes, searchTerm, onStatusFilterSelected, onThemeSelected, onSearchChange }) {
+    const { busy } = useAnalyses();    
+    const disabled = busy || isEmptyObject(result);
+
+    function hasFactInfo() {
+        return Array.isArray(result.factList) && result.factList.length > 0;
+    }
+
+    function hasReport() {
+        return typeof result.report === 'string';
+    }
 
     return (
         <div className={styles.tableHeader}>
@@ -21,6 +33,7 @@ export default function ResultTableHeader({
                         name="mustHandle"
                         checked={statusFilters.includes('mustHandle')}
                         onChange={event => onStatusFilterSelected(event.target.name)}
+                        disabled={disabled}
                     />
 
                     <label htmlFor="must-handle-f" className={styles.mustHandle}>
@@ -36,6 +49,7 @@ export default function ResultTableHeader({
                         name="mustCheck"
                         checked={statusFilters.includes('mustCheck')}
                         onChange={event => onStatusFilterSelected(event.target.name)}
+                        disabled={disabled}
                     />
 
                     <label htmlFor="must-check-f" className={styles.mustCheck}>
@@ -51,6 +65,7 @@ export default function ResultTableHeader({
                         name="nearby"
                         checked={statusFilters.includes('nearby')}
                         onChange={event => onStatusFilterSelected(event.target.name)}
+                        disabled={disabled}
                     />
 
                     <label htmlFor="nearby-f" className={styles.nearby}>
@@ -66,6 +81,7 @@ export default function ResultTableHeader({
                         name="notAnalyzed"
                         checked={statusFilters.includes('notAnalyzed')}
                         onChange={event => onStatusFilterSelected(event.target.name)}
+                        disabled={disabled}
                     />
 
                     <label htmlFor="not-analyzed-f" className={styles.notAnalyzed}>
@@ -90,37 +106,30 @@ export default function ResultTableHeader({
                         aria-label="Søk i tabell"
                         placeholder="Søk i tabell"
                         width={320}
+                        className={styles.search}
+                        disabled={disabled}
                     />
                     <Search.Clear />
                 </Search>
             </div>
-            {
-                result.factList.length > 0 || result.report !== null ?
-                    <div className={styles.buttons}>
-                        {
-                            result.factList.length > 0 && (
-                                <Button
-                                    data-size="sm"
-                                >
-                                    <FactInfoIcon aria-hidden />
-                                    Faktainformasjon
-                                </Button>
-                            )
-                        }
-                        {
-                            result.report !== null && (
-                                <Button
-                                    variant="secondary"
-                                    data-size="sm"
-                                >
-                                    <DownloadIcon aria-hidden />
-                                    Last ned rapport
-                                </Button>
-                            )
-                        }
-                    </div> :
-                    null
-            }
+
+            <div className={styles.buttons}>
+                <Button
+                    data-size="sm"
+                    disabled={!hasFactInfo() || disabled}
+                >
+                    <FactInfoIcon aria-hidden />
+                    Faktainformasjon
+                </Button>
+                <Button
+                    variant="secondary"
+                    data-size="sm"
+                    disabled={!hasReport() || disabled}
+                >
+                    <DownloadIcon aria-hidden />
+                    Last ned rapport
+                </Button>
+            </div>
         </div>
     )
 }

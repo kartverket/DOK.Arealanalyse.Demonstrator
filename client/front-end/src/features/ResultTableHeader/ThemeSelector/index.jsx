@@ -44,6 +44,7 @@ export default function ThemeSelector({ themes, selectedThemes, onThemeSelected 
             <Dropdown.Trigger 
                 variant="secondary"
                 className={styles.dropdownTrigger}
+                disabled={true}
             >
                 <span>
                     Tema: {buttonText}

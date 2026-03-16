@@ -36,14 +36,16 @@ export async function validate(geoJson) {
     }
 }
 
-export async function analyze(payload, correlationId) {
+export async function analyze(payload) {
     const url = `${API_BASE_URL}/pygeoapi`;
-    const data = { ...payload, correlationId };
-    const response = await axios.post(url, data);
 
-    await addLastStep()
-
-    return response.data;
+    try {
+        const response = await axios.post(url, payload);
+        return response.data;
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
 }
 
 async function addLastStep() {

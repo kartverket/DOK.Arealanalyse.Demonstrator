@@ -59,6 +59,11 @@
             border-radius: 16px;
             cursor: pointer;
         }
+
+        input[disabled]+label {
+            cursor: not-allowed;
+            opacity: var(--ds-opacity-disabled);
+        }
     }
 }
 
@@ -73,6 +78,10 @@
             max-height: 360px;
             overflow-y: auto;
         }
+    }
+
+    div:has(.search[disabled])::before {
+        opacity: var(--ds-opacity-disabled);
     }
 }
 

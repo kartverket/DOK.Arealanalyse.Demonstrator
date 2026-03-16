@@ -1,0 +1,75 @@
+.progressContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px dashed #8E8E8E;
+    border-radius: var(--ds-border-radius-lg);
+    background-color: #FCFCFC;
+    margin-bottom: 120px;
+    height: 642px;
+}
+
+.progress {
+    display: flex;
+    width: 672px;
+    height: 400px;
+    background-color: #ffffff;
+}
+
+.statuses {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    font-family: 'Manrope';
+    font-weight: 500;
+    width: 448px;
+
+    .status {
+        display: flex;
+        align-items: center;
+
+        .icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border: 1px solid;
+            border-radius: var(--ds-border-radius-sm);
+            color: #0F172B;
+            font-size: 12px;
+            margin-right: 12px;
+        }
+
+        &.notStarted {
+            color: #5B5B5B;
+
+            .icon {
+                border-color: #E2E8F0;
+                background-color: #F8FAFC;
+                color: #CAD5E2;
+            }
+        }
+
+        &.inProgress .icon {
+            border-color: #1C75D2;
+            color: #1C75D2;
+        }
+
+        &.done .icon {
+            border-color: #1C75D2;
+            background: url('../../../assets/gfx/icon-checkmark.svg') no-repeat center;
+            background-color: #1C75D2;
+        }
+
+        > div {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+
+            .progressBar {
+
+            }
+        }
+    }
+}

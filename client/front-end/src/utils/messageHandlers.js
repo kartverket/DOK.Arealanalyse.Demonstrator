@@ -1,5 +1,5 @@
 import store from 'store';
-import { updateState } from 'store/slices/analysisSlice';
+import { updateState } from 'store/slices/progressSlice';
 import { setCorrelationId } from 'store/slices/appSlice';
 
 const messageHandlers = new Map();

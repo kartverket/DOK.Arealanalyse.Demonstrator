@@ -10,18 +10,21 @@ import 'config/projections.config';
 import 'config/extents.config';
 import 'config/chartjs.config';
 import 'styles/styles.scss';
+import AnalysesProvider from 'context/AnalysesContext/index.jsx';
 
 const root = document.getElementById('root');
 
 ReactDOM.createRoot(root).render(
-   <React.StrictMode>
-      <Provider store={store}>
-         <ThemeProvider theme={theme}>
-            <MapProvider>
-               <App />
-            </MapProvider>
-         </ThemeProvider>
-      </Provider>
-   </React.StrictMode>
+    <React.StrictMode>
+        <Provider store={store}>
+            <ThemeProvider theme={theme}>
+                <MapProvider>
+                    <AnalysesProvider>
+                        <App />
+                    </AnalysesProvider>
+                </MapProvider>
+            </ThemeProvider>
+        </Provider>
+    </React.StrictMode>
 );
 

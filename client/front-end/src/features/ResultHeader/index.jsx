@@ -1,3 +1,5 @@
+import { useAnalyses } from 'context/AnalysesContext';
+import { isEmptyObject } from 'utils/helpers';
 import PointIcon from 'assets/gfx/icon-point.svg?react';
 import AreaIcon from 'assets/gfx/icon-area.svg?react'
 import MustHandleIcon from 'assets/gfx/icon-must-handle.svg?react'
@@ -6,31 +8,43 @@ import NearbyIcon from 'assets/gfx/icon-nearby.svg?react'
 import NotAnalyzedIcon from 'assets/gfx/icon-not-analyzed-2.svg?react'
 import styles from './ResultHeader.module.scss';
 
-export default function ResultHeader({ result, statusFilters, onStatusFilterSelected  }) {
-    function getCount(restultStatuses) {
-        return restultStatuses.reduce((accumulator, resultStatus) => {
-            const grouping = result.resultList[resultStatus];
+export default function ResultHeader({ result, statusFilters, onStatusFilterSelected }) {
+    const { busy } = useAnalyses();
+    const resultList = result.resultList || {};
+    const disabled = busy || isEmptyObject(result);
+
+    function getCount(resultStatuses) {
+        if (disabled) {
+            return '-';
+        }
+
+        return resultStatuses.reduce((accumulator, resultStatus) => {
+            const grouping = resultList[resultStatus];
             return grouping ? accumulator + grouping.length : accumulator + 0;
         }, 0);
     }
 
     return (
         <div className={styles.resultHeader}>
-            <div className={styles.inputArea}>
-                <span>Analyseområde</span>
-                <h2>{result.municipalityName}</h2>
+            {
+                !disabled && (
+                    <div className={styles.inputArea}>
+                        <span>Analyseområde</span>
+                        <h2>{result.municipalityName}</h2>
 
-                <div>
-                    <span>
-                        <PointIcon />
-                        {result.municipalityNumber}
-                    </span>
-                    <span>
-                        <AreaIcon />
-                        {Math.round(result.inputGeometryArea).toLocaleString('nb-NO')} m²
-                    </span>
-                </div>
-            </div>
+                        <div>
+                            <span>
+                                <PointIcon />
+                                {result.municipalityNumber}
+                            </span>
+                            <span>
+                                <AreaIcon />
+                                {Math.round(result.inputGeometryArea).toLocaleString('nb-NO')} m²
+                            </span>
+                        </div>
+                    </div>
+                )
+            }
 
             <div className={styles.cards}>
                 <div className={styles.card}>
@@ -40,6 +54,7 @@ export default function ResultHeader({ result, statusFilters, onStatusFilterSele
                         name="mustHandle"
                         checked={statusFilters.includes('mustHandle')}
                         onChange={event => onStatusFilterSelected(event.target.name)}
+                        disabled={disabled}
                     />
 
                     <label htmlFor="must-handle" className={styles.mustHandle}>
@@ -58,6 +73,7 @@ export default function ResultHeader({ result, statusFilters, onStatusFilterSele
                         name="mustCheck"
                         checked={statusFilters.includes('mustCheck')}
                         onChange={event => onStatusFilterSelected(event.target.name)}
+                        disabled={disabled}
                     />
 
                     <label htmlFor="must-check" className={styles.mustCheck}>
@@ -74,8 +90,9 @@ export default function ResultHeader({ result, statusFilters, onStatusFilterSele
                         id="nearby"
                         type="checkbox"
                         name="nearby"
-                        checked={statusFilters.includes('nearby')}                        
+                        checked={statusFilters.includes('nearby')}
                         onChange={event => onStatusFilterSelected(event.target.name)}
+                        disabled={disabled}
                     />
 
                     <label htmlFor="nearby" className={styles.nearby}>
@@ -92,8 +109,9 @@ export default function ResultHeader({ result, statusFilters, onStatusFilterSele
                         id="not-analyzed"
                         type="checkbox"
                         name="notAnalyzed"
-                        checked={statusFilters.includes('notAnalyzed')}                        
+                        checked={statusFilters.includes('notAnalyzed')}
                         onChange={event => onStatusFilterSelected(event.target.name)}
+                        disabled={disabled}
                     />
 
                     <label htmlFor="not-analyzed" className={styles.notAnalyzed}>

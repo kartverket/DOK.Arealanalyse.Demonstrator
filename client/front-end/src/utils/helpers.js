@@ -33,10 +33,6 @@ export function parseJson(json) {
     }
 }
 
-export function createRandomId() {
-    return `_${Math.floor(Math.random() * Math.floor(Math.random() * Date.now()))}`;
-}
-
 export function debounce(func, delay) {
     let timeoutId;
 
@@ -55,4 +51,12 @@ export function capitalizeFirstLetter(str) {
     }
 
     return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+export function isEmptyObject(value) {
+    return (
+        value != null &&
+        typeof value === 'object' &&
+        Object.keys(value).length === 0
+    );
 }
