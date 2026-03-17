@@ -20,11 +20,7 @@ export default function useSocketIO(messageHandlers) {
             });
 
             initRef.current = false;
-
-            socket.on('connect', () => {
-                dispatch(setCorrelationId(socket.id));
-            });
-
+            
             socket.on('disconnect', () => {
                 dispatch(setCorrelationId(null));
             });

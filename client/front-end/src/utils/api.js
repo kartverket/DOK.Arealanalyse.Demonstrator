@@ -38,8 +38,8 @@ export async function validate(geoJson) {
 
 export async function analyze(payload, correlationId) {
     const url = `${API_BASE_URL}/pygeoapi`;
-    const headers = { 'x-correlation-id': correlationId };
-    const response = await axios.post(url, payload, { headers });
+    const data = { ...payload, correlationId };
+    const response = await axios.post(url, data);
 
     await addLastStep()
 
@@ -50,8 +50,8 @@ async function addLastStep() {
     return new Promise((resolve) => {
         store.dispatch(addStep())
 
-        setTimeout(() => {            
+        setTimeout(() => {
             resolve();
         }, 1000)
-    }); 
+    });
 }

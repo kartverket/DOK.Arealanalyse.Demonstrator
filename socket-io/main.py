@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
+from uuid import uuid4
 import multiprocessing
+from typing import Dict, Any
 import socketio
 import uvicorn
 from fastapi import FastAPI
@@ -27,37 +29,58 @@ app.add_middleware(
 
 
 @sio.on('connect')
-async def connect(sid, *args):
+async def connect(sid, *args) -> None:
+    await sio.emit('client_connected', str(uuid4()), sid)
     print(f'Client connected: {str(sid)}')
 
 
 @sio.on('disconnect')
-async def disconnect(sid):
+async def disconnect(sid) -> None:
     print(f'Client disconnected: {str(sid)}')
 
 
 @sio.on('datasets_counted_api')
-async def datasets_counted(_, data):
-    await sio.emit('datasets_counted', data['count'], data['recipient'])
+async def datasets_counted(_, data: Dict[str, Any]) -> None:
+    recipient = data.pop('recipient')
+
+    await sio.emit('datasets_counted', data, recipient)
 
 
 @sio.on('dataset_analyzed_api')
-async def dataset_analyzed(_, data):
-    await sio.emit('dataset_analyzed', data['dataset'], data['recipient'])
+async def dataset_analyzed(_, data: Dict[str, Any]) -> None:
+    recipient = data.pop('recipient')
+
+    await sio.emit('dataset_analyzed', data, recipient)
 
 
 @sio.on('create_fact_sheet_api')
-async def create_fact_sheet(_, data):
+async def create_fact_sheet(_, data: Dict[str, Any]) -> None:
     await sio.emit('create_fact_sheet', None, data['recipient'])
 
 
+@sio.on('state_updated_api')
+async def state_updated(_, data: Dict[str, Any]) -> None:
+    recipient = data['recipient']
+
+    await sio.emit('state_updated', data, recipient)
+
+
 @sio.on('create_map_images_api')
-async def create_fact_sheet(_, data):
-    await sio.emit('create_map_images', None, data['recipient'])
+async def create_fact_sheet(_, data: Dict[str, Any]) -> None:
+    recipient = data.pop('recipient')
+
+    await sio.emit('create_map_images', data, recipient)
+
+
+@sio.on('map_image_created_api')
+async def create_fact_sheet(_, data: Dict[str, Any]) -> None:
+    recipient = data.pop('recipient')
+
+    await sio.emit('map_image_created', data, recipient)
 
 
 @sio.on('create_report_api')
-async def create_fact_sheet(_, data):
+async def create_fact_sheet(_, data: Dict[str, Any]) -> None:
     await sio.emit('create_report', None, data['recipient'])
 
 
