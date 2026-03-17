@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { setErrorMessage } from 'store/slices/appSlice';
 import { resetState } from 'store/slices/analysisSlice';
 import { useMap } from 'context/MapContext';
@@ -9,7 +9,7 @@ import { General, Form, ResultDialog, ResultList } from 'features';
 import { Heading, Progress, Toaster } from 'components';
 import groupBy from 'lodash.groupby';
 import useSocketIO from 'hooks/useSocketIO';
-import messageHandlers from 'config/messageHandlers';
+import messageHandlers from 'utils/messageHandlers';
 import styles from './App.module.scss';
 import { CheckmarkIcon } from '@navikt/aksel-icons';
 
@@ -18,7 +18,6 @@ export default function App() {
     const [data, setData] = useState(null);
     const [fetching, setFetching] = useState(false);
     const dispatch = useDispatch();
-    const correlationId = useSelector(state => state.app.correlationId);
     const { clearCache } = useMap();
 
     function _resetState() {
@@ -32,7 +31,7 @@ export default function App() {
 
         try {
             setFetching(true);
-            const response = await analyze(payload, correlationId);
+            const response = await analyze(payload);
 
             if (response?.code) {
                 dispatch(setErrorMessage('Kunne ikke kjøre DOK-analyse. En feil har oppstått.'));
