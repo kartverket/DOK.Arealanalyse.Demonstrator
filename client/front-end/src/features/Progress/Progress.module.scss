@@ -11,14 +11,27 @@
 
 .progress {
     display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     width: 672px;
     height: 400px;
     background-color: #ffffff;
+
+    h3 {
+        font-family: 'Manrope';
+        font-size: 18px;
+        font-weight: 600;
+        margin: 0 0 8px 0;
+    }
 }
 
 .statuses {
     display: flex;
     flex-direction: column;
+    border-top: 1px solid #F1F5F9;
+    border-bottom: 1px solid #F1F5F9;
+    padding: 16px 0;
     gap: 16px;
     font-family: 'Manrope';
     font-weight: 500;
@@ -63,14 +76,14 @@
             background-color: #1C75D2;
         }
 
-        > div {
+        >div {
             display: flex;
             flex-direction: column;
             position: relative;
             flex: 1;
 
             .progressBar {
-                position: absolute;                
+                position: absolute;
                 bottom: -16px;
                 width: 100%;
             }

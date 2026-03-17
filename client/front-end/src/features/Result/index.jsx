@@ -1,59 +1,148 @@
-import { useMemo, useState } from 'react';
-import { useDebounce } from 'hooks';
-import { useAnalyses } from 'context/AnalysesContext';
-import { filterResults, getThemes } from './helpers';
-import { ResultHeader, ResultTable, ResultTableHeader } from 'features';
+import { useDispatch } from 'react-redux';
+import { setSelectedResultId } from 'store/slices/appSlice';
+import { RESULT_STATUS } from 'utils/constants';
+import { Button } from '@digdir/designsystemet-react';
+import { ArrowDownIcon, ArrowUpIcon, ChevronRightDoubleIcon } from '@navikt/aksel-icons';
+import MustHandleIcon from 'assets/gfx/icon-must-handle.svg?react';
+import MustCheckIcon from 'assets/gfx/icon-must-check.svg?react';
+import NearbyIcon from 'assets/gfx/icon-nearby.svg?react';
+import NotAnalyzedIcon from 'assets/gfx/icon-not-analyzed.svg?react';
 import styles from './Result.module.scss';
 
-export default function Result() {
-    const analyses = useAnalyses();
-    const result = analyses.result || {}
-    const resultList = analyses.resultList || {};
-    const [statusFilters, setStatusFilters] = useState([]);
-    const [selectedThemes, setSelectedThemes] = useState(['Alle', ...getThemes(resultList)]);
-    const [searchTerm, setSearchTerm] = useState('');
-    const debouncedSearchTerm = useDebounce(searchTerm, 500);
-    const themes = useMemo(() => getThemes(resultList), [resultList]);
 
-    const filteredResult = useMemo(
-        () => filterResults(result, statusFilters, selectedThemes, debouncedSearchTerm),
-        [statusFilters, selectedThemes, debouncedSearchTerm, result]
-    );
+export default function Result({ result, resultIds }) {
+    const dispatch = useDispatch();
 
-    function handleStatusFilterSelected(filter) {
-        const index = statusFilters.indexOf(filter);
+    function getResultIndex() {
+        return resultIds.indexOf(result.id);
+    }
 
-        if (index === -1) {
-            setStatusFilters([...statusFilters, filter]);
+    function close() {
+        dispatch(setSelectedResultId(0));
+    }
+
+    function goNext() {
+        const index = getResultIndex();
+        let nextId;
+
+        if (index + 1 === resultIds.length) {
+            nextId = resultIds[0];
         } else {
-            const clone = [...statusFilters]
-            clone.splice(index, 1);
-            setStatusFilters(clone);
+            nextId = resultIds[index + 1];
+        }
+
+        dispatch(setSelectedResultId(nextId));
+    }
+
+    function goPrevious() {
+        const index = getResultIndex();
+        let prevId;
+
+        if (index === 0) {
+            prevId = resultIds[resultIds.length - 1];
+        } else {
+            prevId = resultIds[index - 1];
+        }
+
+        dispatch(setSelectedResultId(prevId));
+    }
+
+    function renderStatus() {
+        switch (result.status) {
+            case RESULT_STATUS.HIT_RED:
+                return (
+                    <span className={`${styles.status} ${styles.mustHandle}`}>
+                        <MustHandleIcon />
+                        Må håndteres
+                    </span>
+                );
+            case RESULT_STATUS.HIT_YELLOW:
+            case RESULT_STATUS.NO_HIT_YELLOW:
+            case RESULT_STATUS.NOT_IMPLEMENTED:
+            case RESULT_STATUS.TIMEOUT:
+            case RESULT_STATUS.ERROR:
+                return (
+                    <span className={`${styles.status} ${styles.mustCheck}`}>
+                        <MustCheckIcon />
+                        Må sjekkes
+                    </span>
+                );
+            case RESULT_STATUS.NO_HIT_GREEN:
+                return (
+                    <span className={`${styles.status} ${styles.nearby}`}>
+                        <NearbyIcon />
+                        I nærheten
+                    </span>
+                );
+            case RESULT_STATUS.NOT_RELEVANT:
+                return (
+                    <span className={`${styles.status} ${styles.notAnalyzed}`}>
+                        <NotAnalyzedIcon />
+                        Ikke analysert
+                    </span>
+                );
+            default:
+                return null;
         }
     }
 
     return (
         <div className={styles.result}>
-            <ResultHeader
-                result={result}
-                statusFilters={statusFilters}
-                onStatusFilterSelected={handleStatusFilterSelected}
-            />
+            <div className={styles.top}>
+                <div className={styles.navigation}>
+                    <Button
+                        onClick={close}
+                        icon
+                        variant="secondary"
+                        aria-label="Lukk"
+                    >
+                        <ChevronRightDoubleIcon aria-hidden />
+                    </Button>
 
-            <ResultTableHeader
-                result={result}
-                statusFilters={statusFilters}
-                themes={themes}
-                selectedThemes={selectedThemes}
-                searchTerm={searchTerm}
-                onStatusFilterSelected={handleStatusFilterSelected}
-                onThemeSelected={setSelectedThemes}
-                onSearchChange={setSearchTerm}
-            />
+                    <span className={styles.divider}></span>
 
-            <ResultTable 
-                result={filteredResult} 
-            />
+                    <Button
+                        onClick={goPrevious}
+                        icon
+                        variant="secondary"
+                        aria-label="Forrige"
+                    >
+                        <ArrowUpIcon aria-hidden />
+                    </Button>
+
+                    <Button
+                        onClick={goNext}
+                        icon
+                        variant="secondary"
+                        aria-label="Neste"
+                    >
+                        <ArrowDownIcon aria-hidden />
+                    </Button>
+                </div>
+
+                <div className={styles.hits}>
+                    {getResultIndex() + 1} av {resultIds.length} treff
+                </div>
+            </div>
+
+            <div className={styles.content}>
+                <div className={styles.heading}>
+                    <h2 className={styles.title}>{result.description}</h2>
+                    <div className={styles.areaOrDistance}></div>
+                </div>
+
+                <div className={styles.statusAndThemes}>
+                    {renderStatus()}
+
+                    <span className={styles.themes}>
+                        {
+                            result.themes.map(theme => (
+                                <span key={theme} className={styles.theme}>{theme}</span>
+                            ))
+                        }
+                    </span>
+                </div>
+            </div>
         </div>
     );
 }

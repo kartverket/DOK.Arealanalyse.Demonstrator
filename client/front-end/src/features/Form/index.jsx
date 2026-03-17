@@ -15,7 +15,7 @@ import styles from './Form.module.scss';
 export default function Form() {
     const [state, setState] = useState(getDefaultValues());
     const { clearCache } = useMap();
-    const { setResult, busy, setBusy } = useAnalyses();
+    const { setResponse, busy, setBusy } = useAnalyses();
     const geometryDialogRef = useRef(null);
     const correlationId = useSelector(state => state.app.correlationId);
     const dispatch = useDispatch();
@@ -63,7 +63,7 @@ export default function Form() {
     }
 
     function resetState() {
-        setResult(null);
+        setResponse(null);
         clearCache();
         dispatch(resetAppState());
     }
@@ -74,9 +74,9 @@ export default function Form() {
 
         try {
             setBusy(true);
-            const response = await analyze(payload);
-            const result = mapResponse(response)        
-            setResult(result);
+            const response = _data; // await analyze(payload);
+            const mapped = mapResponse(response);
+            setResponse(mapped);
         } catch (error) {
             dispatch(setErrorMessage('Kunne ikke kjøre DOK-analyse. En feil har oppstått.'));
             console.log(error);

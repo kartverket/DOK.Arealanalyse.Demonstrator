@@ -1,20 +1,47 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import RcDrawer from 'rc-drawer';
-import { Button } from '@digdir/designsystemet-react';
-import { motionProps } from './helpers';
+import { getResult, motionProps } from './helpers';
+import { Result } from 'features';
+import { useAnalyses } from 'context';
 
 export default function Drawer() {
-    const [open, setOpen] = useState(false)
+    const { response } = useAnalyses();
+    const [selectedResult, setSelectedResult] = useState(null);
+    const selectedResultId = useSelector(state => state.app.selectedResultId);
+    const resultIds = useSelector(state => state.app.filteredResultIds);
+
+    useEffect(
+        () => {
+            if (response === null) {
+                return;
+            }
+            
+            if (selectedResultId !== 0) {
+                const result = getResult(response.resultList, selectedResultId);
+                setSelectedResult(result);
+            } else {
+                setSelectedResult(null);
+            }
+        },
+        [response, selectedResultId]
+    );
 
     return (
         <RcDrawer
-            open={open}
+            open={selectedResult !== null}
             placement="right"
             width="50%"
             {...motionProps}
         >
-            <h1>Test</h1>
-            <Button onClick={() => setOpen(false)}>Lukk</Button>
+            {
+                selectedResult !== null && (
+                    <Result 
+                        result={selectedResult} 
+                        resultIds={resultIds}
+                    /> 
+                )
+            }
         </RcDrawer>
     );
 }

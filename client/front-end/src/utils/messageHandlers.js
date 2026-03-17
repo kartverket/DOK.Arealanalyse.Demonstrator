@@ -9,7 +9,6 @@ messageHandlers.set('client_connected', message => {
 });
 
 messageHandlers.set('state_updated', message => { 
-    console.log(message)
     store.dispatch(updateState(message));
 });
 

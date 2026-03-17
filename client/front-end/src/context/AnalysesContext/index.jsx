@@ -1,12 +1,11 @@
-import { createContext, useContext, useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { createContext, useContext, useState } from 'react';
 
 export default function AnalysesProvider({ children }) {
-    const [result, setResult] = useState(null);
+    const [response, setResponse] = useState(null);
     const [busy, setBusy] = useState(false);
 
     return (
-        <AnalysesContext.Provider value={{ result, setResult, busy, setBusy }}>
+        <AnalysesContext.Provider value={{ response, setResponse, busy, setBusy }}>
             {children}
         </AnalysesContext.Provider>
     );

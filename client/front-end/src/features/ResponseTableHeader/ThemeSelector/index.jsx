@@ -3,7 +3,7 @@ import { Checkbox, Dropdown } from '@digdir/designsystemet-react';
 import { ChevronDownIcon, ChevronUpIcon } from '@navikt/aksel-icons';
 import styles from './ThemeSelector.module.scss';
 
-export default function ThemeSelector({ themes, selectedThemes, onThemeSelected }) {
+export default function ThemeSelector({ themes, selectedThemes, onThemeSelected, disabled }) {
     const [buttonText, setButtonText] = useState('Alle valgt');
     const [dropdownOpen, setDropdownOpen] = useState(false);
 
@@ -44,7 +44,7 @@ export default function ThemeSelector({ themes, selectedThemes, onThemeSelected 
             <Dropdown.Trigger 
                 variant="secondary"
                 className={styles.dropdownTrigger}
-                disabled={true}
+                disabled={disabled}
             >
                 <span>
                     Tema: {buttonText}

@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useAnalyses } from 'context/AnalysesContext';
-import { Card } from '@digdir/designsystemet-react';
+import { Card, Spinner } from '@digdir/designsystemet-react';
 import { getStatusText, STATE_STATUS, TASK_STATUS } from './helpers';
 import { ProgressBar, PROGRESS_VARIANT } from 'components';
 import styles from './Progress.module.scss';
@@ -15,7 +15,7 @@ const TASK_STATUSES = {
 
 export default function Progress() {
     const { busy } = useAnalyses();
-    const progress = _progress; // useSelector(state => state.progress);
+    const progress = useSelector(state => state.progress);
 
     function getStatusCssClass(taskStatus) {
         return TASK_STATUSES[taskStatus] || '';
@@ -56,25 +56,32 @@ export default function Progress() {
     return (
         <div className={styles.progressContainer}>
             {
-                true && (
+                busy && (
                     <Card className={styles.progress}>
-                        <div className={styles.statuses}>
-                            {
-                                progressItems.map(item => (
-                                    <div key={item.number} className={`${styles.status} ${item.cssClass}`}>
-                                        <span className={styles.icon}>
-                                            {item.taskStatus !== TASK_STATUS.DONE ? item.number : ''}
-                                        </span>
-                                        <div>
-                                            <span>{item.text}</span>
-                                            <div className={styles.progressBar}>
-                                                {item.taskStatus === TASK_STATUS.IN_PROGRESS && renderProgressBar()}
-                                            </div>
-                                        </div>
+                        {
+                            progressItems.length > 0 ?
+                                <>
+                                    <h3>Status</h3>
+                                    <div className={styles.statuses}>
+                                        {
+                                            progressItems.map(item => (
+                                                <div key={item.number} className={`${styles.status} ${item.cssClass}`}>
+                                                    <span className={styles.icon}>
+                                                        {item.taskStatus !== TASK_STATUS.DONE ? item.number : ''}
+                                                    </span>
+                                                    <div>
+                                                        <span>{item.text}</span>
+                                                        <div className={styles.progressBar}>
+                                                            {item.taskStatus === TASK_STATUS.IN_PROGRESS && renderProgressBar()}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        }
                                     </div>
-                                ))
-                            }
-                        </div>
+                                </> :
+                                <Spinner data-size="lg" />
+                        }
                     </Card>
                 )
             }

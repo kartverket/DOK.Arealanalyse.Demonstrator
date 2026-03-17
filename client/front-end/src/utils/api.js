@@ -1,6 +1,5 @@
 import axios from 'axios';
 import store from 'store';
-import { addStep } from 'store/slices/datasetSlice';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -46,14 +45,4 @@ export async function analyze(payload) {
         console.log(error);
         throw error;
     }
-}
-
-async function addLastStep() {
-    return new Promise((resolve) => {
-        store.dispatch(addStep())
-
-        setTimeout(() => {
-            resolve();
-        }, 1000)
-    });
 }

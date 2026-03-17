@@ -1,4 +1,4 @@
-import { useAnalyses } from 'context/AnalysesContext';
+import { useAnalyses } from 'context';
 import { isEmptyObject } from 'utils/helpers';
 import PointIcon from 'assets/gfx/icon-point.svg?react';
 import AreaIcon from 'assets/gfx/icon-area.svg?react'
@@ -6,12 +6,12 @@ import MustHandleIcon from 'assets/gfx/icon-must-handle.svg?react'
 import MustCheckIcon from 'assets/gfx/icon-must-check.svg?react'
 import NearbyIcon from 'assets/gfx/icon-nearby.svg?react'
 import NotAnalyzedIcon from 'assets/gfx/icon-not-analyzed-2.svg?react'
-import styles from './ResultHeader.module.scss';
+import styles from './ResponseHeader.module.scss';
 
-export default function ResultHeader({ result, statusFilters, onStatusFilterSelected }) {
+export default function ResponseHeader({ response, statusFilters, onStatusFilterSelected }) {
     const { busy } = useAnalyses();
-    const resultList = result.resultList || {};
-    const disabled = busy || isEmptyObject(result);
+    const resultList = response.resultList || {};
+    const disabled = busy || isEmptyObject(response);
 
     function getCount(resultStatuses) {
         if (disabled) {
@@ -25,21 +25,21 @@ export default function ResultHeader({ result, statusFilters, onStatusFilterSele
     }
 
     return (
-        <div className={styles.resultHeader}>
+        <div className={styles.responseHeader}>
             {
                 !disabled && (
                     <div className={styles.inputArea}>
                         <span>Analyseområde</span>
-                        <h2>{result.municipalityName}</h2>
+                        <h2>{response.municipalityName}</h2>
 
                         <div>
                             <span>
                                 <PointIcon />
-                                {result.municipalityNumber}
+                                {response.municipalityNumber}
                             </span>
                             <span>
                                 <AreaIcon />
-                                {Math.round(result.inputGeometryArea).toLocaleString('nb-NO')} m²
+                                {Math.round(response.inputGeometryArea).toLocaleString('nb-NO')} m²
                             </span>
                         </div>
                     </div>

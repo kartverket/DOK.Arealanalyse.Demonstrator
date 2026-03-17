@@ -3,7 +3,8 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
     correlationId: null,
     selectedResult: null,
-    selectedResultId: null,
+    filteredResultIds: [],
+    selectedResultId: 0,
     errorMessage: null
 };
 
@@ -23,6 +24,12 @@ export const appSlice = createSlice({
                 selectedResult: action.payload
             };
         }, 
+        setFilteredResultIds: (state, action) => {
+            return {
+                ...state,
+                filteredResultIds: action.payload
+            };            
+        },
         setSelectedResultId: (state, action) => {
             return {
                 ...state,
@@ -41,6 +48,7 @@ export const appSlice = createSlice({
 export const {
     setCorrelationId,
     setSelectedResult,
+    setFilteredResultIds,
     setSelectedResultId,    
     setErrorMessage
 } = appSlice.actions;

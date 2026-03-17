@@ -1,24 +1,24 @@
 import { useDispatch } from 'react-redux';
+import { useAnalyses } from 'context';
 import { setSelectedResultId } from 'store/slices/appSlice';
-import { useAnalyses } from 'context/AnalysesContext';
-import { isEmptyObject } from 'utils/helpers';
+import { RESULT_STATUS } from 'utils/constants';
 import { Table } from '@digdir/designsystemet-react';
 import { Progress } from 'features';
 import MustHandleIcon from 'assets/gfx/icon-must-handle.svg?react';
 import MustCheckIcon from 'assets/gfx/icon-must-check.svg?react';
 import NearbyIcon from 'assets/gfx/icon-nearby.svg?react';
 import NotAnalyzedIcon from 'assets/gfx/icon-not-analyzed.svg?react';
-import styles from './ResultTable.module.scss';
+import styles from './ResponseTable.module.scss';
 
-export default function ResultTable({ result }) {    
-    const disabled = isEmptyObject(result);
+export default function ResponseTable({ resultList }) {   
     const dispatch = useDispatch();
+    const { busy } = useAnalyses();
 
-    function getHitAreaOrDistance(resultItem) {
-        if (resultItem.hitArea.formatted !== null) {
-            return resultItem.hitArea.formatted;
-        } else if (resultItem.distance.formatted !== null) {
-            return resultItem.distance.formatted;
+    function getHitAreaOrDistance(result) {
+        if (result.hitArea.formatted !== null) {
+            return result.hitArea.formatted;
+        } else if (result.distance.formatted !== null) {
+            return result.distance.formatted;
         }
 
         return null;
@@ -26,29 +26,29 @@ export default function ResultTable({ result }) {
 
     function renderStatusIcon(status) {
         switch (status) {
-            case 'HIT-RED':
+            case RESULT_STATUS.HIT_RED:
                 return (
                     <span className={styles.mustHandle}>
                         <MustHandleIcon />
                     </span>
                 );
-            case 'HIT-YELLOW':
-            case 'NO-HIT-YELLOW':
-            case 'NOT-IMPLEMENTED':
-            case 'TIMEOUT':
-            case 'ERROR':
+            case RESULT_STATUS.HIT_YELLOW:
+            case RESULT_STATUS.NO_HIT_YELLOW:
+            case RESULT_STATUS.NOT_IMPLEMENTED:
+            case RESULT_STATUS.TIMEOUT:
+            case RESULT_STATUS.ERROR:
                 return (
                     <span className={styles.mustCheck}>
                         <MustCheckIcon />
                     </span>
                 );
-            case 'NO-HIT-GREEN':
+            case RESULT_STATUS.NO_HIT_GREEN:
                 return (
                     <span className={styles.nearby}>
                         <NearbyIcon />
                     </span>
                 );
-            case 'NOT-RELEVANT':
+            case RESULT_STATUS.NOT_RELEVANT:
                 return (
                     <span className={styles.notAnalyzed}>
                         <NotAnalyzedIcon />
@@ -64,10 +64,10 @@ export default function ResultTable({ result }) {
     }
 
     return (
-        !disabled ?
+        !busy ?
             <div className={styles.tableContainer}>
                 <div>
-                    <Table className={styles.resultTable}>
+                    <Table className={styles.responseTable}>
                         <Table.Head>
                             <Table.Row>
                                 <Table.HeaderCell>Status</Table.HeaderCell>
@@ -78,22 +78,22 @@ export default function ResultTable({ result }) {
                         </Table.Head>
                         <Table.Body>
                             {
-                                result.map(resultItem => (
-                                    <Table.Row key={resultItem._id} onClick={() => handleRowClick(resultItem._id)}>
+                                resultList.map(result => (
+                                    <Table.Row key={result.id} onClick={() => handleRowClick(result.id)}>
                                         <Table.Cell className={styles.status}>
-                                            {renderStatusIcon(resultItem.status)}
+                                            {renderStatusIcon(result.status)}
                                         </Table.Cell>
                                         <Table.Cell>
                                             <span className={styles.themes}>
                                                 {
-                                                    resultItem.themes.map(theme => (
+                                                    result.themes.map(theme => (
                                                         <span key={theme} className={styles.theme}>{theme}</span>
                                                     ))
                                                 }
                                             </span>
                                         </Table.Cell>
-                                        <Table.Cell className={styles.description}>{resultItem.description}</Table.Cell>
-                                        <Table.Cell className={styles.hitAreaOrDistance}>{getHitAreaOrDistance(resultItem)}</Table.Cell>
+                                        <Table.Cell className={styles.description}>{result.description}</Table.Cell>
+                                        <Table.Cell className={styles.hitAreaOrDistance}>{getHitAreaOrDistance(result)}</Table.Cell>
                                     </Table.Row>
                                 ))
                             }

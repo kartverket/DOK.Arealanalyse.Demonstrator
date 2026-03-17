@@ -1,5 +1,6 @@
-import { useAnalyses } from 'context/AnalysesContext';
+import { useAnalyses } from 'context';
 import { isEmptyObject } from 'utils/helpers';
+import { STATUS_FILTER } from 'utils/constants';
 import { Button, Search } from '@digdir/designsystemet-react';
 import ThemeSelector from './ThemeSelector';
 import MustHandleIcon from 'assets/gfx/icon-must-handle.svg?react';
@@ -8,19 +9,20 @@ import NearbyIcon from 'assets/gfx/icon-nearby.svg?react';
 import NotAnalyzedIcon from 'assets/gfx/icon-not-analyzed.svg?react';
 import FactInfoIcon from 'assets/gfx/icon-fact-info.svg?react';
 import DownloadIcon from 'assets/gfx/icon-download.svg?react';
-import styles from './ResultTableHeader.module.scss';
+import styles from './ResponseTableHeader.module.scss';
 
-export default function ResultTableHeader({
-    result, statusFilters, themes, selectedThemes, searchTerm, onStatusFilterSelected, onThemeSelected, onSearchChange }) {
+
+export default function ResponseTableHeader({
+    response, statusFilters, themes, selectedThemes, searchTerm, onStatusFilterSelected, onThemeSelected, onSearchChange }) {
     const { busy } = useAnalyses();    
-    const disabled = busy || isEmptyObject(result);
+    const disabled = busy || isEmptyObject(response);
 
     function hasFactInfo() {
-        return Array.isArray(result.factList) && result.factList.length > 0;
+        return Array.isArray(response.factList) && response.factList.length > 0;
     }
 
     function hasReport() {
-        return typeof result.report === 'string';
+        return typeof response.report === 'string';
     }
 
     return (
@@ -30,8 +32,8 @@ export default function ResultTableHeader({
                     <input
                         id="must-handle-f"
                         type="checkbox"
-                        name="mustHandle"
-                        checked={statusFilters.includes('mustHandle')}
+                        name={STATUS_FILTER.MUST_HANDLE}
+                        checked={statusFilters.includes(STATUS_FILTER.MUST_HANDLE)}
                         onChange={event => onStatusFilterSelected(event.target.name)}
                         disabled={disabled}
                     />
@@ -46,8 +48,8 @@ export default function ResultTableHeader({
                     <input
                         id="must-check-f"
                         type="checkbox"
-                        name="mustCheck"
-                        checked={statusFilters.includes('mustCheck')}
+                        name={STATUS_FILTER.MUST_CHECK}
+                        checked={statusFilters.includes(STATUS_FILTER.MUST_CHECK)}
                         onChange={event => onStatusFilterSelected(event.target.name)}
                         disabled={disabled}
                     />
@@ -62,8 +64,8 @@ export default function ResultTableHeader({
                     <input
                         id="nearby-f"
                         type="checkbox"
-                        name="nearby"
-                        checked={statusFilters.includes('nearby')}
+                        name={STATUS_FILTER.NEARBY}
+                        checked={statusFilters.includes(STATUS_FILTER.NEARBY)}
                         onChange={event => onStatusFilterSelected(event.target.name)}
                         disabled={disabled}
                     />
@@ -78,8 +80,8 @@ export default function ResultTableHeader({
                     <input
                         id="not-analyzed-f"
                         type="checkbox"
-                        name="notAnalyzed"
-                        checked={statusFilters.includes('notAnalyzed')}
+                        name={STATUS_FILTER.NOT_ANALYZED}
+                        checked={statusFilters.includes(STATUS_FILTER.NOT_ANALYZED)}
                         onChange={event => onStatusFilterSelected(event.target.name)}
                         disabled={disabled}
                     />
@@ -96,6 +98,7 @@ export default function ResultTableHeader({
                     themes={themes}
                     selectedThemes={selectedThemes}
                     onThemeSelected={onThemeSelected}
+                    disabled={disabled}
                 />
 
                 <Search>

@@ -1,5 +1,6 @@
 import { inPlaceSort } from 'fast-sort';
 import groupBy from 'lodash.groupby';
+import { RESULT_STATUS } from 'utils/constants';
 
 export function mapResponse(response) {
     const { resultList } = response;
@@ -34,17 +35,17 @@ function mapResultList(resultList) {
             };
         });
 
-        if (['HIT-RED', 'HIT-YELLOW'].includes(status)) {
+        if ([RESULT_STATUS.HIT_RED, RESULT_STATUS.HIT_YELLOW].includes(status)) {
             inPlaceSort(mappedResults).desc([
                 result => result.hitArea.value || 0,
                 result => result.themes[0]
             ]);
-        } else if (['NO-HIT-YELLOW', 'NO-HIT-GREEN'].includes(status)) {
+        } else if ([RESULT_STATUS.NO_HIT_YELLOW, RESULT_STATUS.NO_HIT_GREEN].includes(status)) {
             inPlaceSort(mappedResults).asc([
                 result => result.distance.value,
                 result => result.themes[0]
             ]);
-        } else if (['NOT-RELEVANT', 'NOT-IMPLEMENTED', 'TIMEOUT', 'ERROR'].includes(status)) {
+        } else if ([RESULT_STATUS.NOT_RELEVANT, RESULT_STATUS.NOT_IMPLEMENTED, RESULT_STATUS.TIMEOUT, RESULT_STATUS.ERROR].includes(status)) {
             inPlaceSort(mappedResults).asc([
                 result => result.themes[0],
                 result => result.description
@@ -63,11 +64,11 @@ function getDescription(result) {
         result.title
 
     switch (result.resultStatus) {
-        case 'TIMEOUT':
+        case RESULT_STATUS.TIMEOUT:
             return `Tidsavbrudd: ${datasetTitle}`;
-        case 'ERROR':
+        case RESULT_STATUS.ERROR:
             return `En feil har oppstått: ${datasetTitle}`;
-        case 'NOT-IMPLEMENTED':
+        case RESULT_STATUS.NOT_IMPLEMENTED:
             return `Ikke implementert: ${datasetTitle}`;
         default:
             return datasetTitle;
@@ -98,8 +99,4 @@ function getHitAreaPercentFormatted(result) {
     const rounded = Math.round((percent + Number.EPSILON) * 100) / 100;
 
     return `${rounded.toLocaleString('nb-NO')} %`
-}
-
-function createRandomId() {
-    return `_${Math.floor(Math.random() * Math.floor(Math.random() * Date.now()))}`;
 }
