@@ -1,10 +1,10 @@
+import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useAnalyses } from 'context/AnalysesContext';
 import { Card } from '@digdir/designsystemet-react';
-import { getStatusText, STATE_STATUS, TASK_STATUS } from 'utils/progress';
-import ProgressBar from './LinearProgress';
+import { getStatusText, STATE_STATUS, TASK_STATUS } from './helpers';
+import { ProgressBar, PROGRESS_VARIANT } from 'components';
 import styles from './Progress.module.scss';
-import { useMemo } from 'react';
 
 
 const TASK_STATUSES = {
@@ -15,7 +15,7 @@ const TASK_STATUSES = {
 
 export default function Progress() {
     const { busy } = useAnalyses();
-    const progress = useSelector(state => state.progress);
+    const progress = _progress; // useSelector(state => state.progress);
 
     function getStatusCssClass(taskStatus) {
         return TASK_STATUSES[taskStatus] || '';
@@ -25,19 +25,15 @@ export default function Progress() {
         let variant = PROGRESS_VARIANT.DETERMINATE;
         let value = 0;
 
-        if (state.status === STATE_STATUS.ANALYZING_DATASETS) {
-            value = 1 / state.analysesTotal;
-        } else if (state.status === STATE_STATUS.DATASET_ANALYZED) {
-            value = state.analysisCount / state.analysesTotal;
-        } else if (state.status === STATE_STATUS.CREATING_MAP_IMAGES) {
-            value = 1 / state.mapImagesTotal;
-        } else if (state.status === STATE_STATUS.MAP_IMAGE_CREATED) {
-            value = state.mapImageCount / state.mapImagesTotal;
+        if (progress.status === STATE_STATUS.ANALYZING_DATASETS) {
+            value = progress.analysisCount / progress.analysesTotal;
+        } else if (progress.status === STATE_STATUS.CREATING_MAP_IMAGES) {
+            value = progress.mapImageCount / progress.mapImagesTotal;
         } else {
             variant = PROGRESS_VARIANT.INDETERMINATE;
         }
 
-        return <Linea variant={variant} value={value} />;
+        return <ProgressBar variant={variant} value={value} />;
     }
 
     const progressItems = useMemo(
@@ -71,6 +67,9 @@ export default function Progress() {
                                         </span>
                                         <div>
                                             <span>{item.text}</span>
+                                            <div className={styles.progressBar}>
+                                                {item.taskStatus === TASK_STATUS.IN_PROGRESS && renderProgressBar()}
+                                            </div>
                                         </div>
                                     </div>
                                 ))
@@ -80,5 +79,21 @@ export default function Progress() {
                 )
             }
         </div>
-    )
+    );
+}
+
+const _progress = {
+    "status": "CREATING_FACT_SHEET",
+    "analysesTotal": 53,
+    "analysisCount": 53,
+    "mapImagesTotal": 12,
+    "mapImageCount": 12,
+    "recipient": "2de14343-18d8-4805-9a02-58bf9a6b9afe",
+    "tasks": {
+        "STARTING_UP": "DONE",
+        "ANALYZING_DATASETS": "DONE",
+        "CREATING_FACT_SHEET": "IN_PROGRESS",
+        "CREATING_MAP_IMAGES": "IN_PROGRESS",
+        "CREATING_REPORT": "NOT_STARTED"
+    }
 }

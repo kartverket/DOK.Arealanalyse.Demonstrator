@@ -1,13 +1,17 @@
 .progressBar {
     display: flex;
     align-items: center;
-    height: 4px;
     width: 100%;
     gap: 12px;
+
+    svg {
+        height: 4px !important;
+        border-radius: 4px;
+    }
 }
 
 .progressBarText {
-    width: 44px;
+    width: 48px;
     text-align: right;
     position: static !important;
     transform: none !important;

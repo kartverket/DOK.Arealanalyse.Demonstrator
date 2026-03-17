@@ -9,4 +9,5 @@ export { default as ResultTableHeader } from './ResultTableHeader';
 export { default as Result } from './Result';
 export { default as ResultTable } from './ResultTable';
 export { default as Drawer } from './Drawer';
+export { default as Progress } from './Progress';
 

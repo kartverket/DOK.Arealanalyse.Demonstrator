@@ -3,11 +3,11 @@ import { setSelectedResultId } from 'store/slices/appSlice';
 import { useAnalyses } from 'context/AnalysesContext';
 import { isEmptyObject } from 'utils/helpers';
 import { Table } from '@digdir/designsystemet-react';
+import { Progress } from 'features';
 import MustHandleIcon from 'assets/gfx/icon-must-handle.svg?react';
 import MustCheckIcon from 'assets/gfx/icon-must-check.svg?react';
 import NearbyIcon from 'assets/gfx/icon-nearby.svg?react';
 import NotAnalyzedIcon from 'assets/gfx/icon-not-analyzed.svg?react';
-import Progress from './Progress';
 import styles from './ResultTable.module.scss';
 
 export default function ResultTable({ result }) {    
@@ -43,7 +43,6 @@ export default function ResultTable({ result }) {
                     </span>
                 );
             case 'NO-HIT-GREEN':
-
                 return (
                     <span className={styles.nearby}>
                         <NearbyIcon />
