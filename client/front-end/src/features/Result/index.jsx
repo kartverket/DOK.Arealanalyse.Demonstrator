@@ -47,6 +47,19 @@ export default function Result({ result, resultIds }) {
         dispatch(setSelectedResultId(prevId));
     }
 
+    function renderTitle() {
+        if (result.title !== null) {
+            return (
+                <>
+                    <h5>{result.datasetTitle}</h5>
+                    <h2 className={styles.title}>{result.title}</h2>
+                </>
+            );
+        }
+
+        return <h2 className={styles.title}>{result.datasetTitle}</h2>;
+    }
+
     function renderStatus() {
         switch (result.status) {
             case RESULT_STATUS.HIT_RED:
@@ -127,7 +140,7 @@ export default function Result({ result, resultIds }) {
 
             <div className={styles.content}>
                 <div className={styles.heading}>
-                    <h2 className={styles.title}>{result.description}</h2>
+                    {renderTitle()}
                     <div className={styles.areaOrDistance}></div>
                 </div>
 

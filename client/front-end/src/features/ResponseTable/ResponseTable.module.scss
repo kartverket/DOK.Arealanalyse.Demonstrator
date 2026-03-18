@@ -26,6 +26,10 @@
         &:last-child td {
             border-bottom: 1px solid transparent;
         }
+
+        &:hover td {
+            background-color: #fcfcfd;
+        }
     }
 
     th {
@@ -45,6 +49,15 @@
         &:nth-child(2) {
             width: 192px;
         }
+
+        &:nth-child(4) {
+            width: 150px;
+        }
+
+        &:nth-child(5) {
+            width: 42px;
+            padding-left: 0;
+        }
     }
 
     td {
@@ -52,6 +65,11 @@
         border-bottom: 1px solid #E5E7EB;
         padding: 24px 16px;
         line-height: 1.25;
+
+        &:nth-child(5) {
+            padding-left: 0;
+            text-align: right;
+        }
     }
 }
 

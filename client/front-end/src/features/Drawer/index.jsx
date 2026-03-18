@@ -31,7 +31,7 @@ export default function Drawer() {
         <RcDrawer
             open={selectedResult !== null}
             placement="right"
-            width="50%"
+            width="50%"          
             {...motionProps}
         >
             {

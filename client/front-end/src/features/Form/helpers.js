@@ -22,6 +22,8 @@ function mapResultList(resultList) {
                 id: index++,
                 status,
                 themes: resultItem.themes,
+                title: resultItem.title,
+                datasetTitle: resultItem.runOnDataset?.title || null,
                 description: getDescription(resultItem),
                 distance: {
                     value: resultItem.distanceToObject,

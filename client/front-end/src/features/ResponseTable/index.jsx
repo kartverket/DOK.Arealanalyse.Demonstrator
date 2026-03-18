@@ -9,6 +9,7 @@ import MustCheckIcon from 'assets/gfx/icon-must-check.svg?react';
 import NearbyIcon from 'assets/gfx/icon-nearby.svg?react';
 import NotAnalyzedIcon from 'assets/gfx/icon-not-analyzed.svg?react';
 import styles from './ResponseTable.module.scss';
+import { ChevronRightIcon } from '@navikt/aksel-icons';
 
 export default function ResponseTable({ resultList }) {   
     const dispatch = useDispatch();
@@ -74,6 +75,7 @@ export default function ResponseTable({ resultList }) {
                                 <Table.HeaderCell>Tema</Table.HeaderCell>
                                 <Table.HeaderCell>Beskrivelse</Table.HeaderCell>
                                 <Table.HeaderCell></Table.HeaderCell>
+                                <Table.HeaderCell></Table.HeaderCell>
                             </Table.Row>
                         </Table.Head>
                         <Table.Body>
@@ -94,6 +96,9 @@ export default function ResponseTable({ resultList }) {
                                         </Table.Cell>
                                         <Table.Cell className={styles.description}>{result.description}</Table.Cell>
                                         <Table.Cell className={styles.hitAreaOrDistance}>{getHitAreaOrDistance(result)}</Table.Cell>
+                                        <Table.Cell>
+                                            <ChevronRightIcon fontSize="24px" color="#d1d5dc" />
+                                        </Table.Cell>
                                     </Table.Row>
                                 ))
                             }
