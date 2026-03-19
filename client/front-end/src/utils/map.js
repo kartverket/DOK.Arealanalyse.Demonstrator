@@ -16,22 +16,16 @@ import baseMap from 'config/baseMap.config';
 
 const MAP_WIDTH = 720;
 const MAP_HEIGHT = 480;
-const BASE_MAP = import.meta.env.VITE_BASE_MAP;
 
 export async function createMap(inputGeometry, result) {
     const featuresLayer = createFeaturesLayer(inputGeometry, result);
-    const layers = [];
-
     featuresLayer.set('id', 'features');
 
-    if (BASE_MAP === 'OSM') {
-        layers.push(createOsmLayer());
-    } else {
-        layers.push(await createWmtsLayer());
-    }
-
-    layers.push(createWmsLayer(result.rasterResult.mapUri));
-    layers.push(featuresLayer);
+    const layers = [
+        await createWmtsLayer(),
+        createWmsLayer(result.rasterResult.mapUri),
+        featuresLayer
+    ];
 
     const map = new OlMap({
         controls: defaultControls().extend([new FullScreen()]),
@@ -50,17 +44,12 @@ export async function createMap(inputGeometry, result) {
 
 export async function createOutlineMap(geometry) {
     const featuresLayer = createOutlineFeaturesLayer(geometry);
-    const layers = [];
-
     featuresLayer.set('id', 'features');
 
-    if (BASE_MAP === 'OSM') {
-        layers.push(createOsmLayer());
-    } else {
-        layers.push(await createWmtsLayer());
-    }
-
-    layers.push(featuresLayer);
+    const layers = [
+        await createWmtsLayer(),
+        featuresLayer
+    ];
 
     const map = new OlMap({
         interactions: defaultInteractions().extend([new DragRotateAndZoom()]),
@@ -76,8 +65,8 @@ export async function createOutlineMap(geometry) {
     return map;
 }
 
-export async function createMapImage(inputGeometry, result) {
-    const [map, mapElement] = await createTempMap(inputGeometry, result);
+export async function createMapImage(result, options = {}) {
+    const [map, mapElement] = await createTempMap(result, options);
 
     return new Promise((resolve) => {
         map.once('rendercomplete', () => {
@@ -95,18 +84,14 @@ export function getLayer(map, id) {
         .find(layer => layer.get('id') === id);
 }
 
-async function createTempMap(inputGeometry, result) {
-    const featuresLayer = createFeaturesLayer(inputGeometry, result);
-    const layers = [];
+async function createTempMap(result, options) {
+    const featuresLayer = createFeaturesLayer(result.runOnInputGeometry, result);
 
-    if (BASE_MAP === 'OSM') {
-        layers.push(createOsmLayer());
-    } else {
-        layers.push(await createWmtsLayer());
-    }
-
-    layers.push(createWmsLayer(result.rasterResult.mapUri));
-    layers.push(featuresLayer);
+    const layers = [
+        await createWmtsLayer(),
+        createWmsLayer(result.rasterResult.mapUri),
+        featuresLayer
+    ];
 
     const map = new OlMap({ layers });
 
@@ -117,8 +102,11 @@ async function createTempMap(inputGeometry, result) {
         constrainResolution: true
     }));
 
+    const mapWidth = options.width || MAP_WIDTH;
+    const mapHeight = options.height || MAP_HEIGHT;
+
     const mapElement = document.createElement('div');
-    Object.assign(mapElement.style, { position: 'absolute', top: '-9999px', left: '-9999px', width: `${MAP_WIDTH}px`, height: `${MAP_HEIGHT}px` });
+    Object.assign(mapElement.style, { position: 'absolute', top: '-9999px', left: '-9999px', width: `${mapWidth}px`, height: `${mapHeight}px` });
     document.getElementsByTagName('body')[0].appendChild(mapElement);
 
     map.setTarget(mapElement);
@@ -162,7 +150,7 @@ function createFeature(geoJson, projection, style) {
 }
 
 function createOsmLayer() {
-    const osm = new OSM({ 
+    const osm = new OSM({
         tileLoadFunction: grayscale()
     });
 

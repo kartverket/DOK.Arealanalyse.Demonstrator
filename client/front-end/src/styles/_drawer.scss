@@ -1,3 +1,15 @@
+.rc-drawer:focus-visible {
+    outline: none;
+}
+
+.rc-drawer-mask {
+    background: #00000003;
+}
+
+.rc-drawer-content-wrapper {
+    box-shadow: 0px 25px 50px -12px #00000040;
+}
+
 .mask-motion-enter-active,
 .mask-motion-appear-active,
 .mask-motion-leave-active {

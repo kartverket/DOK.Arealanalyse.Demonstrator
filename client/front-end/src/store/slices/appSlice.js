@@ -5,7 +5,8 @@ const initialState = {
     selectedResult: null,
     filteredResultIds: [],
     selectedResultId: 0,
-    errorMessage: null
+    errorMessage: null,
+    // mapImages: {}
 };
 
 export const appSlice = createSlice({
@@ -17,25 +18,34 @@ export const appSlice = createSlice({
                 ...state,
                 correlationId: action.payload
             };
-        },     
+        },
         setSelectedResult: (state, action) => {
             return {
                 ...state,
                 selectedResult: action.payload
             };
-        }, 
+        },
         setFilteredResultIds: (state, action) => {
             return {
                 ...state,
                 filteredResultIds: action.payload
-            };            
+            };
         },
         setSelectedResultId: (state, action) => {
             return {
                 ...state,
                 selectedResultId: action.payload
             };
-        },        
+        },
+        // addMapImage: (state, action) => {
+        //     return {
+        //         ...state,
+        //         mapImages: {
+        //             ...state.mapImages,
+        //             [action.payload.id]: action.payload.imageUri
+        //         }
+        //     };
+        // },
         setErrorMessage: (state, action) => {
             return {
                 ...state,
@@ -49,7 +59,7 @@ export const {
     setCorrelationId,
     setSelectedResult,
     setFilteredResultIds,
-    setSelectedResultId,    
+    setSelectedResultId,
     setErrorMessage
 } = appSlice.actions;
 

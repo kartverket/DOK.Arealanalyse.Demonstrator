@@ -1,0 +1,23 @@
+.drawer {
+    width: calc(var(--page-width) / 2);
+}
+
+.top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    border-bottom: 1px solid #F3F4F6;
+
+    .navigation {
+        display: flex;
+        gap: 8px;
+
+        .divider {
+            display: flex;
+            height: 32px;
+            width: 1px;
+            background-color: #E5E7EB;
+        }
+    }
+}

@@ -33,7 +33,7 @@ function mapResultList(resultList) {
                     value: resultItem.hitArea,
                     formatted: getHitAreaPercentFormatted(resultItem)
                 },
-                result: resultItem
+                data: resultItem
             };
         });
 

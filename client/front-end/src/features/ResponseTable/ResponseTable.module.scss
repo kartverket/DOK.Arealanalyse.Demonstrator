@@ -73,7 +73,81 @@
     }
 }
 
-.status span {
+.responseTable tr {
+    &.selected td:first-child {
+        border-left: 4px solid;
+        padding-left: 12px;
+    }
+
+    &.mustHandle {
+        &.selected td {
+            background-color: #FEF3F2;
+            border-bottom-color: #FB2C36;
+
+            &:first-child {
+                border-left-color: #FB2C36;
+            }
+        }
+
+        .status {
+            background-color: #FEF3F2;
+
+            svg {
+                stroke: #F04438;
+            }
+        }
+    }
+
+    &.mustCheck {
+        &.selected td {
+            background-color: #FFFBEB80;
+            border-bottom-color: #FE9A00;
+
+            &:first-child {
+                border-left-color: #FE9A00;
+            }
+        }
+
+        .status {
+            background-color: #FFFAEB;
+
+            svg {
+                stroke: #F79009;
+            }
+        }
+    }
+
+    &.nearby {
+        &.selected td {
+            background-color: #F0FDF480;
+            border-bottom-color: #00C950;
+
+            &:first-child {
+                border-left-color: #00C950;
+            }
+        }
+
+        .status {
+            background-color: #ECFDF3;
+
+            svg {
+                stroke: #12B76A;
+            }
+        }
+    }
+
+    &.notAnalyzed {
+        .status {
+            background-color: #F2F4F7;
+
+            svg {
+                stroke: #344054;
+            }
+        }
+    }
+}
+
+.status {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -84,38 +158,6 @@
     svg {
         width: 14px;
         height: 14px;
-    }
-
-    &.mustHandle {
-        background-color: #FEF3F2;
-
-        svg {
-            stroke: #F04438;
-        }
-    }
-
-    &.mustCheck {
-        background-color: #FFFAEB;
-
-        svg {
-            stroke: #F79009;
-        }
-    }
-
-    &.nearby {
-        background-color: #ECFDF3;
-
-        svg {
-            stroke: #12B76A;
-        }
-    }
-
-    &.notAnalyzed {
-        background-color: #F2F4F7;
-
-        svg {
-            stroke: #344054;
-        }
     }
 }
 
@@ -136,8 +178,19 @@
 }
 
 .description {
-    font-size: 16px;
-    font-weight: 500;
+    display: flex;
+    flex-direction: column;
+
+    .datasetTitle {
+        font-size: 12px;
+        color: #6A7282;
+    }
+
+    .title {
+        font-size: 14px;
+        font-weight: 700;
+        color: #101828;
+    }
 }
 
 .hitAreaOrDistance {
