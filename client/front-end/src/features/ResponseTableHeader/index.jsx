@@ -1,4 +1,4 @@
-import { useAnalyses } from 'context';
+import { useResponse } from 'context';
 import { isEmptyObject } from 'utils/helpers';
 import { STATUS_FILTER } from 'utils/constants';
 import { Button, Search } from '@digdir/designsystemet-react';
@@ -14,7 +14,7 @@ import styles from './ResponseTableHeader.module.scss';
 
 export default function ResponseTableHeader({
     response, statusFilters, themes, selectedThemes, searchTerm, onStatusFilterSelected, onThemeSelected, onSearchChange }) {
-    const { busy } = useAnalyses();    
+    const { busy } = useResponse();    
     const disabled = busy || isEmptyObject(response);
 
     function hasFactInfo() {

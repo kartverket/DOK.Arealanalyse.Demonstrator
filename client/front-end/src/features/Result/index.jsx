@@ -1,29 +1,22 @@
-import { useEffect, useState } from 'react';
 import { marked } from 'marked';
 import { RESULT_STATUS } from 'utils/constants';
-import { Heading, Tabs } from '@digdir/designsystemet-react';
-import { getTabVisibility } from './helper';
+import { Heading } from '@digdir/designsystemet-react';
+import { getSectionOptions } from './helpers';
+import { InternalLinks } from 'components';
+import Map from './Map';
+import Actions from './Actions';
+import Data from './Data';
+import Dataset from './Dataset';
 import MustHandleIcon from 'assets/gfx/icon-must-handle.svg?react';
 import MustCheckIcon from 'assets/gfx/icon-must-check.svg?react';
 import NearbyIcon from 'assets/gfx/icon-nearby.svg?react';
 import NotAnalyzedIcon from 'assets/gfx/icon-not-analyzed.svg?react';
 import styles from './Result.module.scss';
-import { ResultMap } from 'features';
 
-export default function Result({ result }) {
+export default function Result({ result, inputGeometry }) {
     const data = result.data;
     const hitAreaOrDistance = getHitAreaOrDistance();
-    const tabVisibility = getTabVisibility(result);
-    const [selectedTab, setSelectedTab] = useState(null);
-
-    useEffect(
-        () => {
-            const { map, actions } = getTabVisibility(result);
-            const tabId = map ? 'map' : actions ? 'actions' : 'data';
-            setSelectedTab(tabId);
-        },
-        [result]
-    );
+    const { show, internalLinks } = getSectionOptions(result);
 
     function renderTitle() {
         return (
@@ -160,48 +153,117 @@ export default function Result({ result }) {
                 )
             }
 
-            <Tabs value={selectedTab} onChange={setSelectedTab}>
-                <Tabs.List>
+            <InternalLinks
+                links={internalLinks}
+                className={styles.internalLinks}
+            />
+
+            <div className={styles.sections}>
+                {
+                    show.map && (
+                        <section id="section-map">
+                            <Map
+                                result={result}
+                                inputGeometry={inputGeometry}
+                            />
+                        </section>
+                    )
+                }
+
+                {
+                    show.actions && (
+                        <section id="section-actions">
+                            <Actions
+                                result={result}
+                            />
+                        </section>
+                    )
+                }
+
+                {
+                    show.data && (
+                        <section id="section-data">
+                            <Data 
+                                result={result}
+                            />
+                        </section>
+                    )
+                }
+
+                {
+                    show.dataset && (
+                        <section id="section-dataset">
+                            <Dataset 
+                                dataset={data.runOnDataset}
+                            />
+                        </section>
+                    )
+                }
+
+                {
+                    show.quality && (
+                        <section id="section-quality">
+                            Kvalitet
+                        </section>
+                    )
+                }
+
+                {
+                    show.analyzis && (
+                        <section id="section-analyzis">
+                            Analyse
+                        </section>
+                    )
+                }
+            </div>
+
+            {/* <Tabs>
+                <Tabs.List className={styles.tabsList}>
                     {
-                        tabVisibility.map && (
+                        showMap && (
                             <Tabs.Tab value="map">Kart</Tabs.Tab>
                         )
                     }
                     {
-                        tabVisibility.actions && (
+                        showActions && (
                             <Tabs.Tab value="actions">Tiltak</Tabs.Tab>
                         )
                     }
                     <Tabs.Tab value="data">Data</Tabs.Tab>
                     <Tabs.Tab value="dataset">Datasett</Tabs.Tab>
                     {
-                        tabVisibility.quality && (
+                        showQuality && (
                             <Tabs.Tab value="quality">Kvalitet</Tabs.Tab>
                         )
                     }
                     <Tabs.Tab value="analyzis">Analyse</Tabs.Tab>
                 </Tabs.List>
                 {
-                    tabVisibility.map && (
-                        <Tabs.Panel value="map">
-                            <ResultMap result={result} />
+                    showMap && (
+                        <Tabs.Panel value="map" className={styles.tabsPanel}>
+                            <Map
+                                result={result}
+                                inputGeometry={inputGeometry}
+                            />
                         </Tabs.Panel>
                     )
                 }
                 {
-                    tabVisibility.actions && (
-                        <Tabs.Panel value="actions">Tiltak</Tabs.Panel>
+                    showActions && (
+                        <Tabs.Panel value="actions" className={styles.tabsPanel}>
+                            <PossibleActions result={result} />
+                        </Tabs.Panel>
                     )
                 }
-                <Tabs.Panel value="data">Data</Tabs.Panel>
-                <Tabs.Panel value="dataset">Datasett</Tabs.Panel>
+                <Tabs.Panel value="data" className={styles.tabsPanel}>Data</Tabs.Panel>
+                <Tabs.Panel value="dataset" className={styles.tabsPanel}>Datasett</Tabs.Panel>
                 {
-                    tabVisibility.quality && (
-                        <Tabs.Panel value="quality">Kvalitet</Tabs.Panel>
+                    showQuality && (
+                        <Tabs.Panel value="quality" className={styles.tabsPanel}>Kvalitet</Tabs.Panel>
                     )
                 }
-                <Tabs.Panel value="analyzis">Analyse</Tabs.Panel>
-            </Tabs>
+                <Tabs.Panel value="analyzis" className={styles.tabsPanel}>Analyse</Tabs.Panel>
+            </Tabs> */}
         </div>
     );
 }

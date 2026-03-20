@@ -1,0 +1,13 @@
+.mapImage {
+    display: flex;
+    border-radius: var(--ds-border-radius-lg);
+}
+
+.map {
+    display: flex;
+    width: 656px;
+    height: 335px;    
+    border: 1px solid #E5E7EB;
+    border-radius: var(--ds-border-radius-lg);
+    overflow: hidden;
+}

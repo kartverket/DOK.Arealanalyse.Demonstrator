@@ -3,11 +3,9 @@ import GeoJSON from 'ol/format/GeoJSON';
 import TileLayer from 'ol/layer/Tile';
 import TileWMS from 'ol/source/TileWMS';
 import WMTS, { optionsFromCapabilities } from 'ol/source/WMTS';
-import { OSM } from 'ol/source';
 import { WMTSCapabilities } from 'ol/format';
 import VectorSource from 'ol/source/Vector';
 import { Vector as VectorLayer } from 'ol/layer';
-import { defaults as defaultControls, FullScreen } from 'ol/control';
 import { defaults as defaultInteractions, DragRotateAndZoom } from 'ol/interaction';
 import Style from 'ol/style/Style';
 import Stroke from 'ol/style/Stroke';
@@ -17,18 +15,14 @@ import baseMap from 'config/baseMap.config';
 const MAP_WIDTH = 720;
 const MAP_HEIGHT = 480;
 
-export async function createMap(inputGeometry, result) {
-    const featuresLayer = createFeaturesLayer(inputGeometry, result);
-    featuresLayer.set('id', 'features');
-
+export async function createMap({ geometry, bufferedGeometry, wmsUrl }) {
     const layers = [
         await createWmtsLayer(),
-        createWmsLayer(result.rasterResult.mapUri),
-        featuresLayer
+        createWmsLayer(wmsUrl),
+        createFeaturesLayer(geometry, bufferedGeometry)
     ];
 
     const map = new OlMap({
-        controls: defaultControls().extend([new FullScreen()]),
         interactions: defaultInteractions().extend([new DragRotateAndZoom()]),
         layers
     });
@@ -43,12 +37,9 @@ export async function createMap(inputGeometry, result) {
 }
 
 export async function createOutlineMap(geometry) {
-    const featuresLayer = createOutlineFeaturesLayer(geometry);
-    featuresLayer.set('id', 'features');
-
     const layers = [
         await createWmtsLayer(),
-        featuresLayer
+        createOutlineFeaturesLayer(geometry)
     ];
 
     const map = new OlMap({
@@ -65,8 +56,8 @@ export async function createOutlineMap(geometry) {
     return map;
 }
 
-export async function createMapImage(result, options = {}) {
-    const [map, mapElement] = await createTempMap(result, options);
+export async function createMapImage({ geometry, bufferedGeometry, wmsUrl, options = {} }) {
+    const [map, mapElement] = await createTempMap(geometry, bufferedGeometry, wmsUrl, options);
 
     return new Promise((resolve) => {
         map.once('rendercomplete', () => {
@@ -84,12 +75,12 @@ export function getLayer(map, id) {
         .find(layer => layer.get('id') === id);
 }
 
-async function createTempMap(result, options) {
-    const featuresLayer = createFeaturesLayer(result.runOnInputGeometry, result);
+async function createTempMap(geometry, bufferedGeometry, wmsUrl, options) {
+    const featuresLayer = createFeaturesLayer(geometry, bufferedGeometry);
 
     const layers = [
         await createWmtsLayer(),
-        createWmsLayer(result.rasterResult.mapUri),
+        createWmsLayer(wmsUrl),
         featuresLayer
     ];
 
@@ -117,17 +108,20 @@ async function createTempMap(result, options) {
     return [map, mapElement];
 }
 
-function createFeaturesLayer(inputGeometry, result) {
-    const projection = getProjection(inputGeometry);
+function createFeaturesLayer(geometry, bufferedGeometry = null) {
+    const projection = getProjection(geometry);
     const source = new VectorSource();
 
-    if (result.buffer > 0) {
-        source.addFeature(createFeature(result.runOnInputGeometry, projection, getBufferStyle()));
+    if (bufferedGeometry !== null) {
+        source.addFeature(createFeature(bufferedGeometry, projection, getBufferStyle()));
     }
 
-    source.addFeature(createFeature(inputGeometry, projection, getOutlineStyle()));
+    source.addFeature(createFeature(geometry, projection, getOutlineStyle()));
 
-    return new VectorLayer({ source });
+    const vectorLayer = new VectorLayer({ source });
+    vectorLayer.set('id', 'features');
+
+    return vectorLayer;
 }
 
 function createOutlineFeaturesLayer(geometry) {
@@ -136,7 +130,10 @@ function createOutlineFeaturesLayer(geometry) {
 
     source.addFeature(createFeature(geometry, projection, getOutlineStyle()));
 
-    return new VectorLayer({ source });
+    const vectorLayer = new VectorLayer({ source });
+    vectorLayer.set('id', 'features');
+
+    return vectorLayer;
 }
 
 function createFeature(geoJson, projection, style) {
@@ -147,16 +144,6 @@ function createFeature(geoJson, projection, style) {
     feature.setStyle(style);
 
     return feature;
-}
-
-function createOsmLayer() {
-    const osm = new OSM({
-        tileLoadFunction: grayscale()
-    });
-
-    return new TileLayer({
-        source: osm
-    });
 }
 
 async function createWmtsLayer() {

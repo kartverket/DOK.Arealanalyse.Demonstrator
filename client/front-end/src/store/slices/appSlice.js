@@ -37,15 +37,6 @@ export const appSlice = createSlice({
                 selectedResultId: action.payload
             };
         },
-        // addMapImage: (state, action) => {
-        //     return {
-        //         ...state,
-        //         mapImages: {
-        //             ...state.mapImages,
-        //             [action.payload.id]: action.payload.imageUri
-        //         }
-        //     };
-        // },
         setErrorMessage: (state, action) => {
             return {
                 ...state,

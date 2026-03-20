@@ -1,50 +1,37 @@
 import { useRef, useState, useEffect } from 'react';
-import { ZoomToExtent } from 'ol/control';
-import { createMap, getLayer } from 'utils/map';
-import baseMap from 'config/baseMap.config';
+import { createMap } from 'utils/map';
+import { setupMap } from './helpers';
+import Zoom from './Zoom';
+import ZoomToExtent from './ZoomToExtent';
 import styles from './MapView.module.scss';
 
-export default function MapView({ inputGeometry, result }) {
+export default function MapView({ result, inputGeometry }) {
     const [map, setMap] = useState(null);
     const mapElementRef = useRef(null);
 
     useEffect(
         () => {
-            if (!inputGeometry || !result) {
-                return;
-            }
-
             (async () => {
-                const olMap = await createMap(inputGeometry, result);
+                const olMap = await createMap({
+                    geometry: inputGeometry,
+                    bufferedGeometry: result.buffer > 0 ? result.runOnInputGeometry : null,
+                    wmsUrl: result.rasterResult.mapUri
+                });
+
                 setMap(olMap);
             })();
         },
-        [inputGeometry, result]
+        [result, inputGeometry]
     );
 
     useEffect(
         () => {
-            if (!map) {
+            if (map === null) {
                 return;
             }
 
             map.setTarget(mapElementRef.current);
-
-            const vectorLayer = getLayer(map, 'features');
-            const extent = vectorLayer.getSource().getExtent();
-            const view = map.getView();
-
-            view.fit(extent, map.getSize());
-            view.setMinZoom(baseMap.minZoom);
-            view.setMaxZoom(baseMap.maxZoom);
-
-            const currentZoom = view.getZoom();
-
-            if (currentZoom > baseMap.maxZoom) {
-                view.setZoom(baseMap.maxZoom);
-            }
-
-            map.addControl(new ZoomToExtent({ extent }));
+            setupMap(map);
 
             return () => {
                 map.dispose();
@@ -54,6 +41,16 @@ export default function MapView({ inputGeometry, result }) {
     );
 
     return (
-        <div ref={mapElementRef} className={styles.map}></div>
+        <div className={styles.mapContainer}>
+            <div ref={mapElementRef} className={styles.map}></div>
+            {
+                map !== null && (
+                    <div className={styles.buttons}>
+                        <Zoom map={map} />
+                        <ZoomToExtent map={map} />
+                    </div>
+                )
+            }
+        </div>
     );
 }

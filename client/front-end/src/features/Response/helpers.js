@@ -105,5 +105,5 @@ function getNearbyResults(resultList) {
 }
 
 function getNotAnalyzedResults(resultList) {
-    return getResultsByStatuses(resultList, [RESULT_STATUS.NOT_ANALYZED]);
+    return getResultsByStatuses(resultList, [RESULT_STATUS.NOT_RELEVANT]);
 }

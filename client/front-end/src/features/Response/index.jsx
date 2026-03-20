@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useDebounce } from 'hooks';
-import { useAnalyses } from 'context';
+import { useResponse } from 'context';
 import { setFilteredResultIds } from 'store/slices/appSlice';
 import { isEmptyObject } from 'utils/helpers';
 import { filterResults, getInitalStatusFilter, getThemes } from './helpers';
@@ -9,7 +9,7 @@ import { ResponseHeader, ResponseTable, ResponseTableHeader } from 'features';
 import styles from './Response.module.scss';
 
 export default function Response() {
-    const analyses = useAnalyses();
+    const analyses = useResponse();
     const response = analyses.response || {}
     const resultList = response.resultList || {};
     const busy = analyses.busy;

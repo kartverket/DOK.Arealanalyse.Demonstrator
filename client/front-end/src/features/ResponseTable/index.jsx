@@ -1,11 +1,11 @@
-import { useAnalyses } from 'context';
+import { useResponse } from 'context';
 import { Table } from '@digdir/designsystemet-react';
 import { Progress } from 'features';
 import ResponseTableRow from './ResponseTableRow';
 import styles from './ResponseTable.module.scss';
 
 export default function ResponseTable({ resultList }) {
-    const { busy } = useAnalyses();
+    const { busy } = useResponse();
 
     return (
         !busy ?

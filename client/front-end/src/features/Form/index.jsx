@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { resetState as resetAppState } from 'store/slices/progressSlice';
-import { useAnalyses } from 'context/AnalysesContext';
+import { useResponse } from 'context/ResponseContext';
 import { useMap } from 'context/MapContext';
 import { setErrorMessage } from 'store/slices/appSlice';
 import { analyze } from 'utils/api';
@@ -15,7 +15,7 @@ import styles from './Form.module.scss';
 export default function Form() {
     const [state, setState] = useState(getDefaultValues());
     const { clearCache } = useMap();
-    const { setResponse, busy, setBusy } = useAnalyses();
+    const { setResponse, busy, setBusy } = useResponse();
     const geometryDialogRef = useRef(null);
     const correlationId = useSelector(state => state.app.correlationId);
     const dispatch = useDispatch();

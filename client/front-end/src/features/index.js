@@ -6,7 +6,7 @@ export { default as ResultDialog } from './ResultDialog';
 export { default as ResultList } from './ResultList';
 
 export { default as Result } from './Result';
-export { default as ResultMap } from './ResultMap';
+export { default as ResultMap } from './Result/Map';
 export { default as Response } from './Response';
 export { default as ResponseHeader } from './ResponseHeader';
 export { default as ResponseTable } from './ResponseTable';

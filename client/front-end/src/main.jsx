@@ -10,7 +10,7 @@ import 'config/projections.config';
 import 'config/extents.config';
 import 'config/chartjs.config';
 import 'styles/styles.scss';
-import AnalysesProvider from 'context/AnalysesContext/index.jsx';
+import AnalysesProvider from 'context/ResponseContext/index.jsx';
 
 const root = document.getElementById('root');
 

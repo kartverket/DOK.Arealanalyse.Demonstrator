@@ -1,4 +1,4 @@
-import { useAnalyses } from 'context';
+import { useResponse } from 'context';
 import { isEmptyObject } from 'utils/helpers';
 import PointIcon from 'assets/gfx/icon-point.svg?react';
 import AreaIcon from 'assets/gfx/icon-area.svg?react'
@@ -9,7 +9,7 @@ import NotAnalyzedIcon from 'assets/gfx/icon-not-analyzed-2.svg?react'
 import styles from './ResponseHeader.module.scss';
 
 export default function ResponseHeader({ response, statusFilters, onStatusFilterSelected }) {
-    const { busy } = useAnalyses();
+    const { busy } = useResponse();
     const resultList = response.resultList || {};
     const disabled = busy || isEmptyObject(response);
 

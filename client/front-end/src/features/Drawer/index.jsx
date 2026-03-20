@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useAnalyses } from 'context';
+import { useResponse } from 'context';
 import { setSelectedResultId } from 'store/slices/appSlice';
 import { getResult, motionProps } from './helpers';
 import { Result } from 'features';
@@ -8,6 +8,7 @@ import RcDrawer from 'rc-drawer';
 import { Button } from '@digdir/designsystemet-react';
 import { ArrowDownIcon, ArrowUpIcon, ChevronRightDoubleIcon } from '@navikt/aksel-icons';
 import styles from './Drawer.module.scss';
+import { AnimatePresence, motion } from 'framer-motion';
 
 const KEY = {
     ARROW_DOWN: 'ArrowDown',
@@ -16,7 +17,7 @@ const KEY = {
 };
 
 export default function Drawer() {
-    const { response } = useAnalyses();
+    const { response } = useResponse();
     const selectedResultId = useSelector(state => state.app.selectedResultId);
     const resultIds = useSelector(state => state.app.filteredResultIds);
     const selectedResultIdRef = useRef(0);
@@ -159,10 +160,21 @@ export default function Drawer() {
                                 {resultIds.indexOf(selectedResultId) + 1} av {resultIds.length} treff
                             </div>
                         </div>
-
-                        <Result
-                            result={selectedResult}
-                        />
+                        
+                        <AnimatePresence mode="wait" initial={false}>
+                            <motion.div
+                                key={selectedResult.id}
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0 }}
+                                transition={{ duration: 0.2 }}
+                            >
+                                <Result
+                                    result={selectedResult}
+                                    inputGeometry={response.inputGeometry}
+                                />
+                            </motion.div>
+                        </AnimatePresence>
                     </div>
                 )
             }
