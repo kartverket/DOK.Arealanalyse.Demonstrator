@@ -29,6 +29,10 @@
     }
 }
 
-.description {
-    white-space: pre-line;
+.description p {
+    margin-bottom: 6px;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
 }

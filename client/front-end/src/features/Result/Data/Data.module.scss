@@ -1,0 +1,32 @@
+.dataList {
+    padding: 24px 24px 18px 24px;
+    border: 1px solid #E5E7EB;
+    border-radius: var(--ds-border-radius-lg);
+}
+
+.data {
+    border-bottom: 1px solid #F3F4F6;
+    margin-bottom: 24px;
+    padding-bottom: 18px;
+
+    &:last-child {
+        border-bottom: 0 none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+}
+
+.row {
+    display: grid;
+    grid-template-columns: 204px 1fr;
+
+}
+
+.label {
+    color: #6A7282;
+    margin-bottom: var(--ds-size-2);
+}
+
+.value {
+    word-break: break-all;
+}

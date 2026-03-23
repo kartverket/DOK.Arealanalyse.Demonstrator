@@ -1,5 +1,9 @@
-.text {
-    margin-right: 6px;
+.paragraphs p {
+    margin-bottom: var(--ds-size-3);
+
+    &:last-child {
+        margin-bottom: 0;
+    }
 }
 
 .button {

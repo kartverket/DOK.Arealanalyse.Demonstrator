@@ -68,13 +68,25 @@ export default function Map({ result, inputGeometry }) {
     }
 
     return (
-        <>
+        <div className={styles.mapContainer}>
             <Heading level={3}>Kartvisning</Heading>
             {
                 mapImageUri === null ?
-                    <Skeleton width={MAP_WIDTH} height={MAP_HEIGHT} /> :
+                    <Skeleton
+                        width={MAP_WIDTH}
+                        height={MAP_HEIGHT}
+                        className={styles.skeleton}
+                    /> :
                     renderMap()
             }
-        </>
+
+            <Heading level={5}>Tegneregler</Heading>
+
+            <div className={styles.legend}>
+                <div className={styles.imgWrapper}>
+                    <img src={result.data.cartography} alt="Tegneregler" />
+                </div>
+            </div>
+        </div>
     );
 }

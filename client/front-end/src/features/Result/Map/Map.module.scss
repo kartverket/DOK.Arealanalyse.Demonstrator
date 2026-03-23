@@ -1,13 +1,35 @@
 .mapImage {
     display: flex;
     border-radius: var(--ds-border-radius-lg);
+    margin-bottom: var(--ds-size-6);
 }
 
 .map {
     display: flex;
     width: 656px;
-    height: 335px;    
+    height: 335px;
     border: 1px solid #E5E7EB;
     border-radius: var(--ds-border-radius-lg);
     overflow: hidden;
+    margin-bottom: var(--ds-size-6);
+}
+
+.skeleton {
+    margin-bottom: var(--ds-size-6);
+}
+
+.legend {
+    border: 1px solid #E5E7EB;
+    border-radius: var(--ds-border-radius-lg);
+    overflow: hidden;
+
+    .imgWrapper {
+        max-height: 204px;
+        overflow-y: auto;
+        padding: 24px;
+
+        img {
+            display: flex;
+        }
+    }
 }

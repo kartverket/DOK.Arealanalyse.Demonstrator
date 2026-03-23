@@ -94,7 +94,8 @@
         border: 1px solid #E5E7EB;
         border-radius: 4px;
         background-color: #F9FAFB;
-        width: 142px;
+        min-width: 142px;
+        padding: 0 12px;
         height: 64px;
     }
 }
@@ -167,9 +168,13 @@
 }
 
 .sections {
-    display: flex;
-    flex-direction: column;
-    gap: 64px;
+    section {
+        margin-bottom: 64px;
+
+        &:last-child {
+            margin-bottom: 32px;
+        }
+    }
 
     h3 {
         font-size: 18px;
@@ -182,16 +187,26 @@
     h4 {
         font-size: 16px;
         font-weight: 600;
-        color: #1E2939;
+        color: #101828;
         line-height: 24px;
         margin-bottom: 12px;
     }
 
     h5 {
+        font-size: 14px;
+        font-weight: 600;
+        color: #101828;
+        text-transform: uppercase;
+        line-height: 20px;
+        margin-bottom: 16px;
+    }
+
+    h6 {
         font-size: 12px;
         font-weight: 600;
-        color: #6A7282;
+        color: #62748E;
+        text-transform: uppercase;
         line-height: 16px;
-        margin-bottom: 12px;
+        margin-bottom: 3px;
     }
 }

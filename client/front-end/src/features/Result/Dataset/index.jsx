@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import { Heading, Link } from '@digdir/designsystemet-react';
-import { ExpandableText } from 'components';
+import { FormattedText } from 'components';
 import styles from './Dataset.module.scss';
 
 export default function Dataset({ dataset }) {
@@ -17,9 +17,9 @@ export default function Dataset({ dataset }) {
                 <div className={styles.row}>
                     <div className={styles.label}>Beskrivelse</div>
                     <div className={styles.description}>
-                        <ExpandableText
+                        <FormattedText
                             text={dataset.description}
-                            limit={240}
+                            maxLength={240}
                         />
                     </div>
                 </div>

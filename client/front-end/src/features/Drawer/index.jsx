@@ -3,12 +3,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useResponse } from 'context';
 import { setSelectedResultId } from 'store/slices/appSlice';
 import { getResult, motionProps } from './helpers';
-import { Result } from 'features';
 import RcDrawer from 'rc-drawer';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Result } from 'features';
 import { Button } from '@digdir/designsystemet-react';
 import { ArrowDownIcon, ArrowUpIcon, ChevronRightDoubleIcon } from '@navikt/aksel-icons';
 import styles from './Drawer.module.scss';
-import { AnimatePresence, motion } from 'framer-motion';
 
 const KEY = {
     ARROW_DOWN: 'ArrowDown',
@@ -21,6 +21,7 @@ export default function Drawer() {
     const selectedResultId = useSelector(state => state.app.selectedResultId);
     const resultIds = useSelector(state => state.app.filteredResultIds);
     const selectedResultIdRef = useRef(0);
+    const drawerRef = useRef(null);
     const dispatch = useDispatch();
 
     useEffect(
@@ -113,12 +114,20 @@ export default function Drawer() {
         [handleKeyDown]
     );
 
+    function scrollToTop() {
+        drawerRef.current.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        })
+    }
+
     return (
         <RcDrawer
             open={selectedResult !== null}
             placement="right"
             width="50%"
             afterOpenChange={handleOpenChange}
+            panelRef={drawerRef}
             {...motionProps}
         >
             {
@@ -130,6 +139,7 @@ export default function Drawer() {
                                     onClick={close}
                                     icon
                                     variant="secondary"
+                                    title="Lukk"
                                     aria-label="Lukk"
                                 >
                                     <ChevronRightDoubleIcon aria-hidden />
@@ -141,6 +151,7 @@ export default function Drawer() {
                                     onClick={goPrevious}
                                     icon
                                     variant="secondary"
+                                    title="Forrige"
                                     aria-label="Forrige"
                                 >
                                     <ArrowUpIcon aria-hidden />
@@ -150,6 +161,7 @@ export default function Drawer() {
                                     onClick={goNext}
                                     icon
                                     variant="secondary"
+                                    title="Neste"
                                     aria-label="Neste"
                                 >
                                     <ArrowDownIcon aria-hidden />
@@ -160,7 +172,7 @@ export default function Drawer() {
                                 {resultIds.indexOf(selectedResultId) + 1} av {resultIds.length} treff
                             </div>
                         </div>
-                        
+
                         <AnimatePresence mode="wait" initial={false}>
                             <motion.div
                                 key={selectedResult.id}
@@ -175,6 +187,18 @@ export default function Drawer() {
                                 />
                             </motion.div>
                         </AnimatePresence>
+
+                        <div className={styles.bottom}>
+                            <Button
+                                onClick={scrollToTop}
+                                icon
+                                variant="secondary"
+                                title="Gå til toppen"
+                                aria-label="Gå til toppen"
+                            >
+                                <ArrowUpIcon aria-hidden />
+                            </Button>
+                        </div>
                     </div>
                 )
             }

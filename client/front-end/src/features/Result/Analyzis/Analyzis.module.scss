@@ -1,0 +1,61 @@
+.analyzis {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.algorithms {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    & > div {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .number {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        width: 32px;
+        height: 32px;
+        color: #45556C;
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 16px;
+        border: 1px solid #E2E8F0;
+        border-radius: 50%;
+        background-color: #F1F5F9;
+    }
+
+    .description {
+        color: #364153;
+        font-weight: 500;
+        line-height: 20px;
+    }
+}
+
+.results {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.box {
+    display: flex;
+    flex-direction: column;
+    padding: 18px;
+    border: 1px solid #F1F5F9;
+    border-radius: 10px;
+    background: #F8FAFC;
+
+    .value {
+        color: #0F172B;
+        font-size: 18px;
+        font-weight: 700;
+        line-height: 28px;        
+    }
+}

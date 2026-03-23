@@ -3,10 +3,12 @@ import { RESULT_STATUS } from 'utils/constants';
 import { Heading } from '@digdir/designsystemet-react';
 import { getSectionOptions } from './helpers';
 import { InternalLinks } from 'components';
-import Map from './Map';
 import Actions from './Actions';
+import Analyzis from './Analyzis';
 import Data from './Data';
 import Dataset from './Dataset';
+import Map from './Map';
+import Quality from './Quality';
 import MustHandleIcon from 'assets/gfx/icon-must-handle.svg?react';
 import MustCheckIcon from 'assets/gfx/icon-must-check.svg?react';
 import NearbyIcon from 'assets/gfx/icon-nearby.svg?react';
@@ -117,6 +119,10 @@ export default function Result({ result, inputGeometry }) {
         );
     }
 
+    function scrollToTop() {
+
+    }
+
     return (
         <div className={`${styles.result} ${getStatusClassName()}`}>
             <div className={styles.heading}>
@@ -184,7 +190,7 @@ export default function Result({ result, inputGeometry }) {
                     show.data && (
                         <section id="section-data">
                             <Data 
-                                result={result}
+                                dataList={data.data}
                             />
                         </section>
                     )
@@ -203,7 +209,9 @@ export default function Result({ result, inputGeometry }) {
                 {
                     show.quality && (
                         <section id="section-quality">
-                            Kvalitet
+                            <Quality
+                                qualityMeasurement={data.qualityMeasurement}
+                            />
                         </section>
                     )
                 }
@@ -211,59 +219,13 @@ export default function Result({ result, inputGeometry }) {
                 {
                     show.analyzis && (
                         <section id="section-analyzis">
-                            Analyse
+                            <Analyzis 
+                                result={result} 
+                            />
                         </section>
                     )
                 }
             </div>
-
-            {/* <Tabs>
-                <Tabs.List className={styles.tabsList}>
-                    {
-                        showMap && (
-                            <Tabs.Tab value="map">Kart</Tabs.Tab>
-                        )
-                    }
-                    {
-                        showActions && (
-                            <Tabs.Tab value="actions">Tiltak</Tabs.Tab>
-                        )
-                    }
-                    <Tabs.Tab value="data">Data</Tabs.Tab>
-                    <Tabs.Tab value="dataset">Datasett</Tabs.Tab>
-                    {
-                        showQuality && (
-                            <Tabs.Tab value="quality">Kvalitet</Tabs.Tab>
-                        )
-                    }
-                    <Tabs.Tab value="analyzis">Analyse</Tabs.Tab>
-                </Tabs.List>
-                {
-                    showMap && (
-                        <Tabs.Panel value="map" className={styles.tabsPanel}>
-                            <Map
-                                result={result}
-                                inputGeometry={inputGeometry}
-                            />
-                        </Tabs.Panel>
-                    )
-                }
-                {
-                    showActions && (
-                        <Tabs.Panel value="actions" className={styles.tabsPanel}>
-                            <PossibleActions result={result} />
-                        </Tabs.Panel>
-                    )
-                }
-                <Tabs.Panel value="data" className={styles.tabsPanel}>Data</Tabs.Panel>
-                <Tabs.Panel value="dataset" className={styles.tabsPanel}>Datasett</Tabs.Panel>
-                {
-                    showQuality && (
-                        <Tabs.Panel value="quality" className={styles.tabsPanel}>Kvalitet</Tabs.Panel>
-                    )
-                }
-                <Tabs.Panel value="analyzis" className={styles.tabsPanel}>Analyse</Tabs.Panel>
-            </Tabs> */}
         </div>
     );
 }
