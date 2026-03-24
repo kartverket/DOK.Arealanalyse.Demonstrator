@@ -13,7 +13,8 @@ internal static class Utils
         bool includeGuidance,
         bool includeQualityMeasurement,
         bool includeFilterChosenDOK,
-        bool includeFacts)
+        bool includeFacts,
+        bool createBinaries)
     {
         var inputGeometry = geometry.DeepClone();
 
@@ -37,7 +38,8 @@ internal static class Utils
                 ["includeGuidance"] = includeGuidance,
                 ["includeQualityMeasurement"] = includeQualityMeasurement,
                 ["includeFilterChosenDOK"] = includeFilterChosenDOK,
-                ["includeFacts"] = includeFacts
+                ["includeFacts"] = includeFacts,
+                ["createBinaries"] = createBinaries
             }
         };
     }

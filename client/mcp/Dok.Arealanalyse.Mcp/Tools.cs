@@ -29,6 +29,7 @@ public static class Tools
         [Description("Include quality measurement")] bool includeQualityMeasurement = true,
         [Description("Only include the municipality's chosen DOK data")] bool includeFilterChosenDOK = false,
         [Description("Include factual information")] bool includeFacts = true,
+        [Description("Generate PDF report and map images. Increases processing time.")] bool createBinaries = false,
         CancellationToken cancellationToken = default)
     {
         PlanResult? plan;
@@ -53,7 +54,7 @@ public static class Tools
 
         try
         {
-            var payload = Utils.BuildAnalysisPayload(plan.Geometry, EpsgProjection, requestedBuffer, context, theme, includeGuidance, includeQualityMeasurement, includeFilterChosenDOK, includeFacts);
+            var payload = Utils.BuildAnalysisPayload(plan.Geometry, EpsgProjection, requestedBuffer, context, theme, includeGuidance, includeQualityMeasurement, includeFilterChosenDOK, includeFacts, createBinaries);
             response = await apiClient.AnalyzeAsync(payload, null, cancellationToken);
         }
         catch (HttpRequestException ex)
@@ -98,6 +99,7 @@ public static class Tools
         [Description("Include quality measurement")] bool includeQualityMeasurement = true,
         [Description("Only include the municipality's chosen DOK data")] bool includeFilterChosenDOK = false,
         [Description("Include factual information")] bool includeFacts = true,
+        [Description("Generate PDF report and map images. Increases processing time.")] bool createBinaries = false,
         CancellationToken cancellationToken = default)
     {
         EiendomResult? eiendom;
@@ -122,7 +124,7 @@ public static class Tools
 
         try
         {
-            var payload = Utils.BuildAnalysisPayload(eiendom.Geometry, EpsgProjection, requestedBuffer, context, theme, includeGuidance, includeQualityMeasurement, includeFilterChosenDOK, includeFacts);
+            var payload = Utils.BuildAnalysisPayload(eiendom.Geometry, EpsgProjection, requestedBuffer, context, theme, includeGuidance, includeQualityMeasurement, includeFilterChosenDOK, includeFacts, createBinaries);
             response = await apiClient.AnalyzeAsync(payload, null, cancellationToken);
         }
         catch (HttpRequestException ex)
@@ -160,14 +162,14 @@ public static class Tools
         "Prefer AnalyzeByPlan or AnalyzeByEiendom when you have a plan ID or property identifier — use this only when you already have GeoJSON geometry. " +
         "The analysis may take up to a few minutes. " +
         "The payload must follow this structure: " +
-        "{\"inputs\":{\"inputGeometry\":<GeoJSON with crs>,\"requestedBuffer\":0,\"context\":null,\"theme\":null,\"includeGuidance\":true,\"includeQualityMeasurement\":true,\"includeFilterChosenDOK\":false,\"includeFacts\":true}}. " +
+        "{\"inputs\":{\"inputGeometry\":<GeoJSON with crs>,\"requestedBuffer\":0,\"context\":null,\"theme\":null,\"includeGuidance\":true,\"includeQualityMeasurement\":true,\"includeFilterChosenDOK\":false,\"includeFacts\":true,\"createBinaries\":false}}. " +
         "The inputGeometry must include a crs property: {\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"urn:ogc:def:crs:EPSG::25833\"}}}. " +
         "Returns the full analysis result as JSON.")]
     public static async Task<string> AnalyzeIntersections(
         DokApiClient apiClient,
         [Description(
             "JSON payload. Must contain an 'inputs' object with 'inputGeometry' (GeoJSON with crs property set to urn:ogc:def:crs:EPSG::25833), " +
-            "'requestedBuffer' (int), and optional 'context', 'theme', 'includeGuidance', 'includeQualityMeasurement', 'includeFilterChosenDOK', 'includeFacts'.")] string payloadJson,
+            "'requestedBuffer' (int), and optional 'context', 'theme', 'includeGuidance', 'includeQualityMeasurement', 'includeFilterChosenDOK', 'includeFacts', 'createBinaries'.")] string payloadJson,
         [Description("Optional x-correlation-id header value")] string? correlationId,
         CancellationToken cancellationToken)
     {
