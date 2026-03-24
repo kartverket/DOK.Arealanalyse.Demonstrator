@@ -22,6 +22,7 @@
 
         &:not(:disabled):active {
             background-color: #eeeeee !important;
+            border-color: var(--ds-color-border-strong);            
         }
 
         svg {

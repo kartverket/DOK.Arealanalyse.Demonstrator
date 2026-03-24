@@ -38,16 +38,18 @@ export default function Zoom({ map, className = '' }) {
                 className={styles.zoomIn}
                 onClick={zoomIn}
                 title="Zoom inn"
+                aria-label="Zoom inn"
             >
-                <PlusIcon />
+                <PlusIcon aria-hidden />
             </button>
 
             <button
                 className={styles.zoomOut}
                 onClick={zoomOut}
                 title="Zoom ut"
+                aria-label="Zoom ut"                
             >
-                <MinusIcon />
+                <MinusIcon aria-hidden />
             </button>
         </div>
     );

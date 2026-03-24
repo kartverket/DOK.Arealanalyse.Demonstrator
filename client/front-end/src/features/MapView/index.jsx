@@ -3,6 +3,7 @@ import { createMap } from 'utils/map';
 import { setupMap } from './helpers';
 import Zoom from './Zoom';
 import ZoomToExtent from './ZoomToExtent';
+import Expand from './Expand';
 import styles from './MapView.module.scss';
 
 export default function MapView({ result, inputGeometry }) {
@@ -48,6 +49,7 @@ export default function MapView({ result, inputGeometry }) {
                     <div className={styles.buttons}>
                         <Zoom map={map} />
                         <ZoomToExtent map={map} />
+                        <Expand />
                     </div>
                 )
             }

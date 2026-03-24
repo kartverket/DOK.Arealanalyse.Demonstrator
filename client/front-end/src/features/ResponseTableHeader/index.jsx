@@ -1,5 +1,4 @@
-import { useResponse } from 'context';
-import { isEmptyObject } from 'utils/helpers';
+import { useSelector } from 'react-redux';
 import { STATUS_FILTER } from 'utils/constants';
 import { Button, Search } from '@digdir/designsystemet-react';
 import ThemeSelector from './ThemeSelector';
@@ -11,18 +10,18 @@ import FactInfoIcon from 'assets/gfx/icon-fact-info.svg?react';
 import DownloadIcon from 'assets/gfx/icon-download.svg?react';
 import styles from './ResponseTableHeader.module.scss';
 
-
 export default function ResponseTableHeader({
-    response, statusFilters, themes, selectedThemes, searchTerm, onStatusFilterSelected, onThemeSelected, onSearchChange }) {
-    const { busy } = useResponse();    
-    const disabled = busy || isEmptyObject(response);
+    statusFilters, themes, selectedThemes, searchTerm, onStatusFilterSelected, onThemeSelected, onSearchChange }) {
+    const busy = useSelector(state => state.app.busy);
+    const data = useSelector(state => state.response.data);
+    const disabled = busy || data === null;
 
     function hasFactInfo() {
-        return Array.isArray(response.factList) && response.factList.length > 0;
+        return data !== null && Array.isArray(data.factList) && data.factList.length > 0;
     }
 
     function hasReport() {
-        return typeof response.report === 'string';
+        return data !== null && typeof data.report === 'string';
     }
 
     return (

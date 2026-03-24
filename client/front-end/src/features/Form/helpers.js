@@ -1,5 +1,4 @@
-import { inPlaceSort } from 'fast-sort';
-import groupBy from 'lodash.groupby';
+import { createRandomId } from 'utils/helpers';
 import { RESULT_STATUS } from 'utils/constants';
 
 export function mapResponse(response) {
@@ -11,53 +10,26 @@ export function mapResponse(response) {
     };
 }
 
-function mapResultList(resultList) {
-    const grouped = groupBy(resultList, result => result.resultStatus);
-    const mappedResultList = {};
-    let index = 1;
-
-    for (const [status, results] of Object.entries(grouped)) {
-        const mappedResults = results.map(resultItem => {
-            return {
-                id: index++,
-                status,
-                themes: resultItem.themes,
-                title: resultItem.title,
-                datasetTitle: resultItem.runOnDataset?.title || null,
-                description: getDescription(resultItem),
-                distance: {
-                    value: resultItem.distanceToObject,
-                    formatted: getDistanceFormatted(resultItem)
-                },
-                hitArea: {
-                    value: resultItem.hitArea,
-                    formatted: getHitAreaPercentFormatted(resultItem)
-                },
-                data: resultItem
-            };
-        });
-
-        if ([RESULT_STATUS.HIT_RED, RESULT_STATUS.HIT_YELLOW].includes(status)) {
-            inPlaceSort(mappedResults).desc([
-                result => result.hitArea.value || 0,
-                result => result.themes[0]
-            ]);
-        } else if ([RESULT_STATUS.NO_HIT_YELLOW, RESULT_STATUS.NO_HIT_GREEN].includes(status)) {
-            inPlaceSort(mappedResults).asc([
-                result => result.distance.value,
-                result => result.themes[0]
-            ]);
-        } else if ([RESULT_STATUS.NOT_RELEVANT, RESULT_STATUS.NOT_IMPLEMENTED, RESULT_STATUS.TIMEOUT, RESULT_STATUS.ERROR].includes(status)) {
-            inPlaceSort(mappedResults).asc([
-                result => result.themes[0],
-                result => result.description
-            ]);
-        }
-
-        mappedResultList[status] = mappedResults;
-    }
-
-    return mappedResultList;
+export function mapResultList(resultList) {
+    return resultList.map(result => {
+        return {
+            id: createRandomId(),
+            status: result.resultStatus,
+            themes: result.themes,
+            title: result.title,
+            datasetTitle: result.runOnDataset?.title || null,
+            description: getDescription(result),
+            distance: {
+                value: result.distanceToObject,
+                formatted: getDistanceFormatted(result)
+            },
+            hitArea: {
+                value: result.hitArea,
+                formatted: getHitAreaPercentFormatted(result)
+            },
+            data: result
+        };
+    });
 }
 
 function getDescription(result) {

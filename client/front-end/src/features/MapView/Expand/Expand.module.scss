@@ -7,6 +7,7 @@
     width: 34px;
     height: 34px;
     padding: 0;
+    background-size: 26px;
     background-color: #ffffff;
     cursor: pointer;
     transition: 0.2s;
@@ -22,6 +23,6 @@
 
     &:not(:disabled):active {
         background-color: #eeeeee !important;
-        border-color: var(--ds-color-border-strong);        
+        border-color: var(--ds-color-border-strong);
     }
 }

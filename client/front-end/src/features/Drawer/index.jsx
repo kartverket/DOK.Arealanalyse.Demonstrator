@@ -1,8 +1,7 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useResponse } from 'context';
-import { setSelectedResultId } from 'store/slices/appSlice';
-import { getResult, motionProps } from './helpers';
+import { setSelectedResultId } from 'store/slices/responseSlice';
+import { motionProps } from './helpers';
 import RcDrawer from 'rc-drawer';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Result } from 'features';
@@ -16,14 +15,15 @@ const KEY = {
     ESCAPE: 'Escape'
 };
 
-export default function Drawer() {
-    const { response } = useResponse();
-    const selectedResultId = useSelector(state => state.app.selectedResultId);
-    const resultIds = useSelector(state => state.app.filteredResultIds);
-    const selectedResultIdRef = useRef(0);
+export default function Drawer() {    
+    const selectedResultId = useSelector(state => state.response.selectedResultId);
+    const selectedResult = useSelector(state => state.response.results.byId[selectedResultId]);    
+    const filteredResultIds = useSelector(state => state.response.filteredResultIds);
+    const data = useSelector(state => state.response.data);
+    const selectedResultIdRef = useRef(null);
     const drawerRef = useRef(null);
     const dispatch = useDispatch();
-
+    
     useEffect(
         () => {
             selectedResultIdRef.current = selectedResultId;
@@ -31,52 +31,41 @@ export default function Drawer() {
         [selectedResultId]
     );
 
-    const selectedResult = useMemo(
-        () => {
-            if (response === null || selectedResultId === 0) {
-                return null;
-            }
-
-            return getResult(response.resultList, selectedResultId);
-        },
-        [response, selectedResultId]
-    );
-
     const goPrevious = useCallback(
         () => {
-            const index = resultIds.indexOf(selectedResultIdRef.current);
+            const index = filteredResultIds.indexOf(selectedResultIdRef.current);
             let prevId;
 
             if (index === 0) {
-                prevId = resultIds[resultIds.length - 1];
+                prevId = filteredResultIds[filteredResultIds.length - 1];
             } else {
-                prevId = resultIds[index - 1];
+                prevId = filteredResultIds[index - 1];
             }
 
             dispatch(setSelectedResultId(prevId));
         },
-        [dispatch, resultIds]
+        [dispatch, filteredResultIds]
     );
 
     const goNext = useCallback(
         () => {
-            const index = resultIds.indexOf(selectedResultIdRef.current);
+            const index = filteredResultIds.indexOf(selectedResultIdRef.current);
             let nextId;
 
-            if (index + 1 === resultIds.length) {
-                nextId = resultIds[0];
+            if (index + 1 === filteredResultIds.length) {
+                nextId = filteredResultIds[0];
             } else {
-                nextId = resultIds[index + 1];
+                nextId = filteredResultIds[index + 1];
             }
 
             dispatch(setSelectedResultId(nextId));
         },
-        [dispatch, resultIds]
+        [dispatch, filteredResultIds]
     );
 
     const close = useCallback(
         () => {
-            dispatch(setSelectedResultId(0));
+            dispatch(setSelectedResultId(null));
         },
         [dispatch]
     );
@@ -118,12 +107,12 @@ export default function Drawer() {
         drawerRef.current.scrollTo({
             top: 0,
             behavior: 'smooth'
-        })
+        });
     }
 
     return (
         <RcDrawer
-            open={selectedResult !== null}
+            open={selectedResult !== undefined}
             placement="right"
             width="50%"
             afterOpenChange={handleOpenChange}
@@ -131,7 +120,7 @@ export default function Drawer() {
             {...motionProps}
         >
             {
-                selectedResult !== null && (
+                selectedResult !== undefined && (
                     <div className={styles.drawer}>
                         <div className={styles.top}>
                             <div className={styles.navigation}>
@@ -169,7 +158,7 @@ export default function Drawer() {
                             </div>
 
                             <div className={styles.hits}>
-                                {resultIds.indexOf(selectedResultId) + 1} av {resultIds.length} treff
+                                {filteredResultIds.indexOf(selectedResultId) + 1} av {filteredResultIds.length} treff
                             </div>
                         </div>
 
@@ -183,7 +172,7 @@ export default function Drawer() {
                             >
                                 <Result
                                     result={selectedResult}
-                                    inputGeometry={response.inputGeometry}
+                                    inputGeometry={data.inputGeometry}
                                 />
                             </motion.div>
                         </AnimatePresence>

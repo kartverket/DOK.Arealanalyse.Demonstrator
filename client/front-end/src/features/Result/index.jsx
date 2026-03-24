@@ -119,10 +119,6 @@ export default function Result({ result, inputGeometry }) {
         );
     }
 
-    function scrollToTop() {
-
-    }
-
     return (
         <div className={`${styles.result} ${getStatusClassName()}`}>
             <div className={styles.heading}>

@@ -1,11 +1,9 @@
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { useResponse } from 'context/ResponseContext';
 import { Card, Spinner } from '@digdir/designsystemet-react';
 import { getStatusText, STATE_STATUS, TASK_STATUS } from './helpers';
 import { ProgressBar, PROGRESS_VARIANT } from 'components';
 import styles from './Progress.module.scss';
-
 
 const TASK_STATUSES = {
     [TASK_STATUS.NOT_STARTED]: styles.notStarted,
@@ -14,7 +12,7 @@ const TASK_STATUSES = {
 }
 
 export default function Progress() {
-    const { busy } = useResponse();
+    const busy = useSelector(state => state.app.busy);
     const progress = useSelector(state => state.progress);
 
     function getStatusCssClass(taskStatus) {

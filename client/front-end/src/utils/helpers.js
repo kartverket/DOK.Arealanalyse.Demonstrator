@@ -60,3 +60,7 @@ export function isEmptyObject(value) {
         Object.keys(value).length === 0
     );
 }
+
+export function createRandomId() {
+    return `_${Math.floor(Math.random() * Math.floor(Math.random() * Date.now()))}`;
+}

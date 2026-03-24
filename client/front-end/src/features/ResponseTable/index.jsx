@@ -1,11 +1,11 @@
-import { useResponse } from 'context';
+import { useSelector } from 'react-redux';
 import { Table } from '@digdir/designsystemet-react';
 import { Progress } from 'features';
 import ResponseTableRow from './ResponseTableRow';
 import styles from './ResponseTable.module.scss';
 
 export default function ResponseTable({ resultList }) {
-    const { busy } = useResponse();
+    const busy = useSelector(state => state.app.busy);
 
     return (
         !busy ?

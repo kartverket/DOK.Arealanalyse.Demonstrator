@@ -1,5 +1,7 @@
-import { useResponse } from 'context';
+import { useSelector } from 'react-redux';
+import { selectResults } from 'store/slices/responseSlice';
 import { isEmptyObject } from 'utils/helpers';
+import { RESULT_STATUS, STATUS_FILTER } from 'utils/constants';
 import PointIcon from 'assets/gfx/icon-point.svg?react';
 import AreaIcon from 'assets/gfx/icon-area.svg?react'
 import MustHandleIcon from 'assets/gfx/icon-must-handle.svg?react'
@@ -8,10 +10,11 @@ import NearbyIcon from 'assets/gfx/icon-nearby.svg?react'
 import NotAnalyzedIcon from 'assets/gfx/icon-not-analyzed-2.svg?react'
 import styles from './ResponseHeader.module.scss';
 
-export default function ResponseHeader({ response, statusFilters, onStatusFilterSelected }) {
-    const { busy } = useResponse();
-    const resultList = response.resultList || {};
-    const disabled = busy || isEmptyObject(response);
+export default function ResponseHeader({ statusFilters, onStatusFilterSelected }) {
+    const busy = useSelector(state => state.app.busy);
+    const data = useSelector(state => state.response.data);
+    const results = useSelector(selectResults);
+    const disabled = busy || isEmptyObject(results);
 
     function getCount(resultStatuses) {
         if (disabled) {
@@ -19,7 +22,7 @@ export default function ResponseHeader({ response, statusFilters, onStatusFilter
         }
 
         return resultStatuses.reduce((accumulator, resultStatus) => {
-            const grouping = resultList[resultStatus];
+            const grouping = results[resultStatus];
             return grouping ? accumulator + grouping.length : accumulator + 0;
         }, 0);
     }
@@ -30,16 +33,16 @@ export default function ResponseHeader({ response, statusFilters, onStatusFilter
                 !disabled && (
                     <div className={styles.inputArea}>
                         <span>Analyseområde</span>
-                        <h2>{response.municipalityName}</h2>
+                        <h2>{data.municipalityName}</h2>
 
                         <div>
                             <span>
                                 <PointIcon />
-                                {response.municipalityNumber}
+                                {data.municipalityNumber}
                             </span>
                             <span>
                                 <AreaIcon />
-                                {Math.round(response.inputGeometryArea).toLocaleString('nb-NO')} m²
+                                {Math.round(data.inputGeometryArea).toLocaleString('nb-NO')} m²
                             </span>
                         </div>
                     </div>
@@ -51,8 +54,8 @@ export default function ResponseHeader({ response, statusFilters, onStatusFilter
                     <input
                         id="must-handle"
                         type="checkbox"
-                        name="mustHandle"
-                        checked={statusFilters.includes('mustHandle')}
+                        name={STATUS_FILTER.MUST_HANDLE}
+                        checked={statusFilters.includes(STATUS_FILTER.MUST_HANDLE)}
                         onChange={event => onStatusFilterSelected(event.target.name)}
                         disabled={disabled}
                     />
@@ -62,7 +65,7 @@ export default function ResponseHeader({ response, statusFilters, onStatusFilter
                             <MustHandleIcon />
                             Må håndteres
                         </div>
-                        <span className={styles.count}>{getCount(['HIT-RED'])}</span>
+                        <span className={styles.count}>{getCount([RESULT_STATUS.HIT_RED])}</span>
                     </label>
                 </div>
 
@@ -70,8 +73,8 @@ export default function ResponseHeader({ response, statusFilters, onStatusFilter
                     <input
                         id="must-check"
                         type="checkbox"
-                        name="mustCheck"
-                        checked={statusFilters.includes('mustCheck')}
+                        name={STATUS_FILTER.MUST_CHECK}
+                        checked={statusFilters.includes(STATUS_FILTER.MUST_CHECK)}
                         onChange={event => onStatusFilterSelected(event.target.name)}
                         disabled={disabled}
                     />
@@ -81,7 +84,17 @@ export default function ResponseHeader({ response, statusFilters, onStatusFilter
                             <MustCheckIcon />
                             Må sjekkes
                         </div>
-                        <span className={styles.count}>{getCount(['HIT-YELLOW', 'NO-HIT-YELLOW', 'ERROR', 'NOT-IMPLEMENTED'])}</span>
+                        <span className={styles.count}>
+                            {
+                                getCount([
+                                    RESULT_STATUS.HIT_YELLOW,
+                                    RESULT_STATUS.NO_HIT_YELLOW,
+                                    RESULT_STATUS.ERROR,
+                                    RESULT_STATUS.TIMEOUT,
+                                    RESULT_STATUS.NOT_IMPLEMENTED
+                                ])
+                            }
+                        </span>
                     </label>
                 </div>
 
@@ -89,8 +102,8 @@ export default function ResponseHeader({ response, statusFilters, onStatusFilter
                     <input
                         id="nearby"
                         type="checkbox"
-                        name="nearby"
-                        checked={statusFilters.includes('nearby')}
+                        name={STATUS_FILTER.NEARBY}
+                        checked={statusFilters.includes(STATUS_FILTER.NEARBY)}
                         onChange={event => onStatusFilterSelected(event.target.name)}
                         disabled={disabled}
                     />
@@ -100,7 +113,7 @@ export default function ResponseHeader({ response, statusFilters, onStatusFilter
                             <NearbyIcon />
                             I nærheten
                         </div>
-                        <span className={styles.count}>{getCount(['NO-HIT-GREEN'])}</span>
+                        <span className={styles.count}>{getCount([RESULT_STATUS.NO_HIT_GREEN])}</span>
                     </label>
                 </div>
 
@@ -108,8 +121,8 @@ export default function ResponseHeader({ response, statusFilters, onStatusFilter
                     <input
                         id="not-analyzed"
                         type="checkbox"
-                        name="notAnalyzed"
-                        checked={statusFilters.includes('notAnalyzed')}
+                        name={STATUS_FILTER.NOT_ANALYZED}
+                        checked={statusFilters.includes(STATUS_FILTER.NOT_ANALYZED)}
                         onChange={event => onStatusFilterSelected(event.target.name)}
                         disabled={disabled}
                     />
@@ -119,7 +132,7 @@ export default function ResponseHeader({ response, statusFilters, onStatusFilter
                             <NotAnalyzedIcon />
                             Ikke analysert
                         </div>
-                        <span className={styles.count}>{getCount(['NOT-RELEVANT'])}</span>
+                        <span className={styles.count}>{getCount([RESULT_STATUS.NOT_RELEVANT])}</span>
                     </label>
                 </div>
             </div>

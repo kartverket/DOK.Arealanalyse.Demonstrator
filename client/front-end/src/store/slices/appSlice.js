@@ -2,10 +2,15 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
     correlationId: null,
-    selectedResult: null,
+
     filteredResultIds: [],
     selectedResultId: 0,
+
+    selectedResult: null,
+    
+
     errorMessage: null,
+    busy: false
     // mapImages: {}
 };
 
@@ -19,10 +24,10 @@ export const appSlice = createSlice({
                 correlationId: action.payload
             };
         },
-        setSelectedResult: (state, action) => {
+        setResponse: (state, action) => {
             return {
                 ...state,
-                selectedResult: action.payload
+                response: action.payload
             };
         },
         setFilteredResultIds: (state, action) => {
@@ -42,6 +47,18 @@ export const appSlice = createSlice({
                 ...state,
                 errorMessage: action.payload
             };
+        },
+        setSelectedResult: (state, action) => {
+            return {
+                ...state,
+                selectedResult: action.payload
+            };
+        },
+        setBusy: (state, action) => {
+            return {
+                ...state,
+                busy: action.payload
+            };
         }
     }
 });
@@ -51,7 +68,8 @@ export const {
     setSelectedResult,
     setFilteredResultIds,
     setSelectedResultId,
-    setErrorMessage
+    setErrorMessage,
+    setBusy
 } = appSlice.actions;
 
 export default appSlice.reducer;

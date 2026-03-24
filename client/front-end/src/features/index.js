@@ -5,6 +5,8 @@ export { default as MapView } from './MapView';
 export { default as ResultDialog } from './ResultDialog';
 export { default as ResultList } from './ResultList';
 
+export { default as MapDialog } from './MapDialog';
+
 export { default as Result } from './Result';
 export { default as ResultMap } from './Result/Map';
 export { default as Response } from './Response';

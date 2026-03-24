@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setSelectedResultId } from 'store/slices/appSlice';
+import { setSelectedResultId, setMapDialogOpen } from 'store/slices/responseSlice';
 import { RESULT_STATUS } from 'utils/constants';
 import { Table } from '@digdir/designsystemet-react';
 import MustHandleIcon from 'assets/gfx/icon-must-handle.svg?react';
@@ -11,7 +11,7 @@ import { ChevronRightIcon } from '@navikt/aksel-icons';
 import styles from '../ResponseTable.module.scss';
 
 function ResponseTableRow({ result }) {
-    const selectedResultId = useSelector(state => state.app.selectedResultId);
+    const selectedResultId = useSelector(state => state.response.selectedResultId);
     const dispatch = useDispatch();
 
     function getRowClassName(result) {

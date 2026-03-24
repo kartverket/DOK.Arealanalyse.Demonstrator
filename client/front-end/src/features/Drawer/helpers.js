@@ -14,9 +14,3 @@ export const motionProps = {
     maskMotion,
     motion,
 };
-
-export function getResult(resultList, resultId) {
-    return Object.values(resultList)
-        .flat()
-        .find(result => result.id === resultId) || null;
-}

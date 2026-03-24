@@ -1,12 +1,11 @@
 import { useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { resetState as resetAppState } from 'store/slices/progressSlice';
-import { useResponse } from 'context/ResponseContext';
-import { useMap } from 'context/MapContext';
-import { setErrorMessage } from 'store/slices/appSlice';
+import { setBusy, setErrorMessage } from 'store/slices/appSlice';
+import { setResponse } from 'store/slices/responseSlice';
 import { analyze } from 'utils/api';
 import { mapResponse } from './helpers';
-import { Button, Checkbox, CircularProgress, FormControl, FormControlLabel, InputAdornment, InputLabel, MenuItem, Paper, Select } from '@mui/material';
+import { Button, Checkbox, CircularProgress, FormControl, FormControlLabel, InputAdornment, InputLabel, MenuItem, Select } from '@mui/material';
 import { IntegerField } from 'components';
 import { GeometryDialog } from 'features';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -14,10 +13,9 @@ import styles from './Form.module.scss';
 
 export default function Form() {
     const [state, setState] = useState(getDefaultValues());
-    const { clearCache } = useMap();
-    const { setResponse, busy, setBusy } = useResponse();
     const geometryDialogRef = useRef(null);
     const correlationId = useSelector(state => state.app.correlationId);
+    const busy = useSelector(state => state.app.busy);
     const dispatch = useDispatch();
 
     function getDefaultValues() {
@@ -63,25 +61,25 @@ export default function Form() {
     }
 
     function resetState() {
-        setResponse(null);
-        clearCache();
+        // setResponse(null);
+        // clearCache();
         dispatch(resetAppState());
     }
 
-    async function runAnalyses() {       
+    async function runAnalyses() {
         resetState();
         const payload = getPayload();
 
         try {
-            setBusy(true);
+            dispatch(setBusy(true));
             const response = _data; // await analyze(payload);
             const mapped = mapResponse(response);
-            setResponse(mapped);
+            dispatch(setResponse(mapped));
         } catch (error) {
             dispatch(setErrorMessage('Kunne ikke kjøre DOK-analyse. En feil har oppstått.'));
             console.log(error);
         } finally {
-            setBusy(false);
+            dispatch(setBusy(false));
         }
     }
 

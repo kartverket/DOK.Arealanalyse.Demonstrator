@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useResponse } from 'context';
 import { createMapImage } from 'utils/map';
+import caching from 'utils/mapImageCache';
 import { Heading, Skeleton } from '@digdir/designsystemet-react';
 import { MapView } from 'features';
 import styles from './Map.module.scss';
@@ -9,7 +9,6 @@ const MAP_WIDTH = 656;
 const MAP_HEIGHT = 335;
 
 export default function Map({ result, inputGeometry }) {
-    const { mapCacheRef } = useResponse();
     const [mapImageUri, setMapImageUri] = useState(null);
     const [showInteractiveMap, setShowInteractiveMap] = useState(false);
 
@@ -20,9 +19,9 @@ export default function Map({ result, inputGeometry }) {
                 let imageUri = data.rasterResult.imageUri;
 
                 if (!imageUri) {
-                    imageUri = mapCacheRef.current.get(result.id);
+                    imageUri = caching.getMapImage(result.id);
 
-                    if (!imageUri) {
+                    if (imageUri === null) {
                         imageUri = await createMapImage({
                             geometry: inputGeometry,
                             bufferedGeometry: data.buffer > 0 ? data.runOnInputGeometry : null,
@@ -32,15 +31,15 @@ export default function Map({ result, inputGeometry }) {
                                 height: MAP_HEIGHT
                             }
                         });
-
-                        mapCacheRef.current.set(result.id, imageUri);
+                        
+                        caching.setMapImage(result.id, imageUri);
                     }
                 }
 
                 setMapImageUri(imageUri);
             })();
         },
-        [result, inputGeometry, mapCacheRef]
+        [result, inputGeometry]
     );
 
     function renderMap() {
