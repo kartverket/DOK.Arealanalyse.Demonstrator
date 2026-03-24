@@ -3,14 +3,14 @@ using System.Text.Json.Nodes;
 
 namespace Dok.Arealanalyse.Mcp.Clients;
 
-public sealed class NapClient(HttpClient httpClient, ILogger<NapClient> logger)
+public sealed class PlanDataClient(HttpClient httpClient, ILogger<PlanDataClient> logger)
 {
     public async Task<PlanResult?> GetPlanAsync(string kommunenummer, string planId, CancellationToken ct)
     {
         logger.LogDebug("Searching for plan {PlanId} in kommune {Kommune}", planId, kommunenummer);
 
-        var url = $"?arealplanId.kommunenummer={Uri.EscapeDataString(kommunenummer)}"
-            + $"&arealplanId.planidentifikasjon={Uri.EscapeDataString(planId)}"
+        var url = $"?nasjonalArealplanId.kommunenummer={Uri.EscapeDataString(kommunenummer)}"
+            + $"&nasjonalArealplanId.planid={Uri.EscapeDataString(planId)}"
             + $"&crs={Uri.EscapeDataString($"http://www.opengis.net/def/crs/EPSG/0/{Tools.Epsg}")}"
             + "&limit=1&f=json";
 
@@ -19,8 +19,8 @@ public sealed class NapClient(HttpClient httpClient, ILogger<NapClient> logger)
         if (!response.IsSuccessStatusCode)
         {
             var body = await response.Content.ReadAsStringAsync(ct);
-            logger.LogError("NAP request failed with status {StatusCode}. Response: {Body}", (int)response.StatusCode, body);
-            throw new HttpRequestException($"NAP request failed with status {(int)response.StatusCode} ({response.StatusCode}). Response: {body}");
+            logger.LogError("PlanData request failed with status {StatusCode}. Response: {Body}", (int)response.StatusCode, body);
+            throw new HttpRequestException($"PlanData request failed with status {(int)response.StatusCode} ({response.StatusCode}). Response: {body}");
         }
 
         var json = await response.Content.ReadAsStringAsync(ct);

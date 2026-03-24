@@ -19,7 +19,7 @@ public static class Tools
         "Returns JSON with planName, planType, reportUrl (link to generated PDF report), and the full analysis result.")]
     public static async Task<string> AnalyzeByPlan(
         DokApiClient apiClient,
-        NapClient napClient,
+        PlanDataClient planDataClient,
         [Description("Plan ID (planidentifikasjon), e.g. '911'")] string planId,
         [Description("Municipality number (kommunenummer), e.g. '3228'")] string kommunenummer,
         [Description("Buffer in meters. Defaults to 0")] int requestedBuffer = 0,
@@ -36,7 +36,7 @@ public static class Tools
 
         try
         {
-            plan = await napClient.GetPlanAsync(kommunenummer, planId, cancellationToken);
+            plan = await planDataClient.GetPlanAsync(kommunenummer, planId, cancellationToken);
         }
         catch (HttpRequestException ex)
         {

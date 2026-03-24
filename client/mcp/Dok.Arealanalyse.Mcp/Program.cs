@@ -1,4 +1,3 @@
-using System.Net.Http.Headers;
 using Dok.Arealanalyse.Mcp;
 using Dok.Arealanalyse.Mcp.Clients;
 
@@ -12,14 +11,10 @@ services.AddHttpClient<DokApiClient>(client =>
     client.Timeout = TimeSpan.FromMinutes(5);
 });
 
-services.AddHttpClient<NapClient>(client =>
+services.AddHttpClient<PlanDataClient>(client =>
 {
-    client.BaseAddress = new Uri($"{configuration["NAP:BaseUrl"]}");
+    client.BaseAddress = new Uri($"{configuration["PlanData:BaseUrl"]}");
     client.Timeout = TimeSpan.FromSeconds(30);
-
-    var basicAuthToken = configuration["NAP:BasicAuthToken"];
-    if (!string.IsNullOrWhiteSpace(basicAuthToken))
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", basicAuthToken);
 });
 
 services.AddHttpClient<EiendomClient>(client =>
