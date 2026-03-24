@@ -9,6 +9,9 @@ namespace Dok.Arealanalyse.Mcp;
 [McpServerToolType]
 public static class Tools
 {
+    public const int Epsg = 25833;
+    private readonly static string EpsgProjection = $"EPSG::{Epsg}";
+
     [McpServerTool, Description("Run DOK arealanalyse for a reguleringsplan. Fetches plan geometry from plandata.ft.dibk.no and passes it to DOK analysis. Returns analysis results with a reportUrl field containing a link to the generated PDF report.")]
     public static async Task<string> AnalyzeByPlan(
         DokApiClient apiClient,
@@ -47,7 +50,7 @@ public static class Tools
 
         try
         {
-            var payload = BuildAnalysisPayload(plan.Geometry, "EPSG::4326", requestedBuffer, context, theme, includeGuidance, includeQualityMeasurement, includeFilterChosenDOK, includeFacts);
+            var payload = Utils.BuildAnalysisPayload(plan.Geometry, EpsgProjection, requestedBuffer, context, theme, includeGuidance, includeQualityMeasurement, includeFilterChosenDOK, includeFacts);
             response = await apiClient.AnalyzeAsync(payload, null, cancellationToken);
         }
         catch (HttpRequestException ex)
@@ -113,7 +116,7 @@ public static class Tools
 
         try
         {
-            var payload = BuildAnalysisPayload(eiendom.Geometry, "EPSG::4326", requestedBuffer, context, theme, includeGuidance, includeQualityMeasurement, includeFilterChosenDOK, includeFacts);
+            var payload = Utils.BuildAnalysisPayload(eiendom.Geometry, EpsgProjection, requestedBuffer, context, theme, includeGuidance, includeQualityMeasurement, includeFilterChosenDOK, includeFacts);
             response = await apiClient.AnalyzeAsync(payload, null, cancellationToken);
         }
         catch (HttpRequestException ex)
@@ -154,8 +157,7 @@ public static class Tools
 
         try
         {
-            payload = JsonNode.Parse(payloadJson)
-                ?? throw new ArgumentException("Payload JSON cannot be null.", nameof(payloadJson));
+            payload = JsonNode.Parse(payloadJson) ?? throw new ArgumentException("Payload JSON cannot be null.", nameof(payloadJson));
         }
         catch (Exception ex)
         {
@@ -221,43 +223,5 @@ public static class Tools
 
         var response = await apiClient.ValidateGeoJsonAsync(geoJson, cancellationToken);
         return DokApiClient.PrettyJson(response);
-    }
-
-    private static JsonNode BuildAnalysisPayload(
-        JsonNode geometry,
-        string crsEpsg,
-        int requestedBuffer,
-        string? context,
-        string? theme,
-        bool includeGuidance,
-        bool includeQualityMeasurement,
-        bool includeFilterChosenDOK,
-        bool includeFacts)
-    {
-        var inputGeometry = geometry.DeepClone();
-
-        inputGeometry["crs"] = new JsonObject
-        {
-            ["type"] = "name",
-            ["properties"] = new JsonObject
-            {
-                ["name"] = $"urn:ogc:def:crs:{crsEpsg}"
-            }
-        };
-
-        return new JsonObject
-        {
-            ["inputs"] = new JsonObject
-            {
-                ["inputGeometry"] = inputGeometry,
-                ["requestedBuffer"] = requestedBuffer,
-                ["context"] = context,
-                ["theme"] = theme,
-                ["includeGuidance"] = includeGuidance,
-                ["includeQualityMeasurement"] = includeQualityMeasurement,
-                ["includeFilterChosenDOK"] = includeFilterChosenDOK,
-                ["includeFacts"] = includeFacts
-            }
-        };
     }
 }

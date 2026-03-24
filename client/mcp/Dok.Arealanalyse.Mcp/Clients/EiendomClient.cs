@@ -9,7 +9,7 @@ public sealed class EiendomClient(HttpClient httpClient, ILogger<EiendomClient> 
         string kommunenummer, int gardsnummer, int bruksnummer,
         int? festenummer, int? seksjonsnummer, CancellationToken ct)
     {
-        var url = $"geokoding?kommunenummer={Uri.EscapeDataString(kommunenummer)}&gardsnummer={gardsnummer}&bruksnummer={bruksnummer}&omrade=true&utkoordsys=4326&filtrer=features.geometry";
+        var url = $"geokoding?kommunenummer={Uri.EscapeDataString(kommunenummer)}&gardsnummer={gardsnummer}&bruksnummer={bruksnummer}&omrade=true&utkoordsys={Tools.Epsg}&filtrer=features.geometry";
 
         if (festenummer.HasValue)
             url += $"&festenummer={festenummer.Value}";
