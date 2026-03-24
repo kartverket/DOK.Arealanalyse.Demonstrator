@@ -12,7 +12,12 @@ public static class Tools
     public const int Epsg = 25833;
     private readonly static string EpsgProjection = $"EPSG::{Epsg}";
 
-    [McpServerTool, Description("Run DOK arealanalyse for a reguleringsplan. Fetches plan geometry from plandata.ft.dibk.no and passes it to DOK analysis. Returns analysis results with a reportUrl field containing a link to the generated PDF report.")]
+    [McpServerTool, Description(
+        "Run DOK arealanalyse for a reguleringsplan (zoning plan). " +
+        "This is the preferred tool when the user has a plan ID and municipality number. " +
+        "Searches across lifecycle stages (planleggingigangsatt, offentligettersyn, vedtattplan) unless a specific stage is provided. " +
+        "The analysis may take up to a few minutes. " +
+        "Returns JSON with planName, planType, lifecycleStage, reportUrl (link to generated PDF report), and the full analysis result.")]
     public static async Task<string> AnalyzeByPlan(
         DokApiClient apiClient,
         PlanDataClient planDataClient,
@@ -76,7 +81,11 @@ public static class Tools
         return DokApiClient.PrettyJson(summary.ToJsonString());
     }
 
-    [McpServerTool, Description("Run DOK arealanalyse for a property (eiendom). Fetches property geometry from api.kartverket.no/eiendom and passes it to DOK analysis. Returns analysis results with a reportUrl field containing a link to the generated PDF report.")]
+    [McpServerTool, Description(
+        "Run DOK arealanalyse for a property (eiendom/matrikkelenhet). " +
+        "This is the preferred tool when the user has a property identifier (kommunenummer, gårdsnummer, bruksnummer). " +
+        "The analysis may take up to a few minutes. " +
+        "Returns JSON with matrikkelnummer, reportUrl (link to generated PDF report), and the full analysis result.")]
     public static async Task<string> AnalyzeByEiendom(
         DokApiClient apiClient,
         EiendomClient eiendomClient,
@@ -140,16 +149,28 @@ public static class Tools
         return DokApiClient.PrettyJson(summary.ToJsonString());
     }
 
-    [McpServerTool, Description("Get configured sample GeoJSON entries from the DOK API.")]
+    [McpServerTool, Description(
+        "Get sample GeoJSON geometries from the DOK API. " +
+        "Use this to discover available test geometries that can be passed to AnalyzeIntersections. " +
+        "Returns an array of sample entries with GeoJSON geometry and metadata.")]
     public static Task<string> ListSamples(DokApiClient apiClient, CancellationToken cancellationToken)
     {
         return apiClient.ListSamplesAsync(cancellationToken);
     }
 
-    [McpServerTool, Description("Run DOK arealanalyse through /api/pygeoapi with a JSON payload.")]
+    [McpServerTool, Description(
+        "Run DOK arealanalyse with a raw JSON payload. " +
+        "Prefer AnalyzeByPlan or AnalyzeByEiendom when you have a plan ID or property identifier — use this only when you already have GeoJSON geometry. " +
+        "The analysis may take up to a few minutes. " +
+        "The payload must follow this structure: " +
+        "{\"inputs\":{\"inputGeometry\":<GeoJSON with crs>,\"requestedBuffer\":0,\"context\":null,\"theme\":null,\"includeGuidance\":true,\"includeQualityMeasurement\":true,\"includeFilterChosenDOK\":false,\"includeFacts\":true}}. " +
+        "The inputGeometry must include a crs property: {\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"urn:ogc:def:crs:EPSG::25833\"}}}. " +
+        "Returns the full analysis result as JSON.")]
     public static async Task<string> AnalyzeIntersections(
         DokApiClient apiClient,
-        [Description("JSON payload passed to /api/pygeoapi")] string payloadJson,
+        [Description(
+            "JSON payload. Must contain an 'inputs' object with 'inputGeometry' (GeoJSON with crs property set to urn:ogc:def:crs:EPSG::25833), " +
+            "'requestedBuffer' (int), and optional 'context', 'theme', 'includeGuidance', 'includeQualityMeasurement', 'includeFilterChosenDOK', 'includeFacts'.")] string payloadJson,
         [Description("Optional x-correlation-id header value")] string? correlationId,
         CancellationToken cancellationToken)
     {
@@ -182,7 +203,10 @@ public static class Tools
         return DokApiClient.PrettyJson(response);
     }
 
-    [McpServerTool, Description("Convert a local SOSI or GML file to outline by calling /api/convert/{fileType}/outline.")]
+    [McpServerTool, Description(
+        "Convert a local SOSI or GML file to an outline GeoJSON geometry. " +
+        "The returned GeoJSON can be used as inputGeometry in AnalyzeIntersections. " +
+        "The output is projected to the specified EPSG (default 25833 / UTM zone 33N).")]
     public static async Task<string> ConvertOutline(
         DokApiClient apiClient,
         [Description("Absolute or relative path to a local file readable by the MCP server process")] string filePath,
@@ -206,7 +230,10 @@ public static class Tools
         return DokApiClient.PrettyJson(response);
     }
 
-    [McpServerTool, Description("Validate a GeoJSON object by calling /api/validate as multipart form-data.")]
+    [McpServerTool, Description(
+        "Validate a GeoJSON geometry before passing it to analysis. " +
+        "Use this to check that GeoJSON is well-formed and has valid geometry. " +
+        "Returns validation result indicating whether the geometry is valid.")]
     public static async Task<string> ValidateGeoJson(
         DokApiClient apiClient,
         [Description("GeoJSON content as a JSON string")] string geoJson,
