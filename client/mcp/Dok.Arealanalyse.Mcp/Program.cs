@@ -25,7 +25,7 @@ services.AddHttpClient<EiendomClient>(client =>
 
 services
     .AddMcpServer()
-    .WithHttpTransport(options => options.Stateless = true)
+    .WithHttpTransport()
     .WithToolsFromAssembly(typeof(Tools).Assembly);
 
 var app = builder.Build();
