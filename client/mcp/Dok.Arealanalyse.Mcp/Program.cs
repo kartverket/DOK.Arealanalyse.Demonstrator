@@ -1,4 +1,3 @@
-using System.Net.Http.Headers;
 using Dok.Arealanalyse.Mcp;
 using Dok.Arealanalyse.Mcp.Clients;
 
@@ -8,29 +7,25 @@ var services = builder.Services;
 
 services.AddHttpClient<DokApiClient>(client =>
 {
-    client.BaseAddress = new Uri($"{configuration["DOK_API_BASE_URL"]}/");
+    client.BaseAddress = new Uri($"{configuration["DokApi:BaseUrl"]}/");
     client.Timeout = TimeSpan.FromMinutes(5);
 });
 
 services.AddHttpClient<PlanDataClient>(client =>
 {
-    client.BaseAddress = new Uri($"{configuration["PlanData:BaseUrl"]}/");
+    client.BaseAddress = new Uri($"{configuration["PlanData:BaseUrl"]}");
     client.Timeout = TimeSpan.FromSeconds(30);
-
-    var basicAuthToken = configuration["PlanData:BasicAuthToken"];
-    if (!string.IsNullOrWhiteSpace(basicAuthToken))
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", basicAuthToken);
 });
 
-services.AddHttpClient<TeigWfsClient>(client =>
+services.AddHttpClient<EiendomClient>(client =>
 {
-    client.BaseAddress = new Uri($"{configuration["TEIG_WFS_URL"]}");
-    client.Timeout = TimeSpan.FromMinutes(2);
+    client.BaseAddress = new Uri($"{configuration["Kartverket:EiendomApiUrl"]}/");
+    client.Timeout = TimeSpan.FromSeconds(30);
 });
 
 services
     .AddMcpServer()
-    .WithHttpTransport()
+    .WithHttpTransport(options => options.Stateless = true)
     .WithToolsFromAssembly(typeof(Tools).Assembly);
 
 var app = builder.Build();

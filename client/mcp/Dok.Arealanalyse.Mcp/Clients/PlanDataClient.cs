@@ -1,73 +1,42 @@
+using Dok.Arealanalyse.Mcp.Models;
 using System.Text.Json.Nodes;
 
 namespace Dok.Arealanalyse.Mcp.Clients;
 
 public sealed class PlanDataClient(HttpClient httpClient, ILogger<PlanDataClient> logger)
 {
-    private static readonly string[] DefaultLifecycleStages = ["planleggingigangsatt", "offentligettersyn", "vedtattplan"];
-
-    public async Task<PlanResult?> GetPlanAsync(
-        string kommunenummer, string planId, string? lifecycleStage, CancellationToken ct)
+    public async Task<PlanResult?> GetPlanAsync(string kommunenummer, string planId, CancellationToken ct)
     {
-        var stages = !string.IsNullOrWhiteSpace(lifecycleStage)
-            ? [lifecycleStage]
-            : DefaultLifecycleStages;
+        logger.LogDebug("Searching for plan {PlanId} in kommune {Kommune}", planId, kommunenummer);
 
-        foreach (var stage in stages)
-        {
-            logger.LogDebug("Searching for plan {PlanId} in kommune {Kommune}, stage {Stage}", planId, kommunenummer, stage);
-            var result = await TryGetPlanFromStageAsync(stage, kommunenummer, planId, ct);
-            if (result is not null)
-            {
-                logger.LogInformation("Found plan '{PlanName}' ({PlanType}) in stage {Stage}", result.PlanName, result.PlanType, stage);
-                return result;
-            }
-        }
-
-        logger.LogWarning("No plan found with planId {PlanId} in kommune {Kommune}", planId, kommunenummer);
-        return null;
-    }
-
-    private async Task<PlanResult?> TryGetPlanFromStageAsync(string stage, string kommunenummer, string planId, CancellationToken ct)
-    {
-        var url = $"{stage}/collections/planomrade/items"
-            + $"?nasjonalArealplanId.kommunenummer={Uri.EscapeDataString(kommunenummer)}"
+        var url = $"?nasjonalArealplanId.kommunenummer={Uri.EscapeDataString(kommunenummer)}"
             + $"&nasjonalArealplanId.planid={Uri.EscapeDataString(planId)}"
+            + $"&crs={Uri.EscapeDataString($"http://www.opengis.net/def/crs/EPSG/0/{Tools.Epsg}")}"
             + "&limit=1&f=json";
 
         using var response = await httpClient.GetAsync(url, ct);
 
         if (!response.IsSuccessStatusCode)
         {
-            logger.LogDebug("Server-side filter returned {StatusCode} for stage {Stage}, falling back to client-side",
-                (int)response.StatusCode, stage);
-            return await TryGetPlanClientSideAsync(stage, kommunenummer, planId, ct);
+            var body = await response.Content.ReadAsStringAsync(ct);
+            logger.LogError("PlanData request failed with status {StatusCode}. Response: {Body}", (int)response.StatusCode, body);
+            throw new HttpRequestException($"PlanData request failed with status {(int)response.StatusCode} ({response.StatusCode}). Response: {body}");
         }
 
         var json = await response.Content.ReadAsStringAsync(ct);
-        var result = TryExtractPlan(json, kommunenummer, planId, stage, serverFiltered: true);
+        var result = TryExtractPlan(json, kommunenummer, planId);
 
         if (result is not null)
+        {
+            logger.LogInformation("Found plan '{PlanName}' ({PlanType})", result.PlanName, result.PlanType);
             return result;
+        }
 
-        return await TryGetPlanClientSideAsync(stage, kommunenummer, planId, ct);
+        logger.LogWarning("No plan found with planId {PlanId} in kommune {Kommune}", planId, kommunenummer);
+        return null;
     }
 
-    private async Task<PlanResult?> TryGetPlanClientSideAsync(
-        string stage, string kommunenummer, string planId, CancellationToken ct)
-    {
-        var url = $"{stage}/collections/planomrade/items?limit=100&f=json";
-
-        using var response = await httpClient.GetAsync(url, ct);
-
-        if (!response.IsSuccessStatusCode)
-            return null;
-
-        var json = await response.Content.ReadAsStringAsync(ct);
-        return TryExtractPlan(json, kommunenummer, planId, stage, serverFiltered: false);
-    }
-
-    private static PlanResult? TryExtractPlan(string json, string kommunenummer, string planId, string stage, bool serverFiltered)
+    private static PlanResult? TryExtractPlan(string json, string kommunenummer, string planId)
     {
         var root = JsonNode.Parse(json);
         var features = root?["features"]?.AsArray();
@@ -84,34 +53,16 @@ public sealed class PlanDataClient(HttpClient httpClient, ILogger<PlanDataClient
             if (properties is null)
                 continue;
 
-            if (!serverFiltered)
-            {
-                var nasjonalId = properties["nasjonalArealplanId"];
-                var featureKommune = nasjonalId?["kommunenummer"]?.GetValue<string>();
-                var featurePlanId = nasjonalId?["planid"]?.GetValue<string>();
-
-                if (!string.Equals(featureKommune, kommunenummer, StringComparison.OrdinalIgnoreCase) ||
-                    !string.Equals(featurePlanId, planId, StringComparison.OrdinalIgnoreCase))
-                    continue;
-            }
-
             var geometry = feature["geometry"];
             if (geometry is null)
                 continue;
 
-            var planName = properties["planNavn"]?.GetValue<string>()
-                ?? properties["navn"]?.GetValue<string>()
-                ?? "Unknown";
+            var planName = properties["planNavn"]?.GetValue<string>() ?? "Unknown";
+            var planType = properties["plantype"]?.GetValue<string>() ?? "Unknown";
 
-            var planType = properties["plantype"]?.GetValue<string>()
-                ?? properties["plantypeKode"]?.GetValue<string>()
-                ?? "Unknown";
-
-            return new PlanResult(geometry.DeepClone(), planName, planType, stage);
+            return new PlanResult(geometry.DeepClone(), planName, planType);
         }
 
         return null;
     }
 }
-
-public record PlanResult(JsonNode Geometry, string PlanName, string PlanType, string LifecycleStage);

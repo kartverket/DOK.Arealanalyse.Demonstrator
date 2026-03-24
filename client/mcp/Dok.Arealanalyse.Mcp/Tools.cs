@@ -1,4 +1,5 @@
 using Dok.Arealanalyse.Mcp.Clients;
+using Dok.Arealanalyse.Mcp.Models;
 using ModelContextProtocol.Server;
 using System.ComponentModel;
 using System.Text.Json.Nodes;
@@ -8,45 +9,84 @@ namespace Dok.Arealanalyse.Mcp;
 [McpServerToolType]
 public static class Tools
 {
-    [McpServerTool, Description("Run DOK arealanalyse for a reguleringsplan. Fetches plan geometry from plandata.ft.dibk.no and passes it to DOK analysis.")]
+    public const int Epsg = 25833;
+    private readonly static string EpsgProjection = $"EPSG::{Epsg}";
+
+    [McpServerTool, Description(
+        "Run DOK arealanalyse for a reguleringsplan (zoning plan). " +
+        "This is the preferred tool when the user has a plan ID and municipality number. " +
+        "The analysis may take up to a few minutes. " +
+        "Returns JSON with planName, planType, reportUrl (link to generated PDF report), and the full analysis result.")]
     public static async Task<string> AnalyzeByPlan(
         DokApiClient apiClient,
         PlanDataClient planDataClient,
         [Description("Plan ID (planidentifikasjon), e.g. '911'")] string planId,
         [Description("Municipality number (kommunenummer), e.g. '3228'")] string kommunenummer,
         [Description("Buffer in meters. Defaults to 0")] int requestedBuffer = 0,
-        [Description("Lifecycle stage: 'planleggingigangsatt', 'offentligettersyn', 'vedtattplan'. Searches all if omitted.")] string? lifecycleStage = null,
         [Description("Use case context: 'Reguleringsplan', 'Kommuneplan', or 'Byggesak'. Defaults to null (all).")] string? context = null,
         [Description("Theme filter: 'Geologi', 'Kulturminner', 'Klima', 'Kyst og fiskeri', 'Landbruk', 'Natur', 'Plan', 'Samferdsel', or 'Samfunnssikkerhet'. Defaults to null (all).")] string? theme = null,
         [Description("Include guidance from Geolett")] bool includeGuidance = true,
         [Description("Include quality measurement")] bool includeQualityMeasurement = true,
         [Description("Only include the municipality's chosen DOK data")] bool includeFilterChosenDOK = false,
         [Description("Include factual information")] bool includeFacts = true,
+        [Description("Generate PDF report and map images. Increases processing time.")] bool createBinaries = false,
         CancellationToken cancellationToken = default)
     {
-        var plan = await planDataClient.GetPlanAsync(kommunenummer, planId, lifecycleStage, cancellationToken);
+        PlanResult? plan;
+
+        try
+        {
+            plan = await planDataClient.GetPlanAsync(kommunenummer, planId, cancellationToken);
+        }
+        catch (HttpRequestException ex)
+        {
+            return $"Failed to fetch plan geometry: {ex.Message}";
+        }
+        catch (TaskCanceledException)
+        {
+            return "Request timed out while fetching plan geometry.";
+        }
 
         if (plan is null)
             return $"No plan found with planId '{planId}' in kommune '{kommunenummer}'.";
 
-        var payload = BuildAnalysisPayload(plan.Geometry, "EPSG::4326", requestedBuffer, context, theme, includeGuidance, includeQualityMeasurement, includeFilterChosenDOK, includeFacts);
-        var response = await apiClient.AnalyzeAsync(payload, null, cancellationToken);
+        string response;
+
+        try
+        {
+            var payload = Utils.BuildAnalysisPayload(plan.Geometry, EpsgProjection, requestedBuffer, context, theme, includeGuidance, includeQualityMeasurement, includeFilterChosenDOK, includeFacts, createBinaries);
+            response = await apiClient.AnalyzeAsync(payload, null, cancellationToken);
+        }
+        catch (HttpRequestException ex)
+        {
+            return $"Plan '{plan.PlanName}' was found, but the DOK analysis request failed: {ex.Message}";
+        }
+        catch (TaskCanceledException)
+        {
+            return $"Plan '{plan.PlanName}' was found, but the DOK analysis request timed out.";
+        }
+
+        var analysisNode = JsonNode.Parse(response);
 
         var summary = new JsonObject
         {
             ["planName"] = plan.PlanName,
             ["planType"] = plan.PlanType,
-            ["lifecycleStage"] = plan.LifecycleStage,
-            ["analysis"] = JsonNode.Parse(response)
+            ["reportUrl"] = analysisNode?["report"]?.GetValue<string>(),
+            ["analysis"] = analysisNode
         };
 
         return DokApiClient.PrettyJson(summary.ToJsonString());
     }
 
-    [McpServerTool, Description("Run DOK arealanalyse for a property (eiendom). Fetches teig geometry from WFS and passes it to DOK analysis.")]
+    [McpServerTool, Description(
+        "Run DOK arealanalyse for a property (eiendom/matrikkelenhet). " +
+        "This is the preferred tool when the user has a property identifier (kommunenummer, gårdsnummer, bruksnummer). " +
+        "The analysis may take up to a few minutes. " +
+        "Returns JSON with matrikkelnummer, reportUrl (link to generated PDF report), and the full analysis result.")]
     public static async Task<string> AnalyzeByEiendom(
         DokApiClient apiClient,
-        TeigWfsClient teigWfsClient,
+        EiendomClient eiendomClient,
         [Description("Municipality number (kommunenummer), e.g. '4020'")] string kommunenummer,
         [Description("Farm number (gårdsnummer), e.g. 56")] int gardsnummer,
         [Description("Property number (bruksnummer), e.g. 65")] int bruksnummer,
@@ -59,36 +99,77 @@ public static class Tools
         [Description("Include quality measurement")] bool includeQualityMeasurement = true,
         [Description("Only include the municipality's chosen DOK data")] bool includeFilterChosenDOK = false,
         [Description("Include factual information")] bool includeFacts = true,
+        [Description("Generate PDF report and map images. Increases processing time.")] bool createBinaries = false,
         CancellationToken cancellationToken = default)
     {
-        var teig = await teigWfsClient.GetTeigAsync(kommunenummer, gardsnummer, bruksnummer, festenummer, seksjonsnummer, cancellationToken);
+        EiendomResult? eiendom;
 
-        if (teig is null)
-            return $"No teig found for eiendom {kommunenummer}/{gardsnummer}/{bruksnummer}.";
+        try
+        {
+            eiendom = await eiendomClient.GetEiendomAsync(kommunenummer, gardsnummer, bruksnummer, festenummer, seksjonsnummer, cancellationToken);
+        }
+        catch (HttpRequestException ex)
+        {
+            return $"Failed to fetch property geometry: {ex.Message}";
+        }
+        catch (TaskCanceledException)
+        {
+            return "Request timed out while fetching property geometry.";
+        }
 
-        var payload = BuildAnalysisPayload(teig.Geometry, $"EPSG::{teig.Epsg}", requestedBuffer, context, theme, includeGuidance, includeQualityMeasurement, includeFilterChosenDOK, includeFacts);
-        var response = await apiClient.AnalyzeAsync(payload, null, cancellationToken);
+        if (eiendom is null)
+            return $"No property found for eiendom {kommunenummer}/{gardsnummer}/{bruksnummer}.";
+
+        string response;
+
+        try
+        {
+            var payload = Utils.BuildAnalysisPayload(eiendom.Geometry, EpsgProjection, requestedBuffer, context, theme, includeGuidance, includeQualityMeasurement, includeFilterChosenDOK, includeFacts, createBinaries);
+            response = await apiClient.AnalyzeAsync(payload, null, cancellationToken);
+        }
+        catch (HttpRequestException ex)
+        {
+            return $"Property {eiendom.MatrikkelnummerTekst} was found, but the DOK analysis request failed: {ex.Message}";
+        }
+        catch (TaskCanceledException)
+        {
+            return $"Property {eiendom.MatrikkelnummerTekst} was found, but the DOK analysis request timed out.";
+        }
+
+        var analysisNode = JsonNode.Parse(response);
 
         var summary = new JsonObject
         {
-            ["matrikkelnummer"] = teig.MatrikkelnummerTekst,
-            ["teigCount"] = teig.TeigCount,
-            ["analysis"] = JsonNode.Parse(response)
+            ["matrikkelnummer"] = eiendom.MatrikkelnummerTekst,
+            ["reportUrl"] = analysisNode?["report"]?.GetValue<string>(),
+            ["analysis"] = analysisNode
         };
 
         return DokApiClient.PrettyJson(summary.ToJsonString());
     }
 
-    [McpServerTool, Description("Get configured sample GeoJSON entries from the DOK API.")]
+    [McpServerTool, Description(
+        "Get sample GeoJSON geometries from the DOK API. " +
+        "Use this to discover available test geometries that can be passed to AnalyzeIntersections. " +
+        "Returns an array of sample entries with GeoJSON geometry and metadata.")]
     public static Task<string> ListSamples(DokApiClient apiClient, CancellationToken cancellationToken)
     {
         return apiClient.ListSamplesAsync(cancellationToken);
     }
 
-    [McpServerTool, Description("Run DOK arealanalyse through /api/pygeoapi with a JSON payload.")]
+    [McpServerTool, Description(
+        "Run DOK arealanalyse with a raw JSON payload. " +
+        "Prefer AnalyzeByPlan or AnalyzeByEiendom when you have a plan ID or property identifier — use this only when you already have GeoJSON geometry. " +
+        "The analysis may take up to a few minutes. " +
+        "The payload must follow this structure: " +
+        "{\"inputs\":{\"inputGeometry\":<GeoJSON with crs>,\"requestedBuffer\":0,\"context\":null,\"theme\":null,\"includeGuidance\":true,\"includeQualityMeasurement\":true,\"includeFilterChosenDOK\":false,\"includeFacts\":true,\"createBinaries\":false}}. " +
+        "The inputGeometry must include a crs property: {\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"urn:ogc:def:crs:EPSG::25833\"}}}. " +
+        "Returns the full analysis result as JSON.")]
     public static async Task<string> AnalyzeIntersections(
         DokApiClient apiClient,
-        [Description("JSON payload passed to /api/pygeoapi")] string payloadJson,
+        [Description(
+            "JSON payload. Must contain an 'inputs' object with 'inputGeometry' (GeoJSON with crs property set to urn:ogc:def:crs:EPSG::25833), " +
+            "'requestedBuffer' (int), and optional 'context', 'theme', 'includeGuidance', 'includeQualityMeasurement', 'includeFilterChosenDOK', 'includeFacts', 'createBinaries'.")] string payloadJson,
         [Description("Optional x-correlation-id header value")] string? correlationId,
         CancellationToken cancellationToken)
     {
@@ -96,19 +177,35 @@ public static class Tools
 
         try
         {
-            payload = JsonNode.Parse(payloadJson)
-                ?? throw new ArgumentException("Payload JSON cannot be null.", nameof(payloadJson));
+            payload = JsonNode.Parse(payloadJson) ?? throw new ArgumentException("Payload JSON cannot be null.", nameof(payloadJson));
         }
         catch (Exception ex)
         {
             throw new ArgumentException("payloadJson must be valid JSON.", nameof(payloadJson), ex);
         }
 
-        var response = await apiClient.AnalyzeAsync(payload, correlationId, cancellationToken);
+        string response;
+
+        try
+        {
+            response = await apiClient.AnalyzeAsync(payload, correlationId, cancellationToken);
+        }
+        catch (HttpRequestException ex)
+        {
+            return $"DOK analysis request failed: {ex.Message}";
+        }
+        catch (TaskCanceledException)
+        {
+            return "DOK analysis request timed out.";
+        }
+
         return DokApiClient.PrettyJson(response);
     }
 
-    [McpServerTool, Description("Convert a local SOSI or GML file to outline by calling /api/convert/{fileType}/outline.")]
+    [McpServerTool, Description(
+        "Convert a local SOSI or GML file to an outline GeoJSON geometry. " +
+        "The returned GeoJSON can be used as inputGeometry in AnalyzeIntersections. " +
+        "The output is projected to the specified EPSG (default 25833 / UTM zone 33N).")]
     public static async Task<string> ConvertOutline(
         DokApiClient apiClient,
         [Description("Absolute or relative path to a local file readable by the MCP server process")] string filePath,
@@ -132,7 +229,10 @@ public static class Tools
         return DokApiClient.PrettyJson(response);
     }
 
-    [McpServerTool, Description("Validate a GeoJSON object by calling /api/validate as multipart form-data.")]
+    [McpServerTool, Description(
+        "Validate a GeoJSON geometry before passing it to analysis. " +
+        "Use this to check that GeoJSON is well-formed and has valid geometry. " +
+        "Returns validation result indicating whether the geometry is valid.")]
     public static async Task<string> ValidateGeoJson(
         DokApiClient apiClient,
         [Description("GeoJSON content as a JSON string")] string geoJson,
@@ -149,43 +249,5 @@ public static class Tools
 
         var response = await apiClient.ValidateGeoJsonAsync(geoJson, cancellationToken);
         return DokApiClient.PrettyJson(response);
-    }
-
-    private static JsonNode BuildAnalysisPayload(
-        JsonNode geometry,
-        string crsEpsg,
-        int requestedBuffer,
-        string? context,
-        string? theme,
-        bool includeGuidance,
-        bool includeQualityMeasurement,
-        bool includeFilterChosenDOK,
-        bool includeFacts)
-    {
-        var inputGeometry = geometry.DeepClone();
-
-        inputGeometry["crs"] = new JsonObject
-        {
-            ["type"] = "name",
-            ["properties"] = new JsonObject
-            {
-                ["name"] = $"urn:ogc:def:crs:{crsEpsg}"
-            }
-        };
-
-        return new JsonObject
-        {
-            ["inputs"] = new JsonObject
-            {
-                ["inputGeometry"] = inputGeometry,
-                ["requestedBuffer"] = requestedBuffer,
-                ["context"] = context,
-                ["theme"] = theme,
-                ["includeGuidance"] = includeGuidance,
-                ["includeQualityMeasurement"] = includeQualityMeasurement,
-                ["includeFilterChosenDOK"] = includeFilterChosenDOK,
-                ["includeFacts"] = includeFacts
-            }
-        };
     }
 }
