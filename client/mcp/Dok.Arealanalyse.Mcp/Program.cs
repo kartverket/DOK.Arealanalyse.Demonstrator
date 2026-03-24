@@ -8,16 +8,16 @@ var services = builder.Services;
 
 services.AddHttpClient<DokApiClient>(client =>
 {
-    client.BaseAddress = new Uri($"{configuration["DOK_API_BASE_URL"]}/");
+    client.BaseAddress = new Uri($"{configuration["DokApi:BaseUrl"]}/");
     client.Timeout = TimeSpan.FromMinutes(5);
 });
 
-services.AddHttpClient<PlanDataClient>(client =>
+services.AddHttpClient<NapClient>(client =>
 {
-    client.BaseAddress = new Uri($"{configuration["PlanData:BaseUrl"]}/");
+    client.BaseAddress = new Uri($"{configuration["NAP:BaseUrl"]}");
     client.Timeout = TimeSpan.FromSeconds(30);
 
-    var basicAuthToken = configuration["PlanData:BasicAuthToken"];
+    var basicAuthToken = configuration["NAP:BasicAuthToken"];
     if (!string.IsNullOrWhiteSpace(basicAuthToken))
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", basicAuthToken);
 });

@@ -15,16 +15,14 @@ public static class Tools
     [McpServerTool, Description(
         "Run DOK arealanalyse for a reguleringsplan (zoning plan). " +
         "This is the preferred tool when the user has a plan ID and municipality number. " +
-        "Searches across lifecycle stages (planleggingigangsatt, offentligettersyn, vedtattplan) unless a specific stage is provided. " +
         "The analysis may take up to a few minutes. " +
-        "Returns JSON with planName, planType, lifecycleStage, reportUrl (link to generated PDF report), and the full analysis result.")]
+        "Returns JSON with planName, planType, reportUrl (link to generated PDF report), and the full analysis result.")]
     public static async Task<string> AnalyzeByPlan(
         DokApiClient apiClient,
-        PlanDataClient planDataClient,
+        NapClient napClient,
         [Description("Plan ID (planidentifikasjon), e.g. '911'")] string planId,
         [Description("Municipality number (kommunenummer), e.g. '3228'")] string kommunenummer,
         [Description("Buffer in meters. Defaults to 0")] int requestedBuffer = 0,
-        [Description("Lifecycle stage: 'planleggingigangsatt', 'offentligettersyn', 'vedtattplan'. Searches all if omitted.")] string? lifecycleStage = null,
         [Description("Use case context: 'Reguleringsplan', 'Kommuneplan', or 'Byggesak'. Defaults to null (all).")] string? context = null,
         [Description("Theme filter: 'Geologi', 'Kulturminner', 'Klima', 'Kyst og fiskeri', 'Landbruk', 'Natur', 'Plan', 'Samferdsel', or 'Samfunnssikkerhet'. Defaults to null (all).")] string? theme = null,
         [Description("Include guidance from Geolett")] bool includeGuidance = true,
@@ -37,15 +35,15 @@ public static class Tools
 
         try
         {
-            plan = await planDataClient.GetPlanAsync(kommunenummer, planId, lifecycleStage, cancellationToken);
+            plan = await napClient.GetPlanAsync(kommunenummer, planId, cancellationToken);
         }
         catch (HttpRequestException ex)
         {
-            return $"Failed to fetch plan geometry from PlanData (plandata.ft.dibk.no): {ex.Message}";
+            return $"Failed to fetch plan geometry: {ex.Message}";
         }
         catch (TaskCanceledException)
         {
-            return "Request to PlanData (plandata.ft.dibk.no) timed out while fetching plan geometry.";
+            return "Request timed out while fetching plan geometry.";
         }
 
         if (plan is null)
@@ -73,7 +71,6 @@ public static class Tools
         {
             ["planName"] = plan.PlanName,
             ["planType"] = plan.PlanType,
-            ["lifecycleStage"] = plan.LifecycleStage,
             ["reportUrl"] = analysisNode?["report"]?.GetValue<string>(),
             ["analysis"] = analysisNode
         };
@@ -111,11 +108,11 @@ public static class Tools
         }
         catch (HttpRequestException ex)
         {
-            return $"Failed to fetch property geometry from Kartverket (api.kartverket.no): {ex.Message}";
+            return $"Failed to fetch property geometry: {ex.Message}";
         }
         catch (TaskCanceledException)
         {
-            return "Request to Kartverket (api.kartverket.no) timed out while fetching property geometry.";
+            return "Request timed out while fetching property geometry.";
         }
 
         if (eiendom is null)

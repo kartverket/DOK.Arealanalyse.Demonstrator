@@ -2,4 +2,4 @@
 
 namespace Dok.Arealanalyse.Mcp.Models;
 
-public record PlanResult(JsonNode Geometry, string PlanName, string PlanType, string LifecycleStage);
+public record PlanResult(JsonNode Geometry, string PlanName, string PlanType);

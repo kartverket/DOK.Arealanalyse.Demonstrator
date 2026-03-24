@@ -81,8 +81,7 @@ public sealed class DokApiClient(HttpClient httpClient, ILogger<DokApiClient> lo
             return;
 
         var body = await response.Content.ReadAsStringAsync(cancellationToken);
-        logger.LogError("DOK API {Operation} failed with status {StatusCode}. Response: {Body}",
-            operation, (int)response.StatusCode, body);
+        logger.LogError("DOK API {Operation} failed with status {StatusCode}. Response: {Body}", operation, (int)response.StatusCode, body);
         throw new HttpRequestException($"DOK API request failed with status {(int)response.StatusCode} ({response.StatusCode}). Response: {body}");
     }
 }
