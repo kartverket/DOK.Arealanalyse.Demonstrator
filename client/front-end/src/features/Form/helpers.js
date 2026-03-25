@@ -1,5 +1,5 @@
 import { createRandomId } from 'utils/helpers';
-import { RESULT_STATUS } from 'utils/constants';
+import { ResultStatus } from 'utils/constants';
 
 export function mapResponse(response) {
     const { resultList } = response;
@@ -38,11 +38,11 @@ function getDescription(result) {
         result.title
 
     switch (result.resultStatus) {
-        case RESULT_STATUS.TIMEOUT:
+        case ResultStatus.TIMEOUT:
             return `Tidsavbrudd: ${datasetTitle}`;
-        case RESULT_STATUS.ERROR:
+        case ResultStatus.ERROR:
             return `En feil har oppstått: ${datasetTitle}`;
-        case RESULT_STATUS.NOT_IMPLEMENTED:
+        case ResultStatus.NOT_IMPLEMENTED:
             return `Ikke implementert: ${datasetTitle}`;
         default:
             return datasetTitle;

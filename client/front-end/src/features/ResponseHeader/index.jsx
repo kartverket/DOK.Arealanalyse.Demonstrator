@@ -1,7 +1,7 @@
 import { useSelector } from 'react-redux';
 import { selectResults } from 'store/slices/responseSlice';
 import { isEmptyObject } from 'utils/helpers';
-import { RESULT_STATUS, STATUS_FILTER } from 'utils/constants';
+import { ResultStatus, StatusFilter } from 'utils/constants';
 import PointIcon from 'assets/gfx/icon-point.svg?react';
 import AreaIcon from 'assets/gfx/icon-area.svg?react'
 import MustHandleIcon from 'assets/gfx/icon-must-handle.svg?react'
@@ -54,8 +54,8 @@ export default function ResponseHeader({ statusFilters, onStatusFilterSelected }
                     <input
                         id="must-handle"
                         type="checkbox"
-                        name={STATUS_FILTER.MUST_HANDLE}
-                        checked={statusFilters.includes(STATUS_FILTER.MUST_HANDLE)}
+                        name={StatusFilter.MUST_HANDLE}
+                        checked={statusFilters.includes(StatusFilter.MUST_HANDLE)}
                         onChange={event => onStatusFilterSelected(event.target.name)}
                         disabled={disabled}
                     />
@@ -65,7 +65,7 @@ export default function ResponseHeader({ statusFilters, onStatusFilterSelected }
                             <MustHandleIcon />
                             Må håndteres
                         </div>
-                        <span className={styles.count}>{getCount([RESULT_STATUS.HIT_RED])}</span>
+                        <span className={styles.count}>{getCount([ResultStatus.HIT_RED])}</span>
                     </label>
                 </div>
 
@@ -73,8 +73,8 @@ export default function ResponseHeader({ statusFilters, onStatusFilterSelected }
                     <input
                         id="must-check"
                         type="checkbox"
-                        name={STATUS_FILTER.MUST_CHECK}
-                        checked={statusFilters.includes(STATUS_FILTER.MUST_CHECK)}
+                        name={StatusFilter.MUST_CHECK}
+                        checked={statusFilters.includes(StatusFilter.MUST_CHECK)}
                         onChange={event => onStatusFilterSelected(event.target.name)}
                         disabled={disabled}
                     />
@@ -87,11 +87,11 @@ export default function ResponseHeader({ statusFilters, onStatusFilterSelected }
                         <span className={styles.count}>
                             {
                                 getCount([
-                                    RESULT_STATUS.HIT_YELLOW,
-                                    RESULT_STATUS.NO_HIT_YELLOW,
-                                    RESULT_STATUS.ERROR,
-                                    RESULT_STATUS.TIMEOUT,
-                                    RESULT_STATUS.NOT_IMPLEMENTED
+                                    ResultStatus.HIT_YELLOW,
+                                    ResultStatus.NO_HIT_YELLOW,
+                                    ResultStatus.ERROR,
+                                    ResultStatus.TIMEOUT,
+                                    ResultStatus.NOT_IMPLEMENTED
                                 ])
                             }
                         </span>
@@ -102,8 +102,8 @@ export default function ResponseHeader({ statusFilters, onStatusFilterSelected }
                     <input
                         id="nearby"
                         type="checkbox"
-                        name={STATUS_FILTER.NEARBY}
-                        checked={statusFilters.includes(STATUS_FILTER.NEARBY)}
+                        name={StatusFilter.NEARBY}
+                        checked={statusFilters.includes(StatusFilter.NEARBY)}
                         onChange={event => onStatusFilterSelected(event.target.name)}
                         disabled={disabled}
                     />
@@ -113,7 +113,7 @@ export default function ResponseHeader({ statusFilters, onStatusFilterSelected }
                             <NearbyIcon />
                             I nærheten
                         </div>
-                        <span className={styles.count}>{getCount([RESULT_STATUS.NO_HIT_GREEN])}</span>
+                        <span className={styles.count}>{getCount([ResultStatus.NO_HIT_GREEN])}</span>
                     </label>
                 </div>
 
@@ -121,8 +121,8 @@ export default function ResponseHeader({ statusFilters, onStatusFilterSelected }
                     <input
                         id="not-analyzed"
                         type="checkbox"
-                        name={STATUS_FILTER.NOT_ANALYZED}
-                        checked={statusFilters.includes(STATUS_FILTER.NOT_ANALYZED)}
+                        name={StatusFilter.NOT_ANALYZED}
+                        checked={statusFilters.includes(StatusFilter.NOT_ANALYZED)}
                         onChange={event => onStatusFilterSelected(event.target.name)}
                         disabled={disabled}
                     />
@@ -132,7 +132,7 @@ export default function ResponseHeader({ statusFilters, onStatusFilterSelected }
                             <NotAnalyzedIcon />
                             Ikke analysert
                         </div>
-                        <span className={styles.count}>{getCount([RESULT_STATUS.NOT_RELEVANT])}</span>
+                        <span className={styles.count}>{getCount([ResultStatus.NOT_RELEVANT])}</span>
                     </label>
                 </div>
             </div>

@@ -13,6 +13,7 @@ services.AddControllers()
         options.JsonSerializerOptions.WriteIndented = true;
     });
 
+services.AddMemoryCache();
 services.AddResponseCaching();
 
 services.AddHttpContextAccessor();
@@ -26,6 +27,7 @@ services.AddTransient<IGeoJsonSampleService, GeoJsonSampleService>();
 services.AddTransient<IValidationService, ValidationService>();
 
 services.AddHttpClient<IPygeoapiService, PygeoapiService>();
+services.AddHttpClient<IDokThemesHttpClient, DokThemesHttpClient>();
 
 services.AddCors(options =>
 {

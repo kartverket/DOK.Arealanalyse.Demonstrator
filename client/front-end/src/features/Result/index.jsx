@@ -1,103 +1,35 @@
 import { marked } from 'marked';
-import { RESULT_STATUS } from 'utils/constants';
-import { Heading } from '@digdir/designsystemet-react';
+import { ResultStatus } from 'utils/constants';
 import { getSectionOptions } from './helpers';
 import { InternalLinks } from 'components';
 import Actions from './Actions';
 import Analyzis from './Analyzis';
 import Data from './Data';
 import Dataset from './Dataset';
+import Heading from './Heading';
 import Map from './Map';
 import Quality from './Quality';
-import MustHandleIcon from 'assets/gfx/icon-must-handle.svg?react';
-import MustCheckIcon from 'assets/gfx/icon-must-check.svg?react';
-import NearbyIcon from 'assets/gfx/icon-nearby.svg?react';
-import NotAnalyzedIcon from 'assets/gfx/icon-not-analyzed.svg?react';
+import StatusAndThemes from './StatusAndThemes';
 import styles from './Result.module.scss';
 
 export default function Result({ result, inputGeometry }) {
     const data = result.data;
-    const hitAreaOrDistance = getHitAreaOrDistance();
     const { show, internalLinks } = getSectionOptions(result);
-
-    function renderTitle() {
-        return (
-            <div className={styles.title}>
-                {
-                    result.title !== null ?
-                        <>
-                            <Heading level={5}>{result.datasetTitle}</Heading>
-                            <Heading level={2} className={styles.title}>{result.title}</Heading>
-                        </> :
-                        <Heading level={2} className={styles.title}>{result.datasetTitle}</Heading>
-                }
-            </div>
-        );
-    }
-
-    function getHitAreaOrDistance() {
-        if (result.hitArea.formatted !== null) {
-            return result.hitArea.formatted;
-        } else if (result.distance.formatted !== null) {
-            return result.distance.formatted;
-        }
-
-        return null;
-    }
 
     function getStatusClassName() {
         switch (result.status) {
-            case RESULT_STATUS.HIT_RED:
+            case ResultStatus.HIT_RED:
                 return styles.mustHandle;
-            case RESULT_STATUS.HIT_YELLOW:
-            case RESULT_STATUS.NO_HIT_YELLOW:
-            case RESULT_STATUS.NOT_IMPLEMENTED:
-            case RESULT_STATUS.TIMEOUT:
-            case RESULT_STATUS.ERROR:
+            case ResultStatus.HIT_YELLOW:
+            case ResultStatus.NO_HIT_YELLOW:
+            case ResultStatus.NOT_IMPLEMENTED:
+            case ResultStatus.TIMEOUT:
+            case ResultStatus.ERROR:
                 return styles.mustCheck;
-            case RESULT_STATUS.NO_HIT_GREEN:
+            case ResultStatus.NO_HIT_GREEN:
                 return styles.nearby;
-            case RESULT_STATUS.NOT_RELEVANT:
+            case ResultStatus.NOT_RELEVANT:
                 return styles.notAnalyzed;
-            default:
-                return null;
-        }
-    }
-
-    function renderStatus() {
-        switch (result.status) {
-            case RESULT_STATUS.HIT_RED:
-                return (
-                    <span className={styles.status}>
-                        <MustHandleIcon />
-                        Må håndteres
-                    </span>
-                );
-            case RESULT_STATUS.HIT_YELLOW:
-            case RESULT_STATUS.NO_HIT_YELLOW:
-            case RESULT_STATUS.NOT_IMPLEMENTED:
-            case RESULT_STATUS.TIMEOUT:
-            case RESULT_STATUS.ERROR:
-                return (
-                    <span className={styles.status}>
-                        <MustCheckIcon />
-                        Må sjekkes
-                    </span>
-                );
-            case RESULT_STATUS.NO_HIT_GREEN:
-                return (
-                    <span className={styles.status}>
-                        <NearbyIcon />
-                        I nærheten
-                    </span>
-                );
-            case RESULT_STATUS.NOT_RELEVANT:
-                return (
-                    <span className={styles.status}>
-                        <NotAnalyzedIcon />
-                        Ikke analysert
-                    </span>
-                );
             default:
                 return null;
         }
@@ -121,29 +53,12 @@ export default function Result({ result, inputGeometry }) {
 
     return (
         <div className={`${styles.result} ${getStatusClassName()}`}>
-            <div className={styles.heading}>
-                {renderTitle()}
+            <Heading result={result} />
 
-                {
-                    hitAreaOrDistance !== null && (
-                        <div className={styles.hitAreaOrDistance}>
-                            {hitAreaOrDistance}
-                        </div>
-                    )
-                }
-            </div>
-
-            <div className={styles.statusAndThemes}>
-                {renderStatus()}
-
-                <span className={styles.themes}>
-                    {
-                        result.themes.map(theme => (
-                            <span key={theme} className={styles.theme}>{theme}</span>
-                        ))
-                    }
-                </span>
-            </div>
+            <StatusAndThemes 
+                result={result} 
+                statusClassName={styles.status}
+            />
 
             {renderDescription()}
 

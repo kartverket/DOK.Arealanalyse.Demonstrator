@@ -1,5 +1,5 @@
 import { getLayer } from 'utils/map';
-import baseMap from 'config/baseMap.config';
+import basemap from 'config/basemap.config';
 
 export function setupMap(map) {
     const vectorLayer = getLayer(map, 'features');
@@ -7,12 +7,12 @@ export function setupMap(map) {
     const view = map.getView();
 
     view.fit(extent, map.getSize());
-    view.setMinZoom(baseMap.minZoom);
-    view.setMaxZoom(baseMap.maxZoom);
+    view.setMinZoom(basemap.minZoom);
+    view.setMaxZoom(basemap.maxZoom);
 
     const currentZoom = view.getZoom();
 
-    if (currentZoom > baseMap.maxZoom) {
-        view.setZoom(baseMap.maxZoom);
+    if (currentZoom > basemap.maxZoom) {
+        view.setZoom(basemap.maxZoom);
     }
 }

@@ -1,0 +1,35 @@
+.statusAndThemes {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+    border: 1px solid;
+    border-radius: 16px;
+    width: fit-content;
+    padding: 4px 10px;
+
+    svg {
+        width: 14px;
+        height: 14px;
+    }
+}
+
+.themes {
+    display: flex;
+    gap: 3px;
+
+    .theme {
+        border: 1px solid #E5E7EB;
+        border-radius: 16px;
+        background-color: #F3F4F6;
+        color: #4A5565;
+        font-weight: 500;
+        padding: 4px 10px;
+    }
+}

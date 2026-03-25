@@ -5,9 +5,12 @@ export { default as MapView } from './MapView';
 export { default as ResultDialog } from './ResultDialog';
 export { default as ResultList } from './ResultList';
 
+export { default as AreaDialog } from './AreaDialog';
 export { default as MapDialog } from './MapDialog';
 
 export { default as Result } from './Result';
+export { default as ResultHeading } from './Result/Heading';
+export { default as ResultStatusAndThemes } from './Result/StatusAndThemes';
 export { default as ResultMap } from './Result/Map';
 export { default as Response } from './Response';
 export { default as ResponseHeader } from './ResponseHeader';

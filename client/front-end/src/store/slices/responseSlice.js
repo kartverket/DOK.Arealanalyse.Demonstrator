@@ -1,7 +1,7 @@
 import { createSelector, createSlice } from '@reduxjs/toolkit';
 import { inPlaceSort } from 'fast-sort';
 import groupBy from 'lodash.groupby';
-import { RESULT_STATUS } from 'utils/constants';
+import { ResultStatus } from 'utils/constants';
 
 const initialState = {
     data: null,
@@ -82,21 +82,21 @@ export const selectResults = createSelector(
         const results = Object.values(byId);
         const groupings = groupBy(results, result => result.status);
 
-        sortResults(groupings, [RESULT_STATUS.HIT_RED, RESULT_STATUS.HIT_YELLOW], results => {
+        sortResults(groupings, [ResultStatus.HIT_RED, ResultStatus.HIT_YELLOW], results => {
             inPlaceSort(results).desc([
                 result => result.hitArea.value || 0,
                 result => result.themes[0]
             ]);
         });
 
-        sortResults(groupings, [RESULT_STATUS.NO_HIT_YELLOW, RESULT_STATUS.NO_HIT_GREEN], results => {
+        sortResults(groupings, [ResultStatus.NO_HIT_YELLOW, ResultStatus.NO_HIT_GREEN], results => {
             inPlaceSort(results).asc([
                 result => result.distance.value,
                 result => result.themes[0]
             ]);
         });
 
-        sortResults(groupings, [RESULT_STATUS.NOT_RELEVANT, RESULT_STATUS.NOT_IMPLEMENTED, RESULT_STATUS.TIMEOUT, RESULT_STATUS.ERROR], results => {
+        sortResults(groupings, [ResultStatus.NOT_RELEVANT, ResultStatus.NOT_IMPLEMENTED, ResultStatus.TIMEOUT, ResultStatus.ERROR], results => {
             inPlaceSort(results).asc([
                 result => result.themes[0],
                 result => result.description

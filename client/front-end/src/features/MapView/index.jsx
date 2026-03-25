@@ -1,12 +1,10 @@
 import { useRef, useState, useEffect } from 'react';
 import { createMap } from 'utils/map';
 import { setupMap } from './helpers';
-import Zoom from './Zoom';
-import ZoomToExtent from './ZoomToExtent';
-import Expand from './Expand';
+import { Expand, MapControl, Zoom, ZoomToExtent } from 'components/Map';
 import styles from './MapView.module.scss';
 
-export default function MapView({ result, inputGeometry }) {
+export default function MapView({ result, inputGeometry, controls = [] }) {
     const [map, setMap] = useState(null);
     const mapElementRef = useRef(null);
 
@@ -47,9 +45,21 @@ export default function MapView({ result, inputGeometry }) {
             {
                 map !== null && (
                     <div className={styles.buttons}>
-                        <Zoom map={map} />
-                        <ZoomToExtent map={map} />
-                        <Expand />
+                        {
+                            controls.includes(MapControl.ZOOM) && (
+                                <Zoom map={map} />
+                            )
+                        }
+                        {
+                            controls.includes(MapControl.ZOOM_TO_EXTENT) && (
+                                <ZoomToExtent map={map} />
+                            )
+                        }
+                        {
+                            controls.includes(MapControl.EXPAND) && (
+                                <Expand />
+                            )
+                        }
                     </div>
                 )
             }

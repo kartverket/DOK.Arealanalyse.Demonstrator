@@ -1,7 +1,7 @@
 using Dok.Arealanalyse.Api.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Dok.Arealanalyse.Api.Controllers;
+namespace Dok.Arealanalyse.Api.Web.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]

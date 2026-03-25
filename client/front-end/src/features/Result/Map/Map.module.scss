@@ -1,7 +1,21 @@
 .mapImage {
-    display: flex;
-    border-radius: var(--ds-border-radius-lg);
-    margin-bottom: var(--ds-size-6);
+    position: relative;
+
+    img {
+        display: flex;
+        border-radius: var(--ds-border-radius-lg);
+        margin-bottom: var(--ds-size-6);
+    }
+
+    .buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        position: absolute;
+        z-index: 2;
+        top: 18px;
+        right: 18px;
+    }
 }
 
 .map {

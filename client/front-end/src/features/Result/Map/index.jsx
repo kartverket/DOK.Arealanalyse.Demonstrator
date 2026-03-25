@@ -3,6 +3,7 @@ import { createMapImage } from 'utils/map';
 import caching from 'utils/mapImageCache';
 import { Heading, Skeleton } from '@digdir/designsystemet-react';
 import { MapView } from 'features';
+import { Expand, MapControl } from 'components/Map';
 import styles from './Map.module.scss';
 
 const MAP_WIDTH = 656;
@@ -31,7 +32,7 @@ export default function Map({ result, inputGeometry }) {
                                 height: MAP_HEIGHT
                             }
                         });
-                        
+
                         caching.setMapImage(result.id, imageUri);
                     }
                 }
@@ -45,14 +46,21 @@ export default function Map({ result, inputGeometry }) {
     function renderMap() {
         if (!showInteractiveMap) {
             return (
-                <img
-                    src={mapImageUri}
-                    title="Åpne kart"
-                    onClick={() => setShowInteractiveMap(true)}
-                    alt="Kartutsnitt"
-                    role="button"
-                    className={styles.mapImage}
-                />
+                <div className={styles.mapImage}>
+                    <img
+                        src={mapImageUri}
+                        onClick={() => setShowInteractiveMap(true)}
+                        title="Åpne interaktivt kart"
+                        aria-label="Åpne interaktivt kart"
+                        alt="Kartutsnitt"
+                        role="button"
+                        className={styles.mapImage}
+                    />
+
+                    <div className={styles.buttons}>
+                        <Expand />
+                    </div>
+                </div>
             );
         }
 
@@ -61,6 +69,11 @@ export default function Map({ result, inputGeometry }) {
                 <MapView
                     result={result.data}
                     inputGeometry={result.data.runOnInputGeometry}
+                    controls={[
+                        MapControl.ZOOM,
+                        MapControl.ZOOM_TO_EXTENT,
+                        MapControl.EXPAND
+                    ]}
                 />
             </div>
         );

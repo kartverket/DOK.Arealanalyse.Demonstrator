@@ -10,7 +10,7 @@ import { defaults as defaultInteractions, DragRotateAndZoom } from 'ol/interacti
 import Style from 'ol/style/Style';
 import Stroke from 'ol/style/Stroke';
 import { getEpsgCode } from './helpers';
-import baseMap from 'config/baseMap.config';
+import basemap from 'config/basemap.config';
 
 const MAP_WIDTH = 720;
 const MAP_HEIGHT = 480;
@@ -30,7 +30,7 @@ export async function createMap({ geometry, bufferedGeometry, wmsUrl }) {
     map.setView(new View({
         padding: [50, 50, 50, 50],
         projection: 'EPSG:25833',
-        maxZoom: baseMap.maxZoom
+        maxZoom: basemap.maxZoom
     }));
 
     return map;
@@ -50,7 +50,7 @@ export async function createOutlineMap(geometry) {
     map.setView(new View({
         padding: [50, 50, 50, 50],
         projection: 'EPSG:25833',
-        maxZoom: baseMap.maxZoom
+        maxZoom: basemap.maxZoom
     }));
 
     return map;
@@ -89,7 +89,7 @@ async function createTempMap(geometry, bufferedGeometry, wmsUrl, options) {
     map.setView(new View({
         padding: [50, 50, 50, 50],
         projection: 'EPSG:25833',
-        maxZoom: baseMap.maxZoom,
+        maxZoom: basemap.maxZoom,
         constrainResolution: true
     }));
 
@@ -155,7 +155,7 @@ async function createWmtsLayer() {
 
     return new TileLayer({
         source: new WMTS(options),
-        maxZoom: baseMap.maxZoom
+        maxZoom: basemap.maxZoom
     });
 }
 
@@ -163,7 +163,7 @@ async function getWmtsOptions() {
     let xml;
 
     try {
-        const response = await fetch(baseMap.wmtsUrl, { timeout: 10000 });
+        const response = await fetch(basemap.wmtsUrl, { timeout: 10000 });
         xml = await response.text();
     } catch {
         return null;
@@ -172,7 +172,7 @@ async function getWmtsOptions() {
     const capabilities = new WMTSCapabilities().read(xml);
 
     const options = optionsFromCapabilities(capabilities, {
-        layer: baseMap.layer,
+        layer: basemap.layer,
         matrixSet: 'EPSG:3857'
     });
 

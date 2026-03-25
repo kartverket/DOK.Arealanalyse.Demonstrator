@@ -1,7 +1,7 @@
 ﻿using Dok.Arealanalyse.Api.Application.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Dok.Arealanalyse.Api.Controllers;
+namespace Dok.Arealanalyse.Api.Web.Controllers;
 
 public abstract class BaseController(
     ILogger<BaseController> logger) : ControllerBase

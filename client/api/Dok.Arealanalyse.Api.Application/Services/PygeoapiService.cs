@@ -1,5 +1,4 @@
 ﻿using Dok.Arealanalyse.Api.Application.Models.Settings;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using System.Net.Http.Json;
 using System.Text;
@@ -9,7 +8,6 @@ namespace Dok.Arealanalyse.Api.Application.Services;
 
 public class PygeoapiService(
     HttpClient httpClient,
-    IHttpContextAccessor httpContextAccessor,
     IOptions<PygeoapiSettings> options) : IPygeoapiService
 {
     public async Task<JsonNode> ExecuteAsync(JsonNode payload)

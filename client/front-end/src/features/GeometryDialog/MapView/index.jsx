@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { createOutlineMap, getLayer } from 'utils/map';
 import { ZoomToExtent } from 'ol/control';
-import baseMap from 'config/baseMap.config';
+import basemap from 'config/basemap.config';
 import styles from './MapView.module.scss';
 
 export default function MapView({ geometry }) {
@@ -35,13 +35,13 @@ export default function MapView({ geometry }) {
          const view = map.getView();
 
          view.fit(extent, map.getSize());
-         view.setMinZoom(baseMap.minZoom);
-         view.setMaxZoom(baseMap.maxZoom);
+         view.setMinZoom(basemap.minZoom);
+         view.setMaxZoom(basemap.maxZoom);
 
          const currentZoom = view.getZoom();
 
-         if (currentZoom > baseMap.maxZoom) {
-            view.setZoom(baseMap.maxZoom);
+         if (currentZoom > basemap.maxZoom) {
+            view.setZoom(basemap.maxZoom);
          }
 
          map.addControl(new ZoomToExtent({ extent }));

@@ -9,7 +9,7 @@ import { Button } from '@digdir/designsystemet-react';
 import { ArrowDownIcon, ArrowUpIcon, ChevronRightDoubleIcon } from '@navikt/aksel-icons';
 import styles from './Drawer.module.scss';
 
-const KEY = {
+const Key = {
     ARROW_DOWN: 'ArrowDown',
     ARROW_UP: 'ArrowUp',
     ESCAPE: 'Escape'
@@ -74,18 +74,18 @@ export default function Drawer() {
         event => {
             const key = event.key;
 
-            if (![KEY.ARROW_UP, KEY.ARROW_DOWN, KEY.ESCAPE].includes(key)) {
+            if (![Key.ARROW_UP, Key.ARROW_DOWN, Key.ESCAPE].includes(key)) {
                 return;
             }
 
             event.preventDefault();
             event.stopPropagation();
 
-            if (key === KEY.ARROW_UP) {
+            if (key === Key.ARROW_UP) {
                 goPrevious();
-            } else if (key === KEY.ARROW_DOWN) {
+            } else if (key === Key.ARROW_DOWN) {
                 goNext();
-            } else if (key === KEY.ESCAPE) {
+            } else if (key === Key.ESCAPE) {
                 close();
             }
         },
@@ -180,12 +180,11 @@ export default function Drawer() {
                         <div className={styles.bottom}>
                             <Button
                                 onClick={scrollToTop}
-                                icon
                                 variant="secondary"
-                                title="Gå til toppen"
-                                aria-label="Gå til toppen"
+                                aria-label="Til toppen"
                             >
                                 <ArrowUpIcon aria-hidden />
+                                Til toppen
                             </Button>
                         </div>
                     </div>

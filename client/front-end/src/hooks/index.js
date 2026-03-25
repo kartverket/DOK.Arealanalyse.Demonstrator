@@ -1,3 +1,3 @@
 export { default as useDebounce } from './useDebounce';
-export { default as useSamples } from './useSamples';
+export { default as useFetcher } from './useFetcher';
 export { default as useSocketIO } from './useSocketIO';

@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setSelectedResultId, setMapDialogOpen } from 'store/slices/responseSlice';
-import { RESULT_STATUS } from 'utils/constants';
+import { ResultStatus } from 'utils/constants';
 import { Table } from '@digdir/designsystemet-react';
 import MustHandleIcon from 'assets/gfx/icon-must-handle.svg?react';
 import MustCheckIcon from 'assets/gfx/icon-must-check.svg?react';
@@ -22,20 +22,20 @@ function ResponseTableRow({ result }) {
         }
 
         switch (result.status) {
-            case RESULT_STATUS.HIT_RED:
+            case ResultStatus.HIT_RED:
                 classes.push(styles.mustHandle);
                 break;
-            case RESULT_STATUS.HIT_YELLOW:
-            case RESULT_STATUS.NO_HIT_YELLOW:
-            case RESULT_STATUS.NOT_IMPLEMENTED:
-            case RESULT_STATUS.TIMEOUT:
-            case RESULT_STATUS.ERROR:
+            case ResultStatus.HIT_YELLOW:
+            case ResultStatus.NO_HIT_YELLOW:
+            case ResultStatus.NOT_IMPLEMENTED:
+            case ResultStatus.TIMEOUT:
+            case ResultStatus.ERROR:
                 classes.push(styles.mustCheck);
                 break;
-            case RESULT_STATUS.NO_HIT_GREEN:
+            case ResultStatus.NO_HIT_GREEN:
                 classes.push(styles.nearby);
                 break;
-            case RESULT_STATUS.NOT_RELEVANT:
+            case ResultStatus.NOT_RELEVANT:
                 classes.push(styles.notAnalyzed);
                 break;
             default:
@@ -47,17 +47,17 @@ function ResponseTableRow({ result }) {
 
     function renderStatusIcon(status) {
         switch (status) {
-            case RESULT_STATUS.HIT_RED:
+            case ResultStatus.HIT_RED:
                 return <MustHandleIcon />;
-            case RESULT_STATUS.HIT_YELLOW:
-            case RESULT_STATUS.NO_HIT_YELLOW:
-            case RESULT_STATUS.NOT_IMPLEMENTED:
-            case RESULT_STATUS.TIMEOUT:
-            case RESULT_STATUS.ERROR:
+            case ResultStatus.HIT_YELLOW:
+            case ResultStatus.NO_HIT_YELLOW:
+            case ResultStatus.NOT_IMPLEMENTED:
+            case ResultStatus.TIMEOUT:
+            case ResultStatus.ERROR:
                 return <MustCheckIcon />;
-            case RESULT_STATUS.NO_HIT_GREEN:
+            case ResultStatus.NO_HIT_GREEN:
                 return <NearbyIcon />;
-            case RESULT_STATUS.NOT_RELEVANT:
+            case ResultStatus.NOT_RELEVANT:
                 return <NotAnalyzedIcon />;
             default:
                 return null;

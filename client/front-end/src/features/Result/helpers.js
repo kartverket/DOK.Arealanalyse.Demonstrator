@@ -1,7 +1,7 @@
-import { RESULT_STATUS } from 'utils/constants';
+import { ResultStatus } from 'utils/constants';
 
 export function getSectionOptions(result) {
-    const showMap = [RESULT_STATUS.HIT_RED, RESULT_STATUS.HIT_YELLOW].includes(result.status);
+    const showMap = [ResultStatus.HIT_RED, ResultStatus.HIT_YELLOW].includes(result.status);
     const showActions = result.data.guidanceText !== null ||
         result.data.possibleActions.length > 0 ||
         result.data.guidanceUri.length > 0;

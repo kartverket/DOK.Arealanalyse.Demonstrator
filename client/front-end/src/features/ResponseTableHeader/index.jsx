@@ -1,5 +1,5 @@
 import { useSelector } from 'react-redux';
-import { STATUS_FILTER } from 'utils/constants';
+import { StatusFilter } from 'utils/constants';
 import { Button, Search } from '@digdir/designsystemet-react';
 import ThemeSelector from './ThemeSelector';
 import MustHandleIcon from 'assets/gfx/icon-must-handle.svg?react';
@@ -31,8 +31,8 @@ export default function ResponseTableHeader({
                     <input
                         id="must-handle-f"
                         type="checkbox"
-                        name={STATUS_FILTER.MUST_HANDLE}
-                        checked={statusFilters.includes(STATUS_FILTER.MUST_HANDLE)}
+                        name={StatusFilter.MUST_HANDLE}
+                        checked={statusFilters.includes(StatusFilter.MUST_HANDLE)}
                         onChange={event => onStatusFilterSelected(event.target.name)}
                         disabled={disabled}
                     />
@@ -47,8 +47,8 @@ export default function ResponseTableHeader({
                     <input
                         id="must-check-f"
                         type="checkbox"
-                        name={STATUS_FILTER.MUST_CHECK}
-                        checked={statusFilters.includes(STATUS_FILTER.MUST_CHECK)}
+                        name={StatusFilter.MUST_CHECK}
+                        checked={statusFilters.includes(StatusFilter.MUST_CHECK)}
                         onChange={event => onStatusFilterSelected(event.target.name)}
                         disabled={disabled}
                     />
@@ -63,8 +63,8 @@ export default function ResponseTableHeader({
                     <input
                         id="nearby-f"
                         type="checkbox"
-                        name={STATUS_FILTER.NEARBY}
-                        checked={statusFilters.includes(STATUS_FILTER.NEARBY)}
+                        name={StatusFilter.NEARBY}
+                        checked={statusFilters.includes(StatusFilter.NEARBY)}
                         onChange={event => onStatusFilterSelected(event.target.name)}
                         disabled={disabled}
                     />
@@ -79,8 +79,8 @@ export default function ResponseTableHeader({
                     <input
                         id="not-analyzed-f"
                         type="checkbox"
-                        name={STATUS_FILTER.NOT_ANALYZED}
-                        checked={statusFilters.includes(STATUS_FILTER.NOT_ANALYZED)}
+                        name={StatusFilter.NOT_ANALYZED}
+                        checked={statusFilters.includes(StatusFilter.NOT_ANALYZED)}
                         onChange={event => onStatusFilterSelected(event.target.name)}
                         disabled={disabled}
                     />

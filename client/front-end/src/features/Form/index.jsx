@@ -3,19 +3,23 @@ import { useDispatch, useSelector } from 'react-redux';
 import { resetState as resetAppState } from 'store/slices/progressSlice';
 import { setBusy, setErrorMessage } from 'store/slices/appSlice';
 import { setResponse } from 'store/slices/responseSlice';
-import { analyze } from 'utils/api';
+import { analyze, fetcher } from 'utils/api';
 import { mapResponse } from './helpers';
-import { Button, Checkbox, CircularProgress, FormControl, FormControlLabel, InputAdornment, InputLabel, MenuItem, Select } from '@mui/material';
+import { Button, Checkbox, CircularProgress, FormControl, FormControlLabel, InputAdornment, InputLabel, MenuItem } from '@mui/material';
 import { IntegerField } from 'components';
-import { GeometryDialog } from 'features';
+import { AreaDialog, GeometryDialog } from 'features';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import styles from './Form.module.scss';
+import { Field, Input, Label, Select } from '@digdir/designsystemet-react';
+import useSWR from 'swr';
+import { useFetcher } from 'hooks';
 
 export default function Form() {
     const [state, setState] = useState(getDefaultValues());
     const geometryDialogRef = useRef(null);
     const correlationId = useSelector(state => state.app.correlationId);
     const busy = useSelector(state => state.app.busy);
+    const { data: themes = [] } = useFetcher('/dokthemes');
     const dispatch = useDispatch();
 
     function getDefaultValues() {
@@ -42,6 +46,10 @@ export default function Form() {
 
     function handleGeometryDialogOk(polygon) {
         setState({ ...state, inputGeometry: polygon });
+    }
+
+    function handleAreaDialogOk(geometry) {
+        console.log(geometry);
     }
 
     function canSubmit() {
@@ -88,11 +96,12 @@ export default function Form() {
             <div className={styles.input}>
                 <div className={styles.row}>
                     <div className={styles.addGeometry}>
-                        <GeometryDialog
+                        {/* <GeometryDialog
                             ref={geometryDialogRef}
                             onOk={handleGeometryDialogOk}
-                        />
-
+                        /> */}
+                        <AreaDialog onOk={handleAreaDialogOk} />
+                        
                         <div className={styles.icons}>
                             <CheckCircleIcon
                                 color="success"
@@ -103,21 +112,27 @@ export default function Form() {
                         </div>
                     </div>
                     <div>
-                        <IntegerField
-                            name="requestedBuffer"
-                            value={state.requestedBuffer}
-                            onChange={handleChange}
-                            label="Buffer"
-                            InputProps={{
-                                endAdornment: <InputAdornment position="end">[meter]</InputAdornment>
-                            }}
-                            sx={{
-                                width: 150
-                            }}
-                        />
+                        <Field>
+                            <Label>Buffer</Label>
+                            <Field.Affixes>
+                                <Input type="number" />
+                                <Field.Affix>meter</Field.Affix>
+                            </Field.Affixes>
+                        </Field>
                     </div>
                     <div>
-                        <FormControl sx={{ width: 200 }}>
+                        <Field>
+                            <Label>Bruksområde</Label>
+                            <Select defaultValue="">
+                                <Select.Option value="" disabled>
+                                    Velg bruksområde
+                                </Select.Option>
+                                <Select.Option value="Reguleringsplan">Reguleringsplan</Select.Option>
+                                <Select.Option value="Kommuneplan">Kommuneplan</Select.Option>
+                                <Select.Option value="Byggesak">Byggesak</Select.Option>
+                            </Select>
+                        </Field>
+                        {/* <FormControl sx={{ width: 200 }}>
                             <InputLabel id="context-label">Bruksområde</InputLabel>
                             <Select
                                 labelId="context-label"
@@ -132,31 +147,49 @@ export default function Form() {
                                 <MenuItem value="Kommuneplan">Kommuneplan</MenuItem>
                                 <MenuItem value="Byggesak">Byggesak</MenuItem>
                             </Select>
-                        </FormControl>
+                        </FormControl> */}
                     </div>
                     <div>
-                        <FormControl sx={{ width: 200 }}>
-                            <InputLabel id="theme-label">Tema</InputLabel>
-                            <Select
-                                labelId="theme-label"
-                                id="theme-select"
-                                name="theme"
-                                value={state.theme}
-                                label="Velg tema"
-                                onChange={handleChange}
-                            >
-                                <MenuItem value="">Velg...</MenuItem>
-                                <MenuItem value="Geologi">Geologi</MenuItem>
-                                <MenuItem value="Kulturminner">Kulturminner</MenuItem>
-                                <MenuItem value="Klima">Klima</MenuItem>
-                                <MenuItem value="Kyst og fiskeri">Kyst og fiskeri</MenuItem>
-                                <MenuItem value="Landbruk">Landbruk</MenuItem>
-                                <MenuItem value="Natur">Natur</MenuItem>
-                                <MenuItem value="Plan">Plan</MenuItem>
-                                <MenuItem value="Samferdsel">Samferdsel</MenuItem>
-                                <MenuItem value="Samfunnssikkerhet">Samfunnssikkerhet</MenuItem>
+                        {/* // <FormControl sx={{ width: 200 }}>
+                        //     <InputLabel id="theme-label">Tema</InputLabel>
+                        //     <Select
+                        //         labelId="theme-label"
+                        //         id="theme-select"
+                        //         name="theme"
+                        //         value={state.theme}
+                        //         label="Velg tema"
+                        //         onChange={handleChange}
+                        //     >
+                        //         <MenuItem value="">Velg...</MenuItem>
+                        //         <MenuItem value="Geologi">Geologi</MenuItem>
+                        //         <MenuItem value="Kulturminner">Kulturminner</MenuItem>
+                        //         <MenuItem value="Klima">Klima</MenuItem>
+                        //         <MenuItem value="Kyst og fiskeri">Kyst og fiskeri</MenuItem>
+                        //         <MenuItem value="Landbruk">Landbruk</MenuItem>
+                        //         <MenuItem value="Natur">Natur</MenuItem>
+                        //         <MenuItem value="Plan">Plan</MenuItem>
+                        //         <MenuItem value="Samferdsel">Samferdsel</MenuItem>
+                        //         <MenuItem value="Samfunnssikkerhet">Samfunnssikkerhet</MenuItem>
+                        //     </Select>
+                        // </FormControl> */}
+                        <Field>
+                            <Label>Tema</Label>
+                            <Select defaultValue="">
+                                <Select.Option value="" disabled>
+                                    Velg tema
+                                </Select.Option>
+                                {
+                                    themes.map(theme => (
+                                        <Select.Option 
+                                            key={theme}
+                                            value={theme}
+                                        >
+                                            {theme}
+                                        </Select.Option>
+                                    ))
+                                }
                             </Select>
-                        </FormControl>
+                        </Field>                        
                     </div>
                     <div className={styles.checkboxes}>
                         <div>

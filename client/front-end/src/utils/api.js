@@ -1,17 +1,25 @@
 import axios from 'axios';
-import store from 'store';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
+const api = axios.create({ 
+    baseURL: API_BASE_URL 
+});
+
+export const fetcher = async url => {
+    const response = await api.get(url);   
+    return response.data;
+}
+
 export async function convert(file, fileType) {
-    const url = `${API_BASE_URL}/convert/${fileType}/outline`;
+    const url = `/convert/${fileType}/outline`;
     const formData = new FormData();
 
     formData.append('file', file);
     formData.append('destEpsg', 25833);
 
     try {
-        const response = await axios.post(url, formData);
+        const response = await api.post(url, formData);
         return response.data;
     } catch (error) {
         console.log(error);
@@ -20,14 +28,14 @@ export async function convert(file, fileType) {
 }
 
 export async function validate(geoJson) {
-    const url = `${API_BASE_URL}/validate`;
+    const url = '/validate';
     const formData = new FormData();
     const blob = new Blob([JSON.stringify(geoJson)], { type: 'application/json' });
 
     formData.append('file', blob);
 
     try {
-        const response = await axios.post(url, formData);
+        const response = await api.post(url, formData);
         return response.data;
     } catch (error) {
         console.log(error);
@@ -36,7 +44,7 @@ export async function validate(geoJson) {
 }
 
 export async function analyze(payload) {
-    const url = `${API_BASE_URL}/pygeoapi`;
+    const url = '/pygeoapi';
 
     try {
         const response = await axios.post(url, payload);

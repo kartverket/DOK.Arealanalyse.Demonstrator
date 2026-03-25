@@ -1,4 +1,4 @@
-import { RESULT_STATUS, STATUS_FILTER } from 'utils/constants';
+import { ResultStatus, StatusFilter } from 'utils/constants';
 import { capitalizeFirstLetter } from 'utils/helpers';
 
 export function getThemes(resultList = {}) {
@@ -17,19 +17,19 @@ export function getThemes(resultList = {}) {
 
 export function getInitalStatusFilter(resultList) {
     if (getMustHandleResults(resultList).length) {
-        return [STATUS_FILTER.MUST_HANDLE];
+        return [StatusFilter.MUST_HANDLE];
     }
 
     if (getMustCheckResults(resultList).length) {
-        return [STATUS_FILTER.MUST_CHECK];
+        return [StatusFilter.MUST_CHECK];
     }
 
     if (getNearbyResults(resultList).length) {
-        return [STATUS_FILTER.NEARBY];
+        return [StatusFilter.NEARBY];
     }
 
     if (getNotAnalyzedResults(resultList).length) {
-        return [STATUS_FILTER.NOT_ANALYZED];
+        return [StatusFilter.NOT_ANALYZED];
     }
 
     return [];
@@ -38,22 +38,22 @@ export function getInitalStatusFilter(resultList) {
 export function filterResults(resultList, statusFilters, selectedThemes, searchTerm) {
     let filtered = [];
 
-    if (statusFilters.includes(STATUS_FILTER.MUST_HANDLE)) {
+    if (statusFilters.includes(StatusFilter.MUST_HANDLE)) {
         const results = getMustHandleResults(resultList);
         filtered.push(...results)
     }
 
-    if (statusFilters.includes(STATUS_FILTER.MUST_CHECK)) {
+    if (statusFilters.includes(StatusFilter.MUST_CHECK)) {
         const results = getMustCheckResults(resultList);
         filtered.push(...results)
     }
 
-    if (statusFilters.includes(STATUS_FILTER.NEARBY)) {
+    if (statusFilters.includes(StatusFilter.NEARBY)) {
         const results = getNearbyResults(resultList);
         filtered.push(...results)
     }
 
-    if (statusFilters.includes(STATUS_FILTER.NOT_ANALYZED)) {
+    if (statusFilters.includes(StatusFilter.NOT_ANALYZED)) {
         const results = getNotAnalyzedResults(resultList);
         filtered.push(...results)
     }
@@ -87,23 +87,23 @@ function getResultsByStatuses(resultList, statuses) {
 }
 
 function getMustHandleResults(resultList) {
-    return getResultsByStatuses(resultList, [RESULT_STATUS.HIT_RED]);
+    return getResultsByStatuses(resultList, [ResultStatus.HIT_RED]);
 }
 
 function getMustCheckResults(resultList) {
     return getResultsByStatuses(resultList, [
-        RESULT_STATUS.HIT_YELLOW,
-        RESULT_STATUS.NO_HIT_YELLOW,
-        RESULT_STATUS.TIMEOUT,
-        RESULT_STATUS.ERROR,
-        RESULT_STATUS.NOT_IMPLEMENTED
+        ResultStatus.HIT_YELLOW,
+        ResultStatus.NO_HIT_YELLOW,
+        ResultStatus.TIMEOUT,
+        ResultStatus.ERROR,
+        ResultStatus.NOT_IMPLEMENTED
     ]);
 }
 
 function getNearbyResults(resultList) {
-    return getResultsByStatuses(resultList, [RESULT_STATUS.NO_HIT_GREEN]);
+    return getResultsByStatuses(resultList, [ResultStatus.NO_HIT_GREEN]);
 }
 
 function getNotAnalyzedResults(resultList) {
-    return getResultsByStatuses(resultList, [RESULT_STATUS.NOT_RELEVANT]);
+    return getResultsByStatuses(resultList, [ResultStatus.NOT_RELEVANT]);
 }

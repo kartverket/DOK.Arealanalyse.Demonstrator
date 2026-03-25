@@ -3,12 +3,12 @@ import { useDispatch } from 'react-redux';
 import { setErrorMessage } from 'store/slices/appSlice';
 import { convert, validate } from 'utils/api';
 import { getFileType, parseJsonFile } from './helpers';
-import useSamples from 'hooks/useSamples';
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, MenuItem, Select, Tab, Tabs } from '@mui/material';
 import { HiddenInput, TabPanel } from 'components';
 import MapView from './MapView';
 import GeoJson from './GeoJson';
 import styles from './GeometryDialog.module.scss';
+import { useFetcher } from 'hooks';
 
 const GeometryDialog = forwardRef(({ onOk }, ref) => {
     const [open, setOpen] = useState(false);
@@ -16,7 +16,7 @@ const GeometryDialog = forwardRef(({ onOk }, ref) => {
     const [selectedSample, setSelectedSample] = useState('');
     const [selectedFileName, setSelectedFileName] = useState('');
     const [selectedTab, setSelectedTab] = useState(0);
-    const { samples = [] } = useSamples();
+    const { data: samples = [] } = useFetcher('/sample')
     const dispatch = useDispatch();
 
     useImperativeHandle(ref, () => ({
