@@ -10,15 +10,15 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/client/api/Dok.Arealanalyse.Api.Web/bin/Debug/net8.0/Dok.Arealanalyse.Api.Web.dll",
+            "program": "${workspaceFolder}/client/api/Dok.Arealanalyse.Api.Web/bin/Debug/net10.0/Dok.Arealanalyse.Api.Web.dll",
             "args": [],
             "cwd": "${workspaceFolder}/client/api/Dok.Arealanalyse.Api.Web",
             "stopAtEntry": false,
             // Enable launching a web browser when ASP.NET Core starts. For more information: https://aka.ms/VSCode-CS-LaunchJson-WebBrowser
-            "serverReadyAction": {
-                "action": "openExternally",
-                "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
-            },
+            // "serverReadyAction": {
+            //     "action": "openExternally",
+            //     "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+            // },
             "env": {
                 "ASPNETCORE_ENVIRONMENT": "Development"
             },

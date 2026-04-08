@@ -1,0 +1,106 @@
+.mapDialog {
+    width: 96vw;
+    height: 96vh;
+    max-width: 100%;
+    max-height: none;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
+    &.mustHandle {
+        .status {
+            color: #B42318;
+            border-color: #f0443866;
+            background-color: #FEF3F2;
+
+            svg {
+                stroke: #F04438;
+            }
+        }
+    }
+
+    &.mustCheck {
+        .status {
+            color: #B54708;
+            border-color: #F7900966;
+            background-color: #FEE9CE;
+
+            svg {
+                stroke: #F79009;
+            }
+        }
+    }
+
+    &.nearby {
+        .status {
+            color: #027A48;
+            border-color: #12B76A66;
+            background-color: #ECFDF3;
+
+            svg {
+                stroke: #12B76A;
+            }
+        }
+    }
+
+    &.notAnalyzed {
+        .status {
+            color: #344054;
+            border-color: #66708566;
+            background-color: #F2F4F7;
+
+            svg {
+                stroke: #344054;
+            }
+        }
+    }    
+}
+
+.top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #F3F4F6;
+    padding-bottom: var(--ds-size-6);
+    margin-bottom: var(--ds-size-4);
+
+    .left {
+        display: flex;
+        gap: 8px;
+    }
+
+    .right {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+    }
+}
+
+.heading {
+    margin-bottom: var(--ds-size-4) !important;
+    min-height: 64px;
+}
+
+.map {
+    position: relative;
+    width: 100%;
+    flex: 1 1 auto;
+    border: 1px solid #E5E7EB;
+    border-radius: var(--ds-border-radius-lg);
+    overflow: hidden;
+}
+
+.mapHeading {
+    position: absolute;
+    z-index: 1;
+    width: 100%;
+    background: #ffffffd1;
+    padding: 17px 17px 0;
+}
+
+.mapView > div:last-child {
+    top: 165px;
+}

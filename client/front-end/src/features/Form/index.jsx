@@ -1,211 +1,181 @@
-import { useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { Button, Checkbox, CircularProgress, FormControl, FormControlLabel, InputAdornment, InputLabel, MenuItem, Paper, Select } from '@mui/material';
-import { GeometryDialog } from 'features';
-import { IntegerField } from 'components';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { useDispatch, useSelector } from 'react-redux';
+import { useFetcher } from 'hooks';
+import { resetProgress } from 'store/slices/progressSlice';
+import { analyzeStart, analyzeFinish, setFormData, setToast } from 'store/slices/appSlice';
+import { setResponse, resetResponseState } from 'store/slices/responseSlice';
+import { analyze } from 'utils/api';
+import { createPayload, mapResponse } from './helpers';
+import { Button, Checkbox, Field, Input, Label, Select } from '@digdir/designsystemet-react';
+import { AreaDialog } from 'features';
+import { CheckmarkCircleFillIcon } from '@navikt/aksel-icons';
 import styles from './Form.module.scss';
 
-export default function Form({ fetching, onSubmit }) {
-    const [state, setState] = useState(getDefaultValues());
-    const geometryDialogRef = useRef(null);
+export default function Form() {
     const correlationId = useSelector(state => state.app.correlationId);
-
-    function getDefaultValues() {
-        return {
-            inputGeometry: null,
-            requestedBuffer: 0,
-            context: '',
-            theme: '',
-            includeGuidance: true,
-            includeQualityMeasurement: true,
-            includeFilterChosenDOK: false,
-            includeFacts: true,
-            createBinaries: false
-        };
-    }
+    const formData = useSelector(state => state.app.formData);
+    const busy = useSelector(state => state.app.busy);
+    const { data: themes = [] } = useFetcher('/dokthemes');
+    const dispatch = useDispatch();
 
     function handleChange(event) {
+        const name = event.target.name;
+
         const value = event.target.type === 'checkbox' ?
             event.target.checked :
             event.target.value;
 
-        setState({ ...state, [event.target.name]: value });
+        dispatch(setFormData({ name, value }));
     }
 
-    function handleGeometryDialogOk(polygon) {
-        setState({ ...state, inputGeometry: polygon });
-    }
-
-    function handleSubmit() {
-        const payload = getPayload();
-        onSubmit(payload);
+    function handleAreaDialogOk(geometry) {
+        dispatch(setFormData({ name: 'inputGeometry', value: geometry }));
     }
 
     function canSubmit() {
-        return !fetching && state.inputGeometry !== null;
+        return !busy && formData.inputGeometry !== null;
     }
 
-    function getPayload() {
-        const inputs = { ...state, };
+    function resetState() {
+        dispatch(resetResponseState());
+        dispatch(resetProgress());
+    }
 
-        inputs.context = inputs.context !== '' ? inputs.context : null;
-        inputs.theme = inputs.theme !== '' ? inputs.theme : null;
-        inputs.correlationId = correlationId;
+    async function runAnalyses() {
+        resetState();
+        const payload = createPayload(formData, correlationId);
 
-        return {
-            inputs
-        };
+        try {
+            dispatch(analyzeStart());
+            const response = await analyze(payload);
+            const mapped = mapResponse(response);
+            dispatch(setResponse(mapped));
+        } catch (error) {
+            dispatch(setToast({ message: 'Kunne ikke kjøre DOK-analyse. En feil har oppstått.' }));
+            console.log(error);
+        } finally {
+            setTimeout(() => {
+                dispatch(analyzeFinish());
+            }, 500);
+        }
     }
 
     return (
-        <Paper sx={{ marginBottom: '24px' }}>
+        <section className={styles.form}>
             <div className={styles.input}>
                 <div className={styles.row}>
                     <div className={styles.addGeometry}>
-                        <GeometryDialog
-                            ref={geometryDialogRef}
-                            onOk={handleGeometryDialogOk}
+                        <AreaDialog onOk={handleAreaDialogOk} />
+
+                        <CheckmarkCircleFillIcon
+                            color="#056d13"
+                            fontSize="24px"
+                            style={{
+                                visibility: formData.inputGeometry !== null ? 'visible' : 'hidden'
+                            }}
+                        />
+                    </div>
+
+                    <Field className={styles.buffer}>
+                        <Label>Buffer</Label>
+                        <Field.Affixes>
+                            <Input
+                                type="number"
+                                name="requestedBuffer"
+                                value={formData.requestedBuffer}
+                                onChange={handleChange}
+                            />
+                            <Field.Affix>meter</Field.Affix>
+                        </Field.Affixes>
+                    </Field>
+
+                    <Field>
+                        <Label>Bruksområde</Label>
+                        <Select
+                            name="context"
+                            value={formData.context}
+                            onChange={handleChange}
+                        >
+                            <Select.Option value="">
+                                Velg bruksområde
+                            </Select.Option>
+                            <Select.Option value="Reguleringsplan">Reguleringsplan</Select.Option>
+                            <Select.Option value="Kommuneplan">Kommuneplan</Select.Option>
+                            <Select.Option value="Byggesak">Byggesak</Select.Option>
+                        </Select>
+                    </Field>
+
+                    <Field>
+                        <Label>Tema</Label>
+                        <Select
+                            name="theme"
+                            value={formData.theme}
+                            onChange={handleChange}
+                        >
+                            <Select.Option value="">
+                                Velg tema
+                            </Select.Option>
+                            {
+                                themes.map(theme => (
+                                    <Select.Option
+                                        key={theme}
+                                        value={theme}
+                                    >
+                                        {theme}
+                                    </Select.Option>
+                                ))
+                            }
+                        </Select>
+                    </Field>
+
+                    <div className={styles.checkboxes}>
+                        <Checkbox
+                            name="includeGuidance"
+                            checked={formData.includeGuidance}
+                            onChange={handleChange}
+                            label="Inkluder veiledning"
                         />
 
-                        <div className={styles.icons}>
-                            <CheckCircleIcon
-                                color="success"
-                                sx={{
-                                    display: state.inputGeometry !== null ? 'block !important' : 'none'
-                                }}
-                            />
-                        </div>
-                    </div>
-                    <div>
-                        <IntegerField
-                            name="requestedBuffer"
-                            value={state.requestedBuffer}
+                        <Checkbox
+                            name="includeFilterChosenDOK"
+                            checked={formData.includeFilterChosenDOK}
                             onChange={handleChange}
-                            label="Buffer"
-                            InputProps={{
-                                endAdornment: <InputAdornment position="end">[meter]</InputAdornment>
-                            }}
-                            sx={{
-                                width: 150
-                            }}
+                            label="Inkluder kun kommunens valgte DOK-data"
                         />
-                    </div>
-                    <div>
-                        <FormControl sx={{ width: 200 }}>
-                            <InputLabel id="context-label">Bruksområde</InputLabel>
-                            <Select
-                                labelId="context-label"
-                                id="context-select"
-                                name="context"
-                                value={state.context}
-                                label="Velg bruksområde"
-                                onChange={handleChange}
-                            >
-                                <MenuItem value="">Velg...</MenuItem>
-                                <MenuItem value="Reguleringsplan">Reguleringsplan</MenuItem>
-                                <MenuItem value="Kommuneplan">Kommuneplan</MenuItem>
-                                <MenuItem value="Byggesak">Byggesak</MenuItem>
-                            </Select>
-                        </FormControl>
-                    </div>
-                    <div>
-                        <FormControl sx={{ width: 200 }}>
-                            <InputLabel id="theme-label">Tema</InputLabel>
-                            <Select
-                                labelId="theme-label"
-                                id="theme-select"
-                                name="theme"
-                                value={state.theme}
-                                label="Velg tema"
-                                onChange={handleChange}
-                            >
-                                <MenuItem value="">Velg...</MenuItem>
-                                <MenuItem value="Geologi">Geologi</MenuItem>
-                                <MenuItem value="Kulturminner">Kulturminner</MenuItem>
-                                <MenuItem value="Klima">Klima</MenuItem>
-                                <MenuItem value="Kyst og fiskeri">Kyst og fiskeri</MenuItem>
-                                <MenuItem value="Landbruk">Landbruk</MenuItem>
-                                <MenuItem value="Natur">Natur</MenuItem>
-                                <MenuItem value="Plan">Plan</MenuItem>
-                                <MenuItem value="Samferdsel">Samferdsel</MenuItem>
-                                <MenuItem value="Samfunnssikkerhet">Samfunnssikkerhet</MenuItem>
-                            </Select>
-                        </FormControl>
-                    </div>
-                    <div className={styles.checkboxes}>
-                        <div>
-                            <FormControlLabel
-                                control={
-                                    <Checkbox
-                                        name="includeGuidance"
-                                        checked={state.includeGuidance}
-                                        onChange={handleChange}
-                                    />
-                                }
-                                label="Inkluder veiledning" />
-                        </div>
-                        <div>
-                            <FormControlLabel
-                                control={
-                                    <Checkbox
-                                        name="includeFilterChosenDOK"
-                                        checked={state.includeFilterChosenDOK}
-                                        onChange={handleChange}
-                                    />
-                                }
-                                label="Inkluder kun kommunens valgte DOK-data" />
-                        </div>
-                        <div>
-                            <FormControlLabel
-                                control={
-                                    <Checkbox
-                                        name="includeQualityMeasurement"
-                                        checked={state.includeQualityMeasurement}
-                                        onChange={handleChange}
-                                    />
-                                }
-                                label="Inkluder kvalitetsinformasjon" />
-                        </div>
-                        <div>
-                            <FormControlLabel
-                                control={
-                                    <Checkbox
-                                        name="createBinaries"
-                                        checked={state.createBinaries}
-                                        onChange={handleChange}
-                                    />
-                                }
-                                label="Lag kartbilder og PDF-rapport" />
-                        </div>
-                        <div>
-                            <FormControlLabel
-                                control={
-                                    <Checkbox
-                                        name="includeFacts"
-                                        checked={state.includeFacts}
-                                        onChange={handleChange}
-                                    />
-                                }
-                                label="Inkluder faktainformasjon" />
-                        </div>
+
+                        <Checkbox
+                            name="includeQualityMeasurement"
+                            checked={formData.includeQualityMeasurement}
+                            onChange={handleChange}
+                            label="Inkluder kvalitetsinformasjon"
+                        />
+
+                        <Checkbox
+                            name="createBinaries"
+                            checked={formData.createBinaries}
+                            onChange={handleChange}
+                            label="Lag kartbilder og PDF-rapport"
+                        />
+
+                        <Checkbox
+                            name="includeFacts"
+                            checked={formData.includeFacts}
+                            onChange={handleChange}
+                            label="Inkluder faktainformasjon"
+                        />
                     </div>
                 </div>
                 <div className={styles.row}>
                     <div className={styles.submit}>
                         <Button
-                            onClick={handleSubmit}
-                            variant="contained"
+                            onClick={runAnalyses}
+                            variant="primary"
                             disabled={!canSubmit()}
                         >
                             Start DOK-analyse
                         </Button>
-                        {
-                            fetching && <CircularProgress size={30} />
-                        }
                     </div>
                 </div>
             </div>
-        </Paper>
+        </section>
     );
 }

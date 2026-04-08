@@ -1,0 +1,23 @@
+.paragraphs p {
+    margin-bottom: var(--ds-size-3);
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+.button {
+    border: 0 none;
+    background: none;
+    padding: 0;
+    cursor: pointer;
+    color: var(--ds-color-text-subtle);
+    text-decoration: underline;
+    text-decoration-color: var(--ds-color-text-subtle);
+    text-underline-offset: 0.27em;
+
+    &:hover {
+        text-decoration-color: var(--ds-color-text-default);
+        text-decoration-thickness: 0.125em;
+    }
+}

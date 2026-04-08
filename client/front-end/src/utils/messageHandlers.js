@@ -1,5 +1,5 @@
 import store from 'store';
-import { updateState } from 'store/slices/analysisSlice';
+import { updateProgress } from 'store/slices/progressSlice';
 import { setCorrelationId } from 'store/slices/appSlice';
 
 const messageHandlers = new Map();
@@ -9,8 +9,7 @@ messageHandlers.set('client_connected', message => {
 });
 
 messageHandlers.set('state_updated', message => { 
-    console.log(message)
-    store.dispatch(updateState(message));
+    store.dispatch(updateProgress(message));
 });
 
 export default messageHandlers;

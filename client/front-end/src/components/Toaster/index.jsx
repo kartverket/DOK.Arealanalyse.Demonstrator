@@ -1,29 +1,50 @@
+import { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setErrorMessage } from 'store/slices/appSlice';
-import { Alert, Snackbar } from '@mui/material';
+import { setToast } from 'store/slices/appSlice';
+import { Alert } from '@digdir/designsystemet-react';
+import { Dialog } from 'components';
+import styles from './Toaster.module.scss';
 
 export default function Toaster() {
-   const errorMessage = useSelector(state => state.app.errorMessage);
-   const dispatch = useDispatch();
+    const toast = useSelector(state => state.app.toast);
+    const dispatch = useDispatch();
 
-   function handleCloseError() {
-      dispatch(setErrorMessage(null));
-   }
+    const handleClose = useCallback(
+        () => {
+            dispatch(setToast(null));
+        },
+        [dispatch]
+    );
 
-   return (
-      <Snackbar
-         open={errorMessage !== null}
-         autoHideDuration={5000}
-         onClose={handleCloseError}
-         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-      >
-         <Alert
-            onClose={handleCloseError}
-            severity="error"
-            sx={{ width: '100%', '& .MuiAlert-message': { fontWeight: 400, fontFamily: 'Roboto-Regular' } }}
-         >
-            {errorMessage}
-         </Alert>
-      </Snackbar>
-   );
+    useEffect(
+        () => {
+            if (toast !== null) {
+                setTimeout(() => {
+                    handleClose();
+                }, 3000);
+            }
+        },
+        [toast, handleClose]
+    );
+
+    return (
+        <Dialog
+            open={toast !== null}
+            onClose={handleClose}
+            placement="right"
+            modal={false}
+            className={styles.toaster}
+        >
+            {
+                toast !== null && (
+                    <Alert
+                        data-color={toast.type}
+                        className={styles.alert}
+                    >
+                        {toast.message}
+                    </Alert>
+                )
+            }
+        </Dialog>
+    );
 }

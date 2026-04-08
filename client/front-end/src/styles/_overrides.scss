@@ -1,3 +1,29 @@
-// .ol-zoom {
-//     display: none;
-// }
+.ds-button {
+    line-height: 1;
+    font-weight: 400;
+    user-select: none;
+
+    &:not([data-icon="true"]) {
+        min-width: 60px;
+    }
+}
+
+.ds-dialog {
+    border: 0;
+}
+
+.ds-dropdown {
+    border: 0;
+}
+
+.ds-tooltip {
+    width: 360px;
+}
+
+.ol-zoom {
+    display: none;
+}
+
+.ol-layer canvas {
+    width: 100%;
+}
