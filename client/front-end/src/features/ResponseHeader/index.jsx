@@ -2,12 +2,13 @@ import { useSelector } from 'react-redux';
 import { selectResults } from 'store/slices/responseSlice';
 import { isEmptyObject } from 'utils/helpers';
 import { ResultStatus, StatusFilter } from 'utils/constants';
+import { Heading } from '@digdir/designsystemet-react';
 import PointIcon from 'assets/gfx/icon-point.svg?react';
-import AreaIcon from 'assets/gfx/icon-area.svg?react'
-import MustHandleIcon from 'assets/gfx/icon-must-handle.svg?react'
-import MustCheckIcon from 'assets/gfx/icon-must-check.svg?react'
-import NearbyIcon from 'assets/gfx/icon-nearby.svg?react'
-import NotAnalyzedIcon from 'assets/gfx/icon-not-analyzed-2.svg?react'
+import AreaIcon from 'assets/gfx/icon-area.svg?react';
+import MustHandleIcon from 'assets/gfx/icon-must-handle.svg?react';
+import MustCheckIcon from 'assets/gfx/icon-must-check.svg?react';
+import NearbyIcon from 'assets/gfx/icon-nearby.svg?react';
+import NotAnalyzedIcon from 'assets/gfx/icon-not-analyzed-2.svg?react';
 import styles from './ResponseHeader.module.scss';
 
 export default function ResponseHeader({ statusFilters, onStatusFilterSelected }) {
@@ -33,7 +34,7 @@ export default function ResponseHeader({ statusFilters, onStatusFilterSelected }
                 !disabled && (
                     <div className={styles.inputArea}>
                         <span>Analyseområde</span>
-                        <h2>{data.municipalityName}</h2>
+                        <Heading level={2}>{data.municipalityName}</Heading>
 
                         <div>
                             <span>
@@ -41,7 +42,7 @@ export default function ResponseHeader({ statusFilters, onStatusFilterSelected }
                                 {data.municipalityNumber}
                             </span>
                             <span>
-                                <AreaIcon />
+                                <AreaIcon stroke="#4a5565" />
                                 {Math.round(data.inputGeometryArea).toLocaleString('nb-NO')} m²
                             </span>
                         </div>

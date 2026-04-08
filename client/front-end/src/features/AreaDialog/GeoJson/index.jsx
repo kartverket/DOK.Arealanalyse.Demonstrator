@@ -6,16 +6,28 @@ import { CheckmarkIcon, FilesIcon } from '@navikt/aksel-icons';
 import styles from './GeoJson.module.scss';
 
 export default function GeoJson({ data }) {
-    const json = useMemo(() => prettyPrintJson.toHtml(data, { quoteKeys: true, trailingCommas: false }), [data]);
+    const json = useMemo(
+        () => {
+            return data !== null ?
+                prettyPrintJson.toHtml(data, { quoteKeys: true, trailingCommas: false }) :
+                null;
+        },
+        [data]
+    );
+
     const [copied, setCopied] = useState(false);
     const outputRef = useRef(null);
 
     function renderCrs() {
+        if (json === null) {
+            return null;
+        }
+
         const epsg = getEpsgCode(getCrsName(data));
         const crs = epsg !== null ? `EPSG:${epsg}` : 'CRS84';
 
         return (
-            <div className={styles.epsg}>
+            <div className={styles.crs}>
                 <strong>CRS:</strong> {crs}
             </div>
         );
@@ -35,24 +47,30 @@ export default function GeoJson({ data }) {
     return (
         <div className={styles.geoJsonContainer}>
             <div className={styles.geoJsonWrapper}>
-                <div className={styles.geoJson}>
-                    <output ref={outputRef} dangerouslySetInnerHTML={{ __html: json }}></output>
-                </div>
+                {
+                    json !== null && (
+                        <>
+                            <div className={styles.geoJson}>
+                                <output ref={outputRef} dangerouslySetInnerHTML={{ __html: json }}></output>
+                            </div>
 
-                <Button
-                    icon
-                    onClick={copyText}
-                    variant="tertiary"
-                    title="Kopiér"
-                    aria-label="Kopiér"
-                    className={styles.copyButton}
-                >
-                    {
-                        !copied ?
-                            <FilesIcon width="24px" height="24px" aria-hidden /> :
-                            <CheckmarkIcon width="24px" height="24px" aria-hidden />
-                    }
-                </Button>
+                            <Button
+                                icon
+                                onClick={copyText}
+                                variant="tertiary"
+                                title="Kopiér"
+                                aria-label="Kopiér"
+                                className={styles.copyButton}
+                            >
+                                {
+                                    !copied ?
+                                        <FilesIcon width="24px" height="24px" aria-hidden /> :
+                                        <CheckmarkIcon width="24px" height="24px" aria-hidden />
+                                }
+                            </Button>
+                        </>
+                    )
+                }
             </div>
 
             {renderCrs()}

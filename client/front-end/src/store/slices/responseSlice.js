@@ -108,7 +108,7 @@ export const selectResults = createSelector(
 );
 
 function sortResults(groupings, statuses, sortFunc) {
-    for (const status in statuses) {
+    for (const status of statuses) {
         const results = groupings[status];
 
         if (Array.isArray(results)) {

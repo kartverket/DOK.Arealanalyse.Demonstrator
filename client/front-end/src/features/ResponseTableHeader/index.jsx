@@ -1,4 +1,4 @@
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { StatusFilter } from 'utils/constants';
 import { Button, Search } from '@digdir/designsystemet-react';
 import ThemeSelector from './ThemeSelector';
@@ -9,11 +9,13 @@ import NotAnalyzedIcon from 'assets/gfx/icon-not-analyzed.svg?react';
 import FactInfoIcon from 'assets/gfx/icon-fact-info.svg?react';
 import DownloadIcon from 'assets/gfx/icon-download.svg?react';
 import styles from './ResponseTableHeader.module.scss';
+import { toggleFactInfo } from 'store/slices/appSlice';
 
 export default function ResponseTableHeader({
     statusFilters, themes, selectedThemes, searchTerm, onStatusFilterSelected, onThemeSelected, onSearchChange }) {
     const busy = useSelector(state => state.app.busy);
     const data = useSelector(state => state.response.data);
+    const dispatch = useDispatch();
     const disabled = busy || data === null;
 
     function hasFactInfo() {
@@ -22,6 +24,10 @@ export default function ResponseTableHeader({
 
     function hasReport() {
         return data !== null && typeof data.report === 'string';
+    }
+
+    function openFactInfo() {
+        dispatch(toggleFactInfo(true));
     }
 
     return (
@@ -118,19 +124,30 @@ export default function ResponseTableHeader({
             <div className={styles.buttons}>
                 <Button
                     data-size="sm"
+                    onClick={openFactInfo}
                     disabled={!hasFactInfo() || disabled}
                 >
                     <FactInfoIcon aria-hidden />
                     Faktainformasjon
                 </Button>
-                <Button
-                    variant="secondary"
-                    data-size="sm"
-                    disabled={!hasReport() || disabled}
-                >
-                    <DownloadIcon aria-hidden />
-                    Last ned rapport
-                </Button>
+
+                <div className={!hasReport() || disabled ? styles.disabled : ''}>
+                    <Button
+                        variant="secondary"
+                        data-size="sm"
+                        asChild
+                    >
+                        <a
+                            href={data?.report}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            download
+                        >
+                            <DownloadIcon aria-hidden />
+                            Last ned rapport
+                        </a>
+                    </Button>
+                </div>
             </div>
         </div>
     )

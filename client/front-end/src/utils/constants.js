@@ -15,3 +15,5 @@ export const ResultStatus = {
     TIMEOUT: 'TIMEOUT',
     ERROR: 'ERROR'
 }
+
+export const DEFAULT_EPSG = 25833;

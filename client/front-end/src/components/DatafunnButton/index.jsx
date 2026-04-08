@@ -1,41 +1,54 @@
-import { Button, Tooltip } from "@mui/material";
-import bbox from "@turf/bbox";
-import datafunn from "assets/gfx/datafunn.svg";
-import { getCrsName, getEpsgCode } from "utils/helpers";
-import styles from "./DatafunnButton.module.scss";
+import bbox from '@turf/bbox';
+import { getCrsName, getEpsgCode } from 'utils/helpers';
+import { Button, Tooltip } from '@digdir/designsystemet-react';
+import DatafunnIcon from 'assets/gfx/icon-datafunn.svg?react';
+import styles from './DatafunnButton.module.scss';
 
 const DATAFUNN_URL = import.meta.env.VITE_DATAFUNN_URL;
+const SYSTEM_NAME = 'DOK Arealanalyse - Demonstrator';
 
-export default function DatafunnButton({ className, inputGeometry }) {
-   if (!inputGeometry) return null;
+export default function DatafunnButton({ inputGeometry, className = '' }) {
+    function getDatafunnUrl() {
+        const extent = bbox(inputGeometry);
+        const crsName = getCrsName(inputGeometry);
+        const epsgCode = getEpsgCode(crsName);
 
-   const extent = bbox(inputGeometry);
+        let queryString = `?extent=${extent.join(',')}`;
 
-   let queryString = `?extent=${extent.join(",")}`;
-   const systemName = "DOK Arealanalyse Demonstrator";
+        if (epsgCode !== null) {
+            queryString += `&epsg=${epsgCode}`;
+        }
 
-   const crsName = getCrsName(inputGeometry);
-   const epsgCode = getEpsgCode(crsName);
+        queryString += `&system=${encodeURIComponent(SYSTEM_NAME)}`;
 
-   if (epsgCode) queryString += `&epsg=${epsgCode}`;
-   queryString += `&system=${encodeURIComponent(systemName)}`;
+        return `${DATAFUNN_URL}/${queryString}`
+    }
 
-   return (
-      <div className={className}>
-         <Tooltip
-            slotProps={{ tooltip: { sx: { fontSize: "1em" } } }}
-            title="Mulighet for å melde inn feil eller mangler i temadata til en førstelinje behandling i en konseptutprøving i geolett 2 datafunn"
-         >
-            <Button
-               variant="contained"
-               href={`${DATAFUNN_URL}/${queryString}`}
-               target="_blank"
-               rel="noopener noreferrer"
+    if (inputGeometry === null) {
+        return null;
+    }
+
+    return (
+        <div className={className}>
+            <Tooltip
+                content="Meld inn feil eller mangler i temadata til en førstelinjebehandling i en konseptutprøving for Geolett 2 - Datafunn"
             >
-               <img className={styles.image} src={datafunn} /> Meld feil i
-               kartet
-            </Button>
-         </Tooltip>
-      </div>
-   );
+                <Button
+                    variant="primary"
+                    data-size="sm"
+                    className={styles.button}
+                    asChild
+                >                    
+                    <a
+                        href={getDatafunnUrl()}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        <DatafunnIcon width="20" height="20" aria-hidden />
+                        Meld feil i kartet
+                    </a>
+                </Button>
+            </Tooltip>
+        </div>
+    );
 }

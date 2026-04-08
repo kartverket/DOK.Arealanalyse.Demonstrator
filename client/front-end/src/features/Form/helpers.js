@@ -5,6 +5,7 @@ export function mapResponse(response) {
     const { resultList } = response;
 
     return {
+        id: createRandomId(),
         ...response,
         resultList: mapResultList(resultList)
     };
@@ -18,7 +19,7 @@ export function mapResultList(resultList) {
             themes: result.themes,
             title: result.title,
             datasetTitle: result.runOnDataset?.title || null,
-            description: getDescription(result),
+            preTitle: getPreTitle(result),
             distance: {
                 value: result.distanceToObject,
                 formatted: getDistanceFormatted(result)
@@ -32,20 +33,14 @@ export function mapResultList(resultList) {
     });
 }
 
-function getDescription(result) {
-    const datasetTitle = result.runOnDataset ?
-        `${result.runOnDataset.title}${result.title !== null ? `\r\n(${result.title})` : ''}` :
-        result.title
-
+function getPreTitle(result) {
     switch (result.resultStatus) {
-        case ResultStatus.TIMEOUT:
-            return `Tidsavbrudd: ${datasetTitle}`;
         case ResultStatus.ERROR:
-            return `En feil har oppstått: ${datasetTitle}`;
+            return `Feil (${result.meta.statusCode})`;
         case ResultStatus.NOT_IMPLEMENTED:
-            return `Ikke implementert: ${datasetTitle}`;
+            return 'Ikke implementert';
         default:
-            return datasetTitle;
+            return null;
     }
 }
 

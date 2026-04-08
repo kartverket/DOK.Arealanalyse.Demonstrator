@@ -1,5 +1,16 @@
 const EPSG_REGEX = /^(http:\/\/www\.opengis\.net\/def\/crs\/EPSG\/0\/|^urn:ogc:def:crs:EPSG::|^EPSG:)(?<epsg>\d+)$/m;
 
+export function getProjection(geometry) {
+    const crsName = getCrsName(geometry);
+    let epsgCode = 4326;
+
+    if (crsName !== undefined) {
+        epsgCode = getEpsgCode(crsName) || 4326;
+    }
+
+    return `EPSG:${epsgCode}`;
+}
+
 export function getEpsgCode(crsName) {
     if (!crsName) {
         return null;

@@ -64,17 +64,52 @@ function ResponseTableRow({ result }) {
         }
     }
 
+    function renderPreTitle(result) {
+        if (result.preTitle === null) {
+            return null;
+        }
+
+        let className = '';
+
+        if (result.status === ResultStatus.ERROR) {
+            className = styles.error;
+        } else if (result.status === ResultStatus.NOT_IMPLEMENTED) {
+            className = styles.notImplemented;
+        }
+
+        return <span className={`${styles.preTitle} ${className}`}>{result.preTitle}</span>;
+    }
+
+
     function renderDescription(result) {
+        if (result.title !== null) {
+            return (
+                <div className={styles.description}>
+                    {renderPreTitle(result)}
+                    <span className={styles.datasetTitle}>{result.datasetTitle}</span>
+                    <span className={styles.title}>{result.title}</span>
+                </div>
+            );
+        }
+
         return (
             <div className={styles.description}>
-                {
-                    result.title !== null ?
-                        <>
-                            <span className={styles.datasetTitle}>{result.datasetTitle}</span>
-                            <span className={styles.title}>{result.title}</span>
-                        </> :
-                        <span className={styles.title}>{result.datasetTitle}</span>
-                }
+                {renderPreTitle(result)}
+                <span className={styles.title}>{result.datasetTitle}</span>
+            </div>
+        );
+    }
+
+    function renderWarnings(result) {
+        if (!result.data.qualityWarning.length) {
+            return null;
+        }
+
+        return (
+            <div className={styles.warnings}>
+                <ul>
+                    {result.data.qualityWarning.map(warning => <li key={warning}>{warning}</li>)}
+                </ul>
             </div>
         );
     }
@@ -112,7 +147,10 @@ function ResponseTableRow({ result }) {
                     }
                 </span>
             </Table.Cell>
-            <Table.Cell>{renderDescription(result)}</Table.Cell>
+            <Table.Cell className={styles.descriptionAndWarnings}>
+                {renderDescription(result)}
+                {renderWarnings(result)}
+            </Table.Cell>
             <Table.Cell className={styles.hitAreaOrDistance}>{getHitAreaOrDistance(result)}</Table.Cell>
             <Table.Cell>
                 <ChevronRightIcon fontSize="24px" color="#d1d5dc" />

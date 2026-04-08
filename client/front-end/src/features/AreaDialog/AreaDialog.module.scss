@@ -1,5 +1,5 @@
 .areaDialog {
-    width: calc(var(--page-width) * 0.5);
+    width: calc(var(--page-width) * 0.6);
     max-width: none;
     max-height: none;
 }
@@ -9,6 +9,12 @@
     align-items: flex-end;
     justify-content: space-between;
     margin-bottom: 18px;
+}
+
+.filePicker {
+    display: flex;
+    align-items: center;
+    gap: 3px;
 }
 
 .content {

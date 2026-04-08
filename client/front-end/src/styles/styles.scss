@@ -3,18 +3,22 @@
 @use './reset';
 @use '../../node_modules/ol/ol.css';
 @use '../../node_modules/pretty-print-json/dist/css/pretty-print-json.css';
-@use '../../node_modules/rc-drawer/assets/index.css';
 @use './fonts';
 @use './overrides';
-@use './drawer';
 
 :root {
-    --page-width: 1440px;
+    --page-width: 1520px;
 }
 
 html {
     font-family: 'Inter';
     font-size: 12px;
+    scrollbar-gutter: stable;
+    background-color: #00000080;
+
+    &.no-scroll {
+        overflow: hidden;
+    }
 }
 
 body {
@@ -22,74 +26,8 @@ body {
     color: #101828;
 }
 
-h1 {
-    font-family: 'Roboto-Medium';
-    font-size: 16px;
-    margin: 18px 0;
-    font-weight: 500;
-    line-height: 24px;
-}
-
-ul {
-    margin-top: 0;
-}
-
-a {
-    color: #0072E5;
-    text-decoration: underline;
-    text-decoration-color: rgba(0, 127, 255, 0.4);
-
-    &:hover {
-        text-decoration-color: #0072E5;
-    }
-}
-
-strong {
-    font-family: 'Roboto-Medium';
-    font-weight: 500;
-}
-
-.section {
-    margin-bottom: 24px;
-}
-
-.paper {
-    border-radius: 4px;
-    border: 1px solid rgba(0, 0, 0, 0.12);
-    padding: 16px;
-}
-
 *[role="button"] {
     cursor: pointer;
-}
-
-.expandable {
-    border-top: 1px solid #e0e0e0;
-
-    .trigger {
-        padding: 18px 24px;
-        display: flex;
-        align-items: center;
-        font-weight: 500;
-        font-family: 'Roboto-Medium';
-
-        &::before {
-            content: "";
-            display: flex;
-            width: 24px;
-            height: 24px;
-            margin-right: 18px;
-            background: url("../assets/gfx/icon-expand.svg") center no-repeat;
-        }
-    }
-
-    &.expanded .trigger {
-        background-color: #e5f6ff;
-
-        &::before {
-            background: url("../assets/gfx/icon-collapse.svg") center no-repeat;
-        }
-    }
 }
 
 .json-container {

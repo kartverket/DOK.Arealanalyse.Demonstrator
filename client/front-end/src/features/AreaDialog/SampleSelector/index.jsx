@@ -4,14 +4,14 @@ import { Dropdown } from '@digdir/designsystemet-react';
 import { ChevronDownIcon, ChevronUpIcon } from '@navikt/aksel-icons';
 import styles from './SampleSelector.module.scss';
 
-export default function SampleSelector({ onSampleSelect }) {
-    const [selectedSample, setSelectedSample] = useState(null);
+export default function SampleSelector({ selectedSample, onSampleSelect }) {
+    // const [selectedSample, setSelectedSample] = useState(null);
     const [dropdownOpen, setDropdownOpen] = useState(false);
-    const { data: samples = [] } = useFetcher('/sample');
+    const { data: samples = [] } = useFetcher('/samples');
     const dropdownTriggerRef = useRef(null);
 
     function handleSampleSelect(sample) {
-        setSelectedSample(sample);
+        // setSelectedSample(sample);
         setDropdownOpen(false);
         onSampleSelect(sample);
     }

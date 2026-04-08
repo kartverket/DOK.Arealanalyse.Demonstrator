@@ -2,11 +2,13 @@ import { useEffect, useState } from 'react';
 import { createMapImage } from 'utils/map';
 import caching from 'utils/mapImageCache';
 import { Heading, Skeleton } from '@digdir/designsystemet-react';
-import { MapView } from 'features';
+import { ResultMapView } from 'features';
 import { Expand, MapControl } from 'components/Map';
 import styles from './Map.module.scss';
+import basemap from 'config/basemap.config';
+import { DatafunnButton } from 'components';
 
-const MAP_WIDTH = 656;
+const MAP_WIDTH = 681;
 const MAP_HEIGHT = 335;
 
 export default function Map({ result, inputGeometry }) {
@@ -27,6 +29,7 @@ export default function Map({ result, inputGeometry }) {
                             geometry: inputGeometry,
                             bufferedGeometry: data.buffer > 0 ? data.runOnInputGeometry : null,
                             wmsUrl: data.rasterResult.mapUri,
+                            wmtsLayer: basemap.layers.topograatone,
                             options: {
                                 width: MAP_WIDTH,
                                 height: MAP_HEIGHT
@@ -54,19 +57,23 @@ export default function Map({ result, inputGeometry }) {
                         aria-label="Åpne interaktivt kart"
                         alt="Kartutsnitt"
                         role="button"
-                        className={styles.mapImage}
                     />
 
                     <div className={styles.buttons}>
                         <Expand />
                     </div>
+
+                    <DatafunnButton
+                        inputGeometry={inputGeometry}
+                        className={styles.datafunn}
+                    />
                 </div>
             );
         }
 
         return (
             <div className={styles.map}>
-                <MapView
+                <ResultMapView
                     result={result.data}
                     inputGeometry={result.data.runOnInputGeometry}
                     controls={[
@@ -74,6 +81,11 @@ export default function Map({ result, inputGeometry }) {
                         MapControl.ZOOM_TO_EXTENT,
                         MapControl.EXPAND
                     ]}
+                />
+
+                <DatafunnButton
+                    inputGeometry={inputGeometry}
+                    className={styles.datafunn}
                 />
             </div>
         );

@@ -1,10 +1,9 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setSelectedResultId } from 'store/slices/responseSlice';
-import { motionProps } from './helpers';
-import RcDrawer from 'rc-drawer';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Result } from 'features';
+import { Dialog } from 'components';
 import { Button } from '@digdir/designsystemet-react';
 import { ArrowDownIcon, ArrowUpIcon, ChevronRightDoubleIcon } from '@navikt/aksel-icons';
 import styles from './Drawer.module.scss';
@@ -15,21 +14,14 @@ const Key = {
     ESCAPE: 'Escape'
 };
 
-export default function Drawer() {    
+export default function Drawer() {
     const selectedResultId = useSelector(state => state.response.selectedResultId);
-    const selectedResult = useSelector(state => state.response.results.byId[selectedResultId]);    
+    const selectedResult = useSelector(state => state.response.results.byId[selectedResultId]);
     const filteredResultIds = useSelector(state => state.response.filteredResultIds);
     const data = useSelector(state => state.response.data);
     const selectedResultIdRef = useRef(null);
     const drawerRef = useRef(null);
     const dispatch = useDispatch();
-    
-    useEffect(
-        () => {
-            selectedResultIdRef.current = selectedResultId;
-        },
-        [selectedResultId]
-    );
 
     const goPrevious = useCallback(
         () => {
@@ -92,15 +84,22 @@ export default function Drawer() {
         [goPrevious, goNext, close]
     );
 
-    const handleOpenChange = useCallback(
-        open => {
-            if (open) {
+    useEffect(
+        () => {
+            selectedResultIdRef.current = selectedResultId;
+        },
+        [selectedResultId]
+    );
+
+    useEffect(
+        () => {
+            if (selectedResult !== undefined) {
                 document.addEventListener('keydown', handleKeyDown);
             } else {
                 document.removeEventListener('keydown', handleKeyDown);
             }
         },
-        [handleKeyDown]
+        [selectedResult, handleKeyDown]
     );
 
     function scrollToTop() {
@@ -111,13 +110,13 @@ export default function Drawer() {
     }
 
     return (
-        <RcDrawer
+        <Dialog
+            ref={drawerRef}
             open={selectedResult !== undefined}
+            onClose={close}
+            closeButton={false}
             placement="right"
-            width="50%"
-            afterOpenChange={handleOpenChange}
-            panelRef={drawerRef}
-            {...motionProps}
+            className={styles.dialog}
         >
             {
                 selectedResult !== undefined && (
@@ -190,6 +189,6 @@ export default function Drawer() {
                     </div>
                 )
             }
-        </RcDrawer>
+        </Dialog>
     );
 }

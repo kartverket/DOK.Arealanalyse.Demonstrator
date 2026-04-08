@@ -1,7 +1,7 @@
 .mapDialog {
-    width: 80vw;
-    height: 90vh;
-    max-width: var(--page-width);
+    width: 96vw;
+    height: 96vh;
+    max-width: 100%;
     max-height: none;
 }
 
@@ -91,4 +91,16 @@
     border: 1px solid #E5E7EB;
     border-radius: var(--ds-border-radius-lg);
     overflow: hidden;
+}
+
+.mapHeading {
+    position: absolute;
+    z-index: 1;
+    width: 100%;
+    background: #ffffffd1;
+    padding: 17px 17px 0;
+}
+
+.mapView > div:last-child {
+    top: 165px;
 }

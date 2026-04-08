@@ -1,56 +1,57 @@
-import axios from 'axios';
+import store from 'store';
+import { setToast } from 'store/slices/appSlice';
+import { DEFAULT_EPSG } from './constants';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-const api = axios.create({ 
-    baseURL: API_BASE_URL 
-});
-
 export const fetcher = async url => {
-    const response = await api.get(url);   
-    return response.data;
+    const apiUrl = API_BASE_URL + url;
+    const response = await fetch(apiUrl);
+
+    return await response.json();
 }
 
-export async function convert(file, fileType) {
-    const url = `/convert/${fileType}/outline`;
+export async function getArea(file) {
+    const url = `${API_BASE_URL}/area`;
     const formData = new FormData();
 
     formData.append('file', file);
-    formData.append('destEpsg', 25833);
+    formData.append('out_epsg', DEFAULT_EPSG);
 
     try {
-        const response = await api.post(url, formData);
-        return response.data;
+        const response = await fetch(url, {
+            method: 'POST',
+            body: formData
+        });
+
+        return await response.json();
     } catch (error) {
-        console.log(error);
+        showError(error);
         return null;
     }
 }
 
-export async function validate(geoJson) {
-    const url = '/validate';
-    const formData = new FormData();
-    const blob = new Blob([JSON.stringify(geoJson)], { type: 'application/json' });
-
-    formData.append('file', blob);
+export async function analyze(payload) {
+    const url = `${API_BASE_URL}/pygeoapi`;
 
     try {
-        const response = await api.post(url, formData);
-        return response.data;
+        const response = await fetch(url, {
+            method: 'POST',
+            body: payload,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        return await response.json()
     } catch (error) {
-        console.log(error);
-        return false;
+        showError(error);
+        throw error;
     }
 }
 
-export async function analyze(payload) {
-    const url = '/pygeoapi';
-
-    try {
-        const response = await axios.post(url, payload);
-        return response.data;
-    } catch (error) {
-        console.log(error);
-        throw error;
-    }
+function showError(error) {
+    debugger
+    const message = error.response.data.detail;
+    store.dispatch(setToast({ message }));
 }

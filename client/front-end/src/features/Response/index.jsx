@@ -23,6 +23,8 @@ export default function Response() {
         [statusFilters, selectedThemes, debouncedSearchTerm, results]
     );
 
+    console.log(filteredResult)
+
     useEffect(
         () => {
             const ids = filteredResult.map(result => result.id);

@@ -22,8 +22,7 @@ services:
     build:
       context: ./client/api
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - Pygeoapi__ApiUrl=http://host.docker.internal:5000/processes/dokanalyse/execution
+      - PYGEOAPI_API_URL=http://host.docker.internal:5000/processes/dokanalyse/execution
     ports:
       - "5001:5001"      
     expose:

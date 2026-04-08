@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Button, Dialog } from '@digdir/designsystemet-react';
+import { Button } from '@digdir/designsystemet-react';
 import { setMapDialogOpen, setMapDialogResultId } from 'store/slices/responseSlice';
 import { ResultStatus } from 'utils/constants';
-import { MapView, ResultHeading, ResultStatusAndThemes } from 'features';
+import { ResultMapView, ResultHeading, ResultStatusAndThemes } from 'features';
 import { Legend, MapControl } from 'components/Map';
 import { ArrowDownIcon, ArrowUpIcon, XMarkIcon } from '@navikt/aksel-icons';
 import MustHandleIcon from 'assets/gfx/icon-must-handle.svg?react';
@@ -11,6 +11,7 @@ import MustCheckIcon from 'assets/gfx/icon-must-check.svg?react';
 import NearbyIcon from 'assets/gfx/icon-nearby.svg?react';
 import NotAnalyzedIcon from 'assets/gfx/icon-not-analyzed.svg?react';
 import styles from './MapDialog.module.scss';
+import { Dialog } from 'components';
 
 export default function MapDialog() {
     const selectedResultId = useSelector(state => state.response.mapDialog.resultId);
@@ -138,24 +139,27 @@ export default function MapDialog() {
                             </div>
                         </div>
 
-                        <ResultHeading
-                            result={selectedResult}
-                            className={styles.heading}
-                        />
-
-                        <ResultStatusAndThemes
-                            result={selectedResult}
-                            statusClassName={styles.status}
-                        />
-
                         <div className={styles.map}>
-                            <MapView
+                            <div className={styles.mapHeading}>
+                                <ResultHeading
+                                    result={selectedResult}
+                                    className={styles.heading}
+                                />
+
+                                <ResultStatusAndThemes
+                                    result={selectedResult}
+                                    statusClassName={styles.status}
+                                />
+                            </div>
+
+                            <ResultMapView
                                 inputGeometry={selectedResult.data.runOnInputGeometry}
                                 result={selectedResult.data}
                                 controls={[
                                     MapControl.ZOOM,
                                     MapControl.ZOOM_TO_EXTENT
                                 ]}
+                                className={styles.mapView}
                             />
 
                             <Legend cartographyUri={selectedResult.data.cartography} />

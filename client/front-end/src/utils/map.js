@@ -9,15 +9,17 @@ import { Vector as VectorLayer } from 'ol/layer';
 import { defaults as defaultInteractions, DragRotateAndZoom } from 'ol/interaction';
 import Style from 'ol/style/Style';
 import Stroke from 'ol/style/Stroke';
-import { getEpsgCode } from './helpers';
+import { getProjection } from './helpers';
 import basemap from 'config/basemap.config';
 
 const MAP_WIDTH = 720;
 const MAP_HEIGHT = 480;
 
+const _wmtsOptions = {};
+
 export async function createMap({ geometry, bufferedGeometry, wmsUrl }) {
     const layers = [
-        await createWmtsLayer(),
+        await createWmtsLayer(basemap.layers.topograatone),
         createWmsLayer(wmsUrl),
         createFeaturesLayer(geometry, bufferedGeometry)
     ];
@@ -36,10 +38,10 @@ export async function createMap({ geometry, bufferedGeometry, wmsUrl }) {
     return map;
 }
 
-export async function createOutlineMap(geometry) {
+export async function createAreaMap(geometry) {
     const layers = [
-        await createWmtsLayer(),
-        createOutlineFeaturesLayer(geometry)
+        await createWmtsLayer(basemap.layers.topograatone),
+        createAreaFeaturesLayer(geometry)
     ];
 
     const map = new OlMap({
@@ -56,8 +58,28 @@ export async function createOutlineMap(geometry) {
     return map;
 }
 
-export async function createMapImage({ geometry, bufferedGeometry, wmsUrl, options = {} }) {
-    const [map, mapElement] = await createTempMap(geometry, bufferedGeometry, wmsUrl, options);
+export async function createFactInfoMap({ geometry, bufferedGeometry }) {
+    const layers = [
+        await createWmtsLayer(basemap.layers.topo),
+        createFeaturesLayer(geometry, bufferedGeometry)
+    ];
+
+    const map = new OlMap({
+        interactions: defaultInteractions().extend([new DragRotateAndZoom()]),
+        layers
+    });
+
+    map.setView(new View({
+        padding: [50, 50, 50, 50],
+        projection: 'EPSG:25833',
+        maxZoom: basemap.maxZoom
+    }));
+
+    return map;
+}
+
+export async function createMapImage({ geometry, bufferedGeometry, wmtsLayer, wmsUrl, options = {} }) {
+    const [map, mapElement] = await createTempMap(geometry, bufferedGeometry, wmtsLayer, wmsUrl, options);
 
     return new Promise((resolve) => {
         map.once('rendercomplete', () => {
@@ -75,14 +97,18 @@ export function getLayer(map, id) {
         .find(layer => layer.get('id') === id);
 }
 
-async function createTempMap(geometry, bufferedGeometry, wmsUrl, options) {
+async function createTempMap(geometry, bufferedGeometry, wmtsLayer, wmsUrl, options) {
     const featuresLayer = createFeaturesLayer(geometry, bufferedGeometry);
 
     const layers = [
-        await createWmtsLayer(),
-        createWmsLayer(wmsUrl),
-        featuresLayer
+        await createWmtsLayer(wmtsLayer)
     ];
+
+    if (wmsUrl) {
+        layers.push(createWmsLayer(wmsUrl));
+    }
+
+    layers.push(featuresLayer);
 
     const map = new OlMap({ layers });
 
@@ -90,7 +116,9 @@ async function createTempMap(geometry, bufferedGeometry, wmsUrl, options) {
         padding: [50, 50, 50, 50],
         projection: 'EPSG:25833',
         maxZoom: basemap.maxZoom,
-        constrainResolution: true
+        constrainResolution: options.constrainResolution !== undefined ?
+            options.constrainResolution :
+            true
     }));
 
     const mapWidth = options.width || MAP_WIDTH;
@@ -124,7 +152,7 @@ function createFeaturesLayer(geometry, bufferedGeometry = null) {
     return vectorLayer;
 }
 
-function createOutlineFeaturesLayer(geometry) {
+function createAreaFeaturesLayer(geometry) {
     const projection = getProjection(geometry);
     const source = new VectorSource();
 
@@ -146,8 +174,8 @@ function createFeature(geoJson, projection, style) {
     return feature;
 }
 
-async function createWmtsLayer() {
-    const options = await getWmtsOptions();
+async function createWmtsLayer(wmtsLayer) {
+    const options = await getWmtsOptions(wmtsLayer);
 
     if (options === null) {
         return null;
@@ -159,7 +187,11 @@ async function createWmtsLayer() {
     });
 }
 
-async function getWmtsOptions() {
+async function getWmtsOptions(wmtsLayer) {
+    if (_wmtsOptions[wmtsLayer] !== undefined) {
+        return _wmtsOptions[wmtsLayer];
+    }
+
     let xml;
 
     try {
@@ -172,7 +204,7 @@ async function getWmtsOptions() {
     const capabilities = new WMTSCapabilities().read(xml);
 
     const options = optionsFromCapabilities(capabilities, {
-        layer: basemap.layer,
+        layer: wmtsLayer,
         matrixSet: 'EPSG:3857'
     });
 
@@ -180,6 +212,8 @@ async function getWmtsOptions() {
         ...options,
         crossOrigin: 'anonymous'
     };
+
+    _wmtsOptions[wmtsLayer] = wmtsOptions;
 
     return wmtsOptions;
 }
@@ -191,17 +225,6 @@ function createWmsLayer(url) {
             crossOrigin: 'anonymous'
         })
     });
-}
-
-function getProjection(geometry) {
-    const crsName = geometry?.crs?.properties?.name;
-    let epsgCode = 4326;
-
-    if (crsName !== undefined) {
-        epsgCode = getEpsgCode(crsName) || 4326;
-    }
-
-    return `EPSG:${epsgCode}`;
 }
 
 function exportToPngImage(map) {

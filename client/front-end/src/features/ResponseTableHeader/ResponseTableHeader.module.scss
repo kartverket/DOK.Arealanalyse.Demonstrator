@@ -102,4 +102,13 @@
 .buttons {
     display: flex;
     gap: 9px;
+
+    .disabled {
+        cursor: not-allowed;
+        opacity: var(--ds-opacity-disabled);
+
+        a {
+            pointer-events: none;
+        }
+    }
 }

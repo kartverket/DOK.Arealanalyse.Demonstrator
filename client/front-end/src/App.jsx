@@ -1,4 +1,4 @@
-import { Form, Response, Drawer, MapDialog } from 'features';
+import { Form, Response, Drawer, MapDialog, FactInfo } from 'features';
 import { Heading, Toaster } from 'components';
 import { useSocketIO } from 'hooks';
 import messageHandlers from 'utils/messageHandlers';
@@ -16,7 +16,9 @@ export default function App() {
                 <Response />
                 <Drawer />
                 <MapDialog />
+                <FactInfo />
                 <Toaster />
+
 
                 {/* <dialog id="my-dialog" open>
                     <p>This dialog was opened using an invoker command.</p>

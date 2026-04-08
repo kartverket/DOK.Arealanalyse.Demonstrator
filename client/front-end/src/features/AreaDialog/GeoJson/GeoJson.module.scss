@@ -12,7 +12,6 @@
     flex-direction: column;
     position: relative;
     overflow: hidden;
-    margin-bottom: var(--ds-size-3);
 }
 
 .geoJson {
@@ -35,4 +34,8 @@
     position: absolute !important;
     right: 29px;
     top: 12px;
+}
+
+.crs {
+    margin-top: var(--ds-size-3);
 }

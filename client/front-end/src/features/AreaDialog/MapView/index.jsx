@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { createOutlineMap } from 'utils/map';
+import { createAreaMap } from 'utils/map';
 import { setupMap } from './helpers';
 import { Zoom, ZoomToExtent } from 'components/Map';
 import styles from './MapView.module.scss';
@@ -15,7 +15,7 @@ export default function MapView({ geometry }) {
             }
 
             (async () => {
-                const olMap = await createOutlineMap(geometry);
+                const olMap = await createAreaMap(geometry);
                 setMap(olMap);
             })();
         },
