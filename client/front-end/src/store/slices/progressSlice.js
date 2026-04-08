@@ -14,18 +14,21 @@ export const progressSlice = createSlice({
     name: 'progress',
     initialState,
     reducers: {
-        updateState: (state, action) => {
+        updateProgress: (state, action) => {
             return {
                 ...state,
                 ...action.payload
             };
         },
-        resetState: () => {
+        resetProgress: () => {
             return initialState;
         }
     }
 });
 
-export const { updateState, resetState } = progressSlice.actions;
+export const { 
+    updateProgress, 
+    resetProgress 
+} = progressSlice.actions;
 
 export default progressSlice.reducer;

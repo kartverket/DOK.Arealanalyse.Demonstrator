@@ -1,154 +1,23 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-const _formData = {
-    "inputGeometry": {
-        "type": "MultiPolygon",
-        "coordinates": [
-            [
-                [
-                    [
-                        196245.008,
-                        6562107.572
-                    ],
-                    [
-                        196229.591,
-                        6562103.926
-                    ],
-                    [
-                        196222.105,
-                        6562110.753
-                    ],
-                    [
-                        196199.112,
-                        6562159.204
-                    ],
-                    [
-                        196268.705,
-                        6562181.558
-                    ],
-                    [
-                        196265.603,
-                        6562198.885
-                    ],
-                    [
-                        196264.261,
-                        6562206.183
-                    ],
-                    [
-                        196273.401,
-                        6562215.36
-                    ],
-                    [
-                        196281.051,
-                        6562202.106
-                    ],
-                    [
-                        196285.908,
-                        6562182.168
-                    ],
-                    [
-                        196297.046,
-                        6562141.811
-                    ],
-                    [
-                        196276.525,
-                        6562135.399
-                    ],
-                    [
-                        196253.464,
-                        6562118.641
-                    ],
-                    [
-                        196245.008,
-                        6562107.572
-                    ]
-                ]
-            ],
-            [
-                [
-                    [
-                        196343.502,
-                        6562224.953
-                    ],
-                    [
-                        196344.651,
-                        6562222.869
-                    ],
-                    [
-                        196344.928,
-                        6562221.929
-                    ],
-                    [
-                        196345.622,
-                        6562219.926
-                    ],
-                    [
-                        196346.472,
-                        6562216.975
-                    ],
-                    [
-                        196347.067,
-                        6562215.554
-                    ],
-                    [
-                        196347.084,
-                        6562215.513
-                    ],
-                    [
-                        196345.606,
-                        6562214.842
-                    ],
-                    [
-                        196338.31,
-                        6562211.63
-                    ],
-                    [
-                        196334.274,
-                        6562220.829
-                    ],
-                    [
-                        196341.57,
-                        6562224.041
-                    ],
-                    [
-                        196343.502,
-                        6562224.953
-                    ]
-                ]
-            ]
-        ],
-        "crs": {
-            "type": "name",
-            "properties": {
-                "name": "urn:ogc:def:crs:EPSG::25833"
-            }
-        }
-    },
-    "requestedBuffer": '50',
-    "context": '',
-    "theme": '',
-    "includeGuidance": true,
-    "includeQualityMeasurement": true,
-    "includeFilterChosenDOK": true,
-    "includeFacts": true,
-    "createBinaries": false
-}
-
 const initialState = {
     correlationId: null,
-
-    formData: _formData,
-    factInfoOpen: false,
-
-    filteredResultIds: [],
-    selectedResultId: 0,
-
-    selectedResult: null,
-
+    formData: {
+        inputGeometry: null,
+        requestedBuffer: 0,
+        context: '',
+        theme: '',
+        includeGuidance: true,
+        includeQualityMeasurement: true,
+        includeFilterChosenDOK: false,
+        includeFacts: true,
+        createBinaries: false
+    },
     toast: null,
     errorMessage: null,
-    busy: false
-    // mapImages: {}
+    analyzisId: 0,
+    busy: false,
+    factInfoOpen: false
 };
 
 export const appSlice = createSlice({
@@ -170,38 +39,6 @@ export const appSlice = createSlice({
                 }
             };
         },
-        resetFormData: (state, action) => {
-            return {
-                ...state,
-                formData: {
-                    ...initialState.formData
-                }
-            };
-        },
-        toggleFactInfo: (state, action) => {
-            return {
-                ...state,
-                factInfoOpen: action.payload
-            };
-        },
-        setResponse: (state, action) => {
-            return {
-                ...state,
-                response: action.payload
-            };
-        },
-        setFilteredResultIds: (state, action) => {
-            return {
-                ...state,
-                filteredResultIds: action.payload
-            };
-        },
-        setSelectedResultId: (state, action) => {
-            return {
-                ...state,
-                selectedResultId: action.payload
-            };
-        },
         setToast: (state, action) => {
             let toast = null;
 
@@ -215,16 +52,23 @@ export const appSlice = createSlice({
                 toast
             };
         },
-        setSelectedResult: (state, action) => {
+        analyzeStart: (state) => {
             return {
                 ...state,
-                selectedResult: action.payload
+                analyzisId: state.analyzisId + 1,
+                busy: true
             };
         },
-        setBusy: (state, action) => {
+        analyzeFinish:  (state) => {
             return {
                 ...state,
-                busy: action.payload
+                busy: false
+            };
+        },
+        toggleFactInfo: (state, action) => {
+            return {
+                ...state,
+                factInfoOpen: action.payload
             };
         }
     }
@@ -233,14 +77,11 @@ export const appSlice = createSlice({
 export const {
     setCorrelationId,
     setFormData,
-    resetFormData,
-    toggleFactInfo,
-    setSelectedResult,
-    setFilteredResultIds,
-    setSelectedResultId,
     setErrorMessage,
     setToast,
-    setBusy
+    analyzeStart,
+    analyzeFinish,
+    toggleFactInfo
 } = appSlice.actions;
 
 export default appSlice.reducer;

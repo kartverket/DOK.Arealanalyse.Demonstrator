@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setSelectedResultId, setMapDialogOpen } from 'store/slices/responseSlice';
+import { setSelectedResultId } from 'store/slices/responseSlice';
 import { ResultStatus } from 'utils/constants';
 import { Table } from '@digdir/designsystemet-react';
 import MustHandleIcon from 'assets/gfx/icon-must-handle.svg?react';

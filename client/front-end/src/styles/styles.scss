@@ -1,5 +1,5 @@
 @use '@digdir/designsystemet-css';
-@use './theme.css';
+@use './_theme.css';
 @use './reset';
 @use '../../node_modules/ol/ol.css';
 @use '../../node_modules/pretty-print-json/dist/css/pretty-print-json.css';
@@ -14,7 +14,6 @@ html {
     font-family: 'Inter';
     font-size: 12px;
     scrollbar-gutter: stable;
-    background-color: #00000080;
 
     &.no-scroll {
         overflow: hidden;
@@ -30,7 +29,7 @@ body {
     cursor: pointer;
 }
 
-.json-container {
-    white-space: pre;
-    font-weight: normal;
-}
+// .json-container {
+//     white-space: pre;
+//     font-weight: normal;
+// }

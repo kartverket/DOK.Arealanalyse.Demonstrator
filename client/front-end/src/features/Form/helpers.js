@@ -11,7 +11,20 @@ export function mapResponse(response) {
     };
 }
 
-export function mapResultList(resultList) {
+export function createPayload(formData, correlationId) {
+    const inputs = { ...formData };
+
+    inputs.requestedBuffer = parseInt(inputs.requestedBuffer);
+    inputs.context = inputs.context !== '' ? inputs.context : null;
+    inputs.theme = inputs.theme !== '' ? inputs.theme : null;
+    inputs.correlationId = correlationId;
+
+    return {
+        inputs
+    };
+}
+
+function mapResultList(resultList) {
     return resultList.map(result => {
         return {
             id: createRandomId(),
@@ -32,6 +45,8 @@ export function mapResultList(resultList) {
         };
     });
 }
+
+
 
 function getPreTitle(result) {
     switch (result.resultStatus) {

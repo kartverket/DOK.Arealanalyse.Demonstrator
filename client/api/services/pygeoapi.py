@@ -1,16 +1,23 @@
 from os import environ
 from typing import Any, Dict
 import aiohttp
+from .exceptions import HttpError
 
 _API_URL = environ['PYGEOAPI_API_URL']
 
 
 async def analyze(payload: Dict[str, Any]) -> Dict[str, Any]:
-    async with aiohttp.ClientSession() as session:
-        async with session.post(_API_URL, json=payload) as response:
-            data = await response.json()
-            
-            if response.status != 200:
-                raise Exception(data)
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.post(_API_URL, json=payload) as response:
+                if response.status == 404:
+                    raise HttpError(404)
 
-            return data
+                body = await response.json()
+
+                if response.status >= 400:
+                    raise HttpError(response.status, body)
+                
+                return body
+    except aiohttp.ClientConnectorDNSError:
+        raise HttpError(500)

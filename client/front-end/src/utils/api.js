@@ -37,7 +37,7 @@ export async function analyze(payload) {
     try {
         const response = await fetch(url, {
             method: 'POST',
-            body: payload,
+            body: JSON.stringify(payload),
             headers: {
                 'Content-Type': 'application/json'
             }
@@ -51,7 +51,6 @@ export async function analyze(payload) {
 }
 
 function showError(error) {
-    debugger
     const message = error.response.data.detail;
     store.dispatch(setToast({ message }));
 }

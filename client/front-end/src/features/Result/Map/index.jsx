@@ -75,7 +75,7 @@ export default function Map({ result, inputGeometry }) {
             <div className={styles.map}>
                 <ResultMapView
                     result={result.data}
-                    inputGeometry={result.data.runOnInputGeometry}
+                    inputGeometry={inputGeometry}
                     controls={[
                         MapControl.ZOOM,
                         MapControl.ZOOM_TO_EXTENT,

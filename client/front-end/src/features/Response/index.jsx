@@ -7,10 +7,8 @@ import { filterResults, getInitalStatusFilter, getThemes } from './helpers';
 import { ResponseHeader, ResponseTable, ResponseTableHeader } from 'features';
 import styles from './Response.module.scss';
 
-
 export default function Response() {
     const results = useSelector(selectResults);
-    const busy = useSelector(state => state.app.busy);
     const [statusFilters, setStatusFilters] = useState([]);
     const [selectedThemes, setSelectedThemes] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -23,8 +21,6 @@ export default function Response() {
         [statusFilters, selectedThemes, debouncedSearchTerm, results]
     );
 
-    console.log(filteredResult)
-
     useEffect(
         () => {
             const ids = filteredResult.map(result => result.id);
@@ -36,22 +32,12 @@ export default function Response() {
     useEffect(
         () => {
             if (!isEmptyObject(results)) {
+                // eslint-disable-next-line react-hooks/set-state-in-effect
                 setSelectedThemes(['Alle', ...getThemes(results)]);
                 setStatusFilters(getInitalStatusFilter(results));
             }
         },
         [results]
-    );
-
-    useEffect(
-        () => {
-            if (busy) {
-                setSelectedThemes([]);
-                setStatusFilters([]);
-                setSearchTerm('');
-            }
-        },
-        [busy]
     );
 
     function handleStatusFilterSelected(filter) {

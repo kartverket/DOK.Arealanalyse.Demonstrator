@@ -49,7 +49,6 @@ export default function AreaDialog({ onOk }) {
             <Button
                 onClick={() => setOpen(true)}
                 variant="secondary"
-                disabled
             >
                 <AreaIcon
                     color="#3e6272"

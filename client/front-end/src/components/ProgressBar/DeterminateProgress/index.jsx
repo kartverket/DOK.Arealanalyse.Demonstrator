@@ -19,8 +19,6 @@ export default function DeterminateProgress({ value }) {
                 strokeWidth: 1,
                 easing: 'easeInOut',
                 duration: 100,
-                color: '#2a7cc5',
-                trailColor: '#ddeaf6',
                 trailWidth: 1,
                 svgStyle: {
                     width: '100%',

@@ -42,12 +42,18 @@ export const responseSlice = createSlice({
                 }
             };
         },
+        setSelectedThemes: (state, action) => {
+            return {
+                ...state,
+                selectedThemes: action.payload
+            };
+        },
         setSelectedResultId: (state, action) => {
             return {
                 ...state,
                 selectedResultId: action.payload
             };
-        },              
+        },
         setFilteredResultIds: (state, action) => {
             return {
                 ...state,
@@ -71,8 +77,8 @@ export const responseSlice = createSlice({
                     resultId: action.payload
                 }
             };
-        },          
-        resetState: () => initialState
+        },
+        resetResponseState: () => initialState
     }
 });
 
@@ -123,7 +129,7 @@ export const {
     setFilteredResultIds,
     setMapDialogOpen,
     setMapDialogResultId,
-    resetState
+    resetResponseState,
 } = responseSlice.actions;
 
 export default responseSlice.reducer;

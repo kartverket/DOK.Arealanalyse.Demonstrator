@@ -1,17 +1,13 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button } from '@digdir/designsystemet-react';
 import { setMapDialogOpen, setMapDialogResultId } from 'store/slices/responseSlice';
 import { ResultStatus } from 'utils/constants';
 import { ResultMapView, ResultHeading, ResultStatusAndThemes } from 'features';
+import { Dialog } from 'components';
 import { Legend, MapControl } from 'components/Map';
 import { ArrowDownIcon, ArrowUpIcon, XMarkIcon } from '@navikt/aksel-icons';
-import MustHandleIcon from 'assets/gfx/icon-must-handle.svg?react';
-import MustCheckIcon from 'assets/gfx/icon-must-check.svg?react';
-import NearbyIcon from 'assets/gfx/icon-nearby.svg?react';
-import NotAnalyzedIcon from 'assets/gfx/icon-not-analyzed.svg?react';
 import styles from './MapDialog.module.scss';
-import { Dialog } from 'components';
 
 export default function MapDialog() {
     const selectedResultId = useSelector(state => state.response.mapDialog.resultId);
@@ -28,45 +24,36 @@ export default function MapDialog() {
         [selectedResultId]
     );
 
-    const goPrevious = useCallback(
-        () => {
-            const index = filteredResultIds.indexOf(selectedResultIdRef.current);
-            let prevId;
+    function goPrevious() {
+        const index = filteredResultIds.indexOf(selectedResultIdRef.current);
+        let prevId;
 
-            if (index === 0) {
-                prevId = filteredResultIds[filteredResultIds.length - 1];
-            } else {
-                prevId = filteredResultIds[index - 1];
-            }
+        if (index === 0) {
+            prevId = filteredResultIds[filteredResultIds.length - 1];
+        } else {
+            prevId = filteredResultIds[index - 1];
+        }
 
-            dispatch(setMapDialogResultId(prevId));
-        },
-        [dispatch, filteredResultIds]
-    );
+        dispatch(setMapDialogResultId(prevId));
+    }
 
-    const goNext = useCallback(
-        () => {
-            const index = filteredResultIds.indexOf(selectedResultIdRef.current);
-            let nextId;
+    function goNext() {
+        const index = filteredResultIds.indexOf(selectedResultIdRef.current);
+        let nextId;
 
-            if (index + 1 === filteredResultIds.length) {
-                nextId = filteredResultIds[0];
-            } else {
-                nextId = filteredResultIds[index + 1];
-            }
+        if (index + 1 === filteredResultIds.length) {
+            nextId = filteredResultIds[0];
+        } else {
+            nextId = filteredResultIds[index + 1];
+        }
 
-            dispatch(setMapDialogResultId(nextId));
-        },
-        [dispatch, filteredResultIds]
-    );
+        dispatch(setMapDialogResultId(nextId));
+    }
 
-    const close = useCallback(
-        () => {
-            dispatch(setMapDialogOpen(false));
-            dispatch(setMapDialogResultId(null));
-        },
-        [dispatch]
-    );
+    function close() {
+        dispatch(setMapDialogOpen(false));
+        dispatch(setMapDialogResultId(null));
+    }
 
     function getStatusClassName() {
         switch (selectedResult.status) {

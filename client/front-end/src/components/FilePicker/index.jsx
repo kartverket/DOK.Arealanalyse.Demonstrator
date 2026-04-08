@@ -1,5 +1,5 @@
 import { useId, useState } from 'react';
-import { FileIcon, UploadIcon } from '@navikt/aksel-icons';
+import { FileIcon } from '@navikt/aksel-icons';
 import styles from './FilePicker.module.scss';
 
 export default function FilePicker({ label, fileTypes, multiple = false, onFileSelected }) {

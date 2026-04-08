@@ -1,28 +1,17 @@
-.progressContainer {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px dashed #8E8E8E;
-    border-radius: var(--ds-border-radius-lg);
-    background-color: #FCFCFC;
-    margin-bottom: 120px;
-    height: 642px;
-}
-
 .progress {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 672px;
-    height: 400px;
+    width: 540px;
+    height: 312px;
     background-color: #ffffff;
+    position: relative;
 
     h3 {
-        font-family: 'Manrope';
         font-size: 18px;
         font-weight: 600;
-        margin: 0 0 8px 0;
+        margin: -18px 0 8px 0;
     }
 }
 
@@ -66,14 +55,14 @@
         }
 
         &.inProgress .icon {
-            border-color: #1C75D2;
-            color: #1C75D2;
+            border-color: var(--ds-color-base-default);
+            color: var(--ds-color-base-default);
         }
 
         &.done .icon {
-            border-color: #1C75D2;
-            background: url('../../assets/gfx/icon-checkmark.svg') no-repeat center;
-            background-color: #1C75D2;
+            border-color: var(--ds-color-base-default);
+            background: url('../../../assets/gfx/icon-checkmark.svg') no-repeat center;
+            background-color: var(--ds-color-base-default);
         }
 
         >div {

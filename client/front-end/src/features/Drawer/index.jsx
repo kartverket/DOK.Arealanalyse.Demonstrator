@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setSelectedResultId } from 'store/slices/responseSlice';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -7,12 +7,6 @@ import { Dialog } from 'components';
 import { Button } from '@digdir/designsystemet-react';
 import { ArrowDownIcon, ArrowUpIcon, ChevronRightDoubleIcon } from '@navikt/aksel-icons';
 import styles from './Drawer.module.scss';
-
-const Key = {
-    ARROW_DOWN: 'ArrowDown',
-    ARROW_UP: 'ArrowUp',
-    ESCAPE: 'Escape'
-};
 
 export default function Drawer() {
     const selectedResultId = useSelector(state => state.response.selectedResultId);
@@ -23,67 +17,6 @@ export default function Drawer() {
     const drawerRef = useRef(null);
     const dispatch = useDispatch();
 
-    const goPrevious = useCallback(
-        () => {
-            const index = filteredResultIds.indexOf(selectedResultIdRef.current);
-            let prevId;
-
-            if (index === 0) {
-                prevId = filteredResultIds[filteredResultIds.length - 1];
-            } else {
-                prevId = filteredResultIds[index - 1];
-            }
-
-            dispatch(setSelectedResultId(prevId));
-        },
-        [dispatch, filteredResultIds]
-    );
-
-    const goNext = useCallback(
-        () => {
-            const index = filteredResultIds.indexOf(selectedResultIdRef.current);
-            let nextId;
-
-            if (index + 1 === filteredResultIds.length) {
-                nextId = filteredResultIds[0];
-            } else {
-                nextId = filteredResultIds[index + 1];
-            }
-
-            dispatch(setSelectedResultId(nextId));
-        },
-        [dispatch, filteredResultIds]
-    );
-
-    const close = useCallback(
-        () => {
-            dispatch(setSelectedResultId(null));
-        },
-        [dispatch]
-    );
-
-    const handleKeyDown = useCallback(
-        event => {
-            const key = event.key;
-
-            if (![Key.ARROW_UP, Key.ARROW_DOWN, Key.ESCAPE].includes(key)) {
-                return;
-            }
-
-            event.preventDefault();
-            event.stopPropagation();
-
-            if (key === Key.ARROW_UP) {
-                goPrevious();
-            } else if (key === Key.ARROW_DOWN) {
-                goNext();
-            } else if (key === Key.ESCAPE) {
-                close();
-            }
-        },
-        [goPrevious, goNext, close]
-    );
-
     useEffect(
         () => {
             selectedResultIdRef.current = selectedResultId;
@@ -91,16 +24,35 @@ export default function Drawer() {
         [selectedResultId]
     );
 
-    useEffect(
-        () => {
-            if (selectedResult !== undefined) {
-                document.addEventListener('keydown', handleKeyDown);
-            } else {
-                document.removeEventListener('keydown', handleKeyDown);
-            }
-        },
-        [selectedResult, handleKeyDown]
-    );
+    function goPrevious() {
+        const index = filteredResultIds.indexOf(selectedResultIdRef.current);
+        let prevId;
+
+        if (index === 0) {
+            prevId = filteredResultIds[filteredResultIds.length - 1];
+        } else {
+            prevId = filteredResultIds[index - 1];
+        }
+
+        dispatch(setSelectedResultId(prevId));
+    }
+
+    function goNext() {
+        const index = filteredResultIds.indexOf(selectedResultIdRef.current);
+        let nextId;
+
+        if (index + 1 === filteredResultIds.length) {
+            nextId = filteredResultIds[0];
+        } else {
+            nextId = filteredResultIds[index + 1];
+        }
+
+        dispatch(setSelectedResultId(nextId));
+    }
+
+    function close() {
+        dispatch(setSelectedResultId(null));
+    }
 
     function scrollToTop() {
         drawerRef.current.scrollTo({

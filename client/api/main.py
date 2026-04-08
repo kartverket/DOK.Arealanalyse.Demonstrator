@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import services
 from services.exceptions import (
-    InvalidDatasetError, InvalidGeometryError, GeometryConversionError)
+    HttpError, InvalidDatasetError, InvalidGeometryError, GeometryConversionError)
 
 app = FastAPI()
 
@@ -30,12 +30,10 @@ app.add_middleware(
 async def analyze(payload: Dict[str, Any]) -> Dict[str, Any]:
     try:
         return await services.analyze(payload)
-    except Exception as err:
-        detail = err.args[0]       
-
+    except HttpError as err:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=detail
+            status_code=err.status,
+            detail=err.body
         )
 
 
@@ -107,4 +105,4 @@ async def area(
 
 
 if __name__ == '__main__':
-    uvicorn.run('main:app', host='0.0.0.0', port=5001)
+    uvicorn.run('main:app', host='0.0.0.0', port=5001, reload=True)

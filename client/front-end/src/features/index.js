@@ -3,7 +3,7 @@ export { default as Drawer } from './Drawer';
 export { default as FactInfo } from './FactInfo';
 export { default as Form } from './Form';
 export { default as MapDialog } from './MapDialog';
-export { default as Progress } from './Progress';
+export { default as ProgressDialog } from './ProgressDialog';
 export { default as Result } from './Result';
 export { default as ResultHeading } from './Result/Heading';
 export { default as ResultMap } from './Result/Map';

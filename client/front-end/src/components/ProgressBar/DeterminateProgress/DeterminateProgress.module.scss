@@ -7,6 +7,14 @@
     svg {
         height: 4px !important;
         border-radius: 4px;
+
+        path:nth-child(1) {
+            stroke: var(--ds-color-surface-tinted);
+        }
+
+        path:nth-child(2) {
+            stroke: var(--ds-color-base-default);
+        }
     }
 }
 

@@ -15,7 +15,7 @@ export default function Dialog({ children, modal = true, ...props }) {
                 document.documentElement.classList.remove('no-scroll')
             }
         },
-        [props.open]
+        [modal, props.open]
     );
 
     function renderModal() {

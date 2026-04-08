@@ -65,6 +65,7 @@
         border-bottom: 1px solid #E5E7EB;
         padding: 24px 16px;
         line-height: 1.25;
+        min-height: 77px;
 
         &:nth-child(5) {
             padding-left: 0;
@@ -180,8 +181,7 @@
 .descriptionAndWarnings {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 24px;
+    gap: 60px;
 
     .description {
         display: flex;
@@ -216,8 +216,8 @@
         align-items: center;
         padding: 6px 12px;
         height: max-content;
-        border-radius: 4px;
-        background-color: rgb(255, 224, 180);
+        border-radius: var(--ds-border-radius-default);
+        background-color: #FEE9CE;
 
         ul {
             margin: 0;
@@ -226,6 +226,7 @@
 
             li {
                 margin-left: 18px;
+                line-height: 1.5;
 
                 &:only-child {
                     list-style: none;
