@@ -26,7 +26,7 @@ app.add_middleware(
 )
 
 
-@app.post('/pygeoapi')
+@app.post('/api/pygeoapi')
 async def analyze(payload: Dict[str, Any]) -> Dict[str, Any]:
     try:
         return await services.analyze(payload)
@@ -37,7 +37,7 @@ async def analyze(payload: Dict[str, Any]) -> Dict[str, Any]:
         )
 
 
-@app.get('/dokthemes')
+@app.get('/api/dokthemes')
 async def get_dok_themes(response: Response) -> List[str]:
     response.headers['Cache-Control'] = 'public, max-age=86400'
 
@@ -50,7 +50,7 @@ async def get_dok_themes(response: Response) -> List[str]:
         )
 
 
-@app.get('/samples')
+@app.get('/api/samples')
 async def get_samples(response: Response) -> List[Dict[str, Any]]:
     response.headers['Cache-Control'] = 'public, max-age=86400'
 
@@ -63,7 +63,7 @@ async def get_samples(response: Response) -> List[Dict[str, Any]]:
         )
 
 
-@app.post('/area')
+@app.post('/api/area')
 async def area(
     file: UploadFile = File(...),
     out_epsg: Annotated[int | None, Form(...)] = None
@@ -105,4 +105,4 @@ async def area(
 
 
 if __name__ == '__main__':
-    uvicorn.run('main:app', host='0.0.0.0', port=5001, reload=True)
+    uvicorn.run('main:app', host='0.0.0.0', port=5001)
