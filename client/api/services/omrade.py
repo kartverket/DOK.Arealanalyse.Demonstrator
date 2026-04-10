@@ -4,6 +4,7 @@ from typing import Any, Dict, List
 from osgeo import ogr, osr, gdal
 from shapely.geometry import shape
 import aiofiles
+from .common import add_geojson_crs, get_polygons_from_geometries
 from .exceptions import InvalidDatasetError, InvalidGeometryError, GeometryConversionError
 
 ogr.UseExceptions()
@@ -14,7 +15,7 @@ HOLE_AREA_MIN_SIZE = 1
 WGS_84 = 4326
 
 
-async def get_area(filepath: Path, out_epsg: int | None) -> Dict[str, Any]:
+async def get_omrade(filepath: Path, out_epsg: int | None) -> Dict[str, Any]:
     geojson_obj = await _handle_geojson_geometry(filepath)
 
     if geojson_obj:
@@ -41,7 +42,7 @@ async def get_area(filepath: Path, out_epsg: int | None) -> Dict[str, Any]:
     geojson_obj = json.loads(json_str)
 
     if out_epsg and out_epsg != WGS_84:
-        _add_geojson_crs(geojson_obj, out_epsg)
+        add_geojson_crs(geojson_obj, out_epsg)
 
     return geojson_obj
 
@@ -69,7 +70,7 @@ def _get_geometry_from_dataset(dataset: gdal.Dataset, out_epsg: int) -> ogr.Geom
         raise InvalidGeometryError()
 
     multi_polygon = ogr.Geometry(ogr.wkbMultiPolygon)
-    polygons = _get_polygons_from_geometries(geometries)
+    polygons = get_polygons_from_geometries(geometries)
 
     for polygon in polygons:
         multi_polygon.AddGeometry(polygon)
@@ -130,23 +131,6 @@ def _get_geometries_from_layer(
             geometries.append(_get_geometry(geometry, coord_trans))
 
     return geometries
-
-
-def _get_polygons_from_geometries(geometries: List[ogr.Geometry]) -> List[ogr.Geometry]:
-    polygons: List[ogr.Geometry] = []
-
-    for geometry in geometries:
-        geom_type = geometry.GetGeometryType()
-
-        if geom_type == ogr.wkbPolygon:
-            polygons.append(geometry)
-        elif geom_type == ogr.wkbMultiPolygon:
-            geom_count = geometry.GetGeometryCount()
-
-            for i in range(geom_count):
-                polygons.append(geometry.GetGeometryRef(i))
-
-    return polygons
 
 
 def _remove_holes(geometry: ogr.Geometry) -> ogr.Geometry:
@@ -290,16 +274,4 @@ def _validate(geometry: ogr.Geometry) -> None:
         raise InvalidGeometryError()
 
 
-def _add_geojson_crs(geojson: Dict[str, Any], epsg: int | None) -> None:
-    if epsg is None:
-        return
-
-    geojson['crs'] = {
-        'type': 'name',
-        'properties': {
-            'name': 'urn:ogc:def:crs:EPSG::' + str(epsg)
-        }
-    }
-
-
-__all__ = ['get_area']
+__all__ = ['get_omrade']

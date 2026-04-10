@@ -6,8 +6,8 @@ _API_URL = 'https://register.geonorge.no/api/dok-statusregisteret.json'
 
 
 @alru_cache(ttl=86400)
-async def get_dok_themes() -> List[str]:
-    result = await _fetch_dok_themes()
+async def get_dok_tema() -> List[str]:
+    result = await _fetch_dok_tema()
     items: List[Dict[str, Any]] = result['containeditems']
     themes: List[str] = []
 
@@ -23,7 +23,7 @@ async def get_dok_themes() -> List[str]:
     return sorted(list(set(themes)))
 
 
-async def _fetch_dok_themes() -> Dict[str, Any]:
+async def _fetch_dok_tema() -> Dict[str, Any]:
     async with aiohttp.ClientSession() as session:
         async with session.get(_API_URL) as response:
             response.raise_for_status()
@@ -31,4 +31,4 @@ async def _fetch_dok_themes() -> Dict[str, Any]:
             return await response.json()
 
 
-__all__ = ['get_dok_themes']
+__all__ = ['get_dok_tema']

@@ -9,7 +9,7 @@ _config_filepath = _dirpath.joinpath('config.json')
 
 
 @alru_cache(maxsize=None)
-async def get_samples() -> List[Dict[str, Any]]:
+async def get_eksempler() -> List[Dict[str, Any]]:
     config: List[Dict[str, Any]] = await _read_json_file(_config_filepath)
 
     for item in config:
@@ -26,4 +26,4 @@ async def _read_json_file(path: Path) -> Any:
     return json.loads(json_str)
 
 
-__all__ = ['get_samples']
+__all__ = ['get_eksempler']
