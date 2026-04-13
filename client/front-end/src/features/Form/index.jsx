@@ -14,7 +14,7 @@ export default function Form() {
     const correlationId = useSelector(state => state.app.correlationId);
     const formData = useSelector(state => state.app.formData);
     const busy = useSelector(state => state.app.busy);
-    const { data: themes = [] } = useFetcher('/dokthemes');
+    const { data: themes = [] } = useFetcher('/doktema');
     const dispatch = useDispatch();
 
     function handleChange(event) {

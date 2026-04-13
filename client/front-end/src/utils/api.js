@@ -12,7 +12,7 @@ export const fetcher = async url => {
 }
 
 export async function getArea(file) {
-    const url = `${API_BASE_URL}/area`;
+    const url = `${API_BASE_URL}/omrade`;
     const formData = new FormData();
 
     formData.append('file', file);
@@ -25,6 +25,21 @@ export async function getArea(file) {
         });
 
         return await response.json();
+    } catch (error) {
+        showError(error);
+        return null;
+    }
+}
+
+export async function getPlanIds(municipalityNumber) {
+    const url = `${API_BASE_URL}/reguleringsplaner/planids/${municipalityNumber}`;
+
+    try {
+        const response = await fetch(url);
+
+        const b = await response.json();
+        console.log(b);
+        return b;
     } catch (error) {
         showError(error);
         return null;

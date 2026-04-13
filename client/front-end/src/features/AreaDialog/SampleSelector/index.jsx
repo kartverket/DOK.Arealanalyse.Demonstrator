@@ -5,13 +5,11 @@ import { ChevronDownIcon, ChevronUpIcon } from '@navikt/aksel-icons';
 import styles from './SampleSelector.module.scss';
 
 export default function SampleSelector({ selectedSample, onSampleSelect }) {
-    // const [selectedSample, setSelectedSample] = useState(null);
     const [dropdownOpen, setDropdownOpen] = useState(false);
-    const { data: samples = [] } = useFetcher('/samples');
+    const { data: samples = [] } = useFetcher('/eksempler');
     const dropdownTriggerRef = useRef(null);
 
     function handleSampleSelect(sample) {
-        // setSelectedSample(sample);
         setDropdownOpen(false);
         onSampleSelect(sample);
     }

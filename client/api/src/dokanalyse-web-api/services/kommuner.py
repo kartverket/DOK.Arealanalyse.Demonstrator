@@ -1,0 +1,105 @@
+import os
+import json
+from pathlib import Path
+from typing import Any, Dict, List
+from async_lru import alru_cache
+from .common import is_cache_valid, read_file_from_disk, write_file_to_disk
+from ..utils.session_registry import get_session
+
+_API_URL = 'https://api.kartverket.no/kommuneinfo/v1/fylkerkommuner'
+_TTL = 86400 * 180
+
+_query_params = {
+    'utkoordsys': 4326,
+    'filtrer': 'kommuner.kommunenummer,kommuner.kommunenavnNorsk,kommuner.avgrensningsboks'
+}
+
+_cache_path = Path('/tmp/kommuner.geojson')
+
+
+@alru_cache(maxsize=None, ttl=_TTL)
+async def get_kommuner() -> Dict[str, Any]:
+    if is_cache_valid(_cache_path, 180):
+        return read_file_from_disk(_cache_path)
+
+    return await get_and_cache_kommuner()
+
+
+@alru_cache(maxsize=None, ttl=_TTL)
+async def get_kommuner_for_plan() -> Dict[str, Any]:
+    kommuner = await get_kommuner()
+    excluded = _get_excluded_kommuner()
+    features = [feature for feature in kommuner['features']
+                if feature['properties']['kommunenummer'] not in excluded]
+
+    return {
+        **kommuner,
+        'features': features
+    }
+
+
+@alru_cache(maxsize=None, ttl=_TTL)
+async def get_kommune_by_kommunenummer(kommunenummer: str) -> Dict[str, Any] | None:
+    kommuner = await get_kommuner()
+    features = kommuner['features']
+
+    return next(feature for feature in features if feature['properties']['kommunenummer'] == kommunenummer)
+
+
+async def get_and_cache_kommuner() -> Dict[str, Any]:
+    async with get_session().get(_API_URL, params=_query_params) as response:
+        response.raise_for_status()
+        data = await response.json()
+
+        kommuner = _map_response(data)
+        write_file_to_disk(_cache_path, json.dumps(
+            kommuner, ensure_ascii=False))
+
+        return kommuner
+
+
+def _map_response(response: List[Dict[str, Any]]) -> Dict[str, Any]:
+    features: List[Dict[str, Any]] = []
+
+    for fylke in response:
+        for kommune in fylke['kommuner']:
+            geom = kommune['avgrensningsboks']
+            points = geom['coordinates'][0]
+            kommunenummer = kommune['kommunenummer']
+
+            features.append({
+                'type': 'Feature',
+                'id': kommunenummer,
+                'geometry': {
+                    'type': 'MultiPoint',
+                    'coordinates': [
+                        points[0],
+                        points[2]
+                    ]
+                },
+                'properties': {
+                    'kommunenummer': kommune['kommunenummer'],
+                    'kommunenavn': kommune['kommunenavnNorsk']
+                }
+            })
+
+    sorted_features = sorted(
+        features, key=lambda feature: feature['properties']['kommunenavn'])
+
+    return {
+        'type': 'FeatureCollection',
+        'features': sorted_features
+    }
+
+
+def _get_excluded_kommuner() -> List[str]:
+    to_exclude = os.getenv('EXCLUDED_KOMMUNER')
+
+    if not to_exclude:
+        return []
+
+    return [kommunenummer.strip() for kommunenummer in to_exclude.split(',')]
+
+
+__all__ = ['get_kommuner', 'get_kommuner_for_plan',
+           'get_kommune_by_kommunenummer', 'get_and_cache_kommuner']

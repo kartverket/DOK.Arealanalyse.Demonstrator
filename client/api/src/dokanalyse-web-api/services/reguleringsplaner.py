@@ -7,6 +7,7 @@ import aiohttp
 from async_lru import alru_cache
 from osgeo import ogr
 from .common import add_geojson_crs, get_polygons_from_geometries
+from ..utils.session_registry import get_session
 
 _API_URL = 'https://nap.ft.dibk.no/services/rest/reguleringsplaner/vn2/collections/rpomrade/items'
 _LIMIT = 500
@@ -19,24 +20,23 @@ _DEFAULT_EPSG = 25833
 async def get_plan_ids(municipality_number: str) -> List[str]:
     semaphore = asyncio.Semaphore(_MAX_CONCURRENT)
 
-    async with aiohttp.ClientSession(auth=_get_auth()) as session:
-        all_plan_ids, number_matched = await _fetch_plan_ids(session, semaphore, municipality_number, 0)
-        num_pages = math.ceil(number_matched / _LIMIT)
-        offsets = [i * _LIMIT for i in range(num_pages)][1:]
+    all_plan_ids, number_matched = await _fetch_plan_ids(semaphore, municipality_number, 0)
+    num_pages = math.ceil(number_matched / _LIMIT)
+    offsets = [i * _LIMIT for i in range(num_pages)][1:]
 
-        tasks: List[asyncio.Task[Tuple[List[str], int]]] = []
+    tasks: List[asyncio.Task[Tuple[List[str], int]]] = []
 
-        async with asyncio.TaskGroup() as tg:
-            for offset in offsets:
-                task = tg.create_task(_fetch_plan_ids(
-                    session, semaphore, municipality_number, offset))
-                tasks.append(task)
+    async with asyncio.TaskGroup() as tg:
+        for offset in offsets:
+            task = tg.create_task(_fetch_plan_ids(
+                semaphore, municipality_number, offset))
+            tasks.append(task)
 
-        for task in tasks:
-            plan_ids, _ = task.result()
-            all_plan_ids.extend(plan_ids)
+    for task in tasks:
+        plan_ids, _ = task.result()
+        all_plan_ids.extend(plan_ids)
 
-        return sorted(set(all_plan_ids))
+    return sorted(set(all_plan_ids))
 
 
 @alru_cache(ttl=86400)
@@ -47,29 +47,27 @@ async def get_reguleringsplan(municipality_number: str, plan_id: str) -> Dict[st
         'crs': _DEFAULT_CRS
     }
 
-    async with aiohttp.ClientSession(auth=_get_auth()) as session:
-        async with session.get(_API_URL, params=params) as response:
-            response.raise_for_status()
+    async with get_session().get(_API_URL, params=params, auth=_get_auth()) as response:
+        response.raise_for_status()
 
-            data = await response.json()
-            features: List[Dict[str, Any]] = data['features']
+        data = await response.json()
+        features: List[Dict[str, Any]] = data['features']
 
-            if not features:
-                return None
+        if not features:
+            return None
 
-            geometries: List[Dict[str, Any]] = []
+        geometries: List[Dict[str, Any]] = []
 
-            for feature in features:
-                geometries.append(feature['geometry'])
+        for feature in features:
+            geometries.append(feature['geometry'])
 
-            if not geometries:
-                return None
+        if not geometries:
+            return None
 
-            return _create_feature(features[0], geometries)
+        return _create_feature(features[0], geometries)
 
 
 async def _fetch_plan_ids(
-    session: aiohttp.ClientSession,
     semaphore: asyncio.Semaphore,
     municipality_number: str,
     offset: int
@@ -78,7 +76,7 @@ async def _fetch_plan_ids(
         params = _get_query_params(municipality_number, offset)
         plan_ids: List[str] = []
 
-        async with session.get(_API_URL, params=params) as response:
+        async with get_session().get(_API_URL, params=params, auth=_get_auth()) as response:
             response.raise_for_status()
 
             data = await response.json()

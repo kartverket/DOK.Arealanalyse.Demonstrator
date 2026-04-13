@@ -5,12 +5,13 @@ from pathlib import Path
 from collections import defaultdict
 from typing import Any, Dict, List
 from lxml import etree as ET
-import aiohttp
 from async_lru import alru_cache
 from osgeo import ogr
 import Levenshtein
 from .kommuner import get_kommune_by_kommunenummer
 from .common import get_polygons_from_geometries
+from ..utils.session_registry import get_session
+
 
 _ADRESSE_API_URL = 'https://ws.geonorge.no/adresser/v1/sok'
 
@@ -48,14 +49,14 @@ _matrikkel_pattern = re.compile(
 
 
 @alru_cache(maxsize=None, ttl=86400)
-async def search(search_str: str) -> Dict[str, Any] | None:
+async def search(kommunenummer: str, search_str: str) -> Dict[str, Any]:
     search_str = search_str.strip()
     match = _matrikkel_pattern.match(search_str)
-
+    
     if match:
         return await _search_by_matrikkel_no(match)
 
-    return await _search_by_adresse(search_str)
+    return await _search_by_adresse(kommunenummer, search_str)
 
 
 async def get_eiendom_from_matrikkel(geometry: Dict[str, Any]) -> Dict[str, Any] | None:
@@ -85,36 +86,34 @@ async def _search_by_matrikkel_no(match: re.Match) -> Dict[str, Any]:
     params.update((key, value)
                   for key, value in match.groupdict().items() if value is not None)
 
-    async with aiohttp.ClientSession() as session:
-        async with session.get(_MATRIKKEL_API_URL, params=params) as response:
-            response.raise_for_status()
-            data = await response.json()
+    async with get_session().get(_MATRIKKEL_API_URL, params=params) as response:
+        response.raise_for_status()
+        data = await response.json()
 
-            return await _map_matrikkel_response(data)
+        return await _map_matrikkel_response(data)
 
 
-async def _search_by_adresse(search_str: str) -> Dict[str, Any]:
+async def _search_by_adresse(kommunenummer, search_str: str) -> Dict[str, Any]:
     params = {
         **_adresse_query_params,
+        'kommunenummer': kommunenummer,
         'sok': search_str
     }
+    
+    async with get_session().get(_ADRESSE_API_URL, params=params) as response:
+        response.raise_for_status()
+        data = await response.json()
 
-    async with aiohttp.ClientSession() as session:
-        async with session.get(_ADRESSE_API_URL, params=params) as response:
-            response.raise_for_status()
-            data = await response.json()
-
-            return await _map_adresse_response(data, search_str)
+        return await _map_adresse_response(data, search_str)
 
 
 async def _query_wfs(base_url: str, xml_body: str) -> bytes:
     url = f'{base_url}?service=WFS&version=2.0.0'
 
-    async with aiohttp.ClientSession() as session:
-        async with session.post(url, data=xml_body) as response:
-            response.raise_for_status()
+    async with get_session().post(url, data=xml_body) as response:
+        response.raise_for_status()
 
-            return await response.read()
+        return await response.read()
 
 
 def _get_geometries_from_wfs_response(response: bytes, layer: str, geom_field: str) -> List[ogr.Geometry]:
@@ -193,7 +192,7 @@ async def _map_matrikkel_response(response: Dict[str, Any]) -> Dict[str, Any]:
                 'matrikkelnummer': matrikkelnummer,
                 'adressetekst': None,
                 'kommunenummer': kommunenummer,
-                'kommunenavn': kommune['kommunenavn'] if kommune else None
+                'kommunenavn': kommune['properties']['kommunenavn'] if kommune else None
             }
         }
 
@@ -227,7 +226,7 @@ async def _map_adresse_response(response: Dict[str, Any], search_str: str) -> Di
                 'matrikkelnummer': _get_matrikkelnummer(adresse),
                 'adressetekst': adresse['adressetekst'],
                 'kommunenummer': kommunenummer,
-                'kommunenavn': kommune['kommunenavn'] if kommune else None
+                'kommunenavn': kommune['properties']['kommunenavn'] if kommune else None
             }
         }
 

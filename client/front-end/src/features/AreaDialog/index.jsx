@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { getArea } from 'utils/api';
-import { Button, Heading, Popover, Tabs } from '@digdir/designsystemet-react';
+import { Button, EXPERIMENTAL_Suggestion as Suggestion, Heading, Popover, Tabs, Select } from '@digdir/designsystemet-react';
 import { Dialog, FilePicker } from 'components';
 import GeoJson from './GeoJson';
 import MapView from './MapView';
@@ -8,10 +8,11 @@ import SampleSelector from './SampleSelector';
 import AreaIcon from 'assets/gfx/icon-area.svg?react'
 import { QuestionmarkCircleFillIcon } from '@navikt/aksel-icons';
 import styles from './AreaDialog.module.scss';
+import Search from './Search';
 
 export default function AreaDialog({ onOk }) {
     const [open, setOpen] = useState(false);
-    const [selectedSample, setSelectedSample] = useState(null);
+    const [selectedSample, setSelectedSample] = useState(null);    
     const [filename, setFilename] = useState(null);
     const [geometry, setGeometry] = useState(null);
 
@@ -107,7 +108,20 @@ export default function AreaDialog({ onOk }) {
                         </Tabs.List>
 
                         <Tabs.Panel value="map" className={styles.tabPanel}>
-                            <div className={styles.map}>
+                            <div className={styles.map}>                                
+                                <div className={styles.search}>
+                                    <Search />
+                                    {/* <Select>
+                                        <Select.Option value="">Velg kommune</Select.Option>
+                                        {
+                                            kommuner.map(kommune => (
+                                                <Select.Option key={}
+                                            ))
+                                        }
+                                    </Select> */}
+                                    {/* <Suggestion */}
+                                </div>
+
                                 <MapView geometry={geometry} />
                             </div>
                         </Tabs.Panel>
