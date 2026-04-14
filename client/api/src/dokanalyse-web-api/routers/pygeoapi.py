@@ -5,8 +5,8 @@ from ..services import pygeoapi
 router = APIRouter()
 
 
-@router.get('/eksempler')
-async def get_dok_tema(
+@router.post('/pygeoapi')
+async def analyze(
     payload: Dict[str, Any]
 ) -> Dict[str, Any]:
     try:
@@ -14,5 +14,5 @@ async def get_dok_tema(
     except:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail='Kunne ikke hente eksempler'
+            detail='Kunne ikke analysere'
         )

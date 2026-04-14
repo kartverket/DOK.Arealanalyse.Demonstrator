@@ -31,21 +31,6 @@ export async function getArea(file) {
     }
 }
 
-export async function getPlanIds(municipalityNumber) {
-    const url = `${API_BASE_URL}/reguleringsplaner/planids/${municipalityNumber}`;
-
-    try {
-        const response = await fetch(url);
-
-        const b = await response.json();
-        console.log(b);
-        return b;
-    } catch (error) {
-        showError(error);
-        return null;
-    }
-}
-
 export async function analyze(payload) {
     const url = `${API_BASE_URL}/pygeoapi`;
 

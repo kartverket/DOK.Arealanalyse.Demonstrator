@@ -3,11 +3,10 @@ import re
 from io import BytesIO
 from pathlib import Path
 from collections import defaultdict
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple
 from lxml import etree as ET
 from async_lru import alru_cache
 from osgeo import ogr
-import Levenshtein
 from .kommuner import get_kommune_by_kommunenummer
 from .common import get_polygons_from_geometries
 from ..utils.session_registry import get_session
@@ -38,31 +37,37 @@ _matrikkel_query_params = {
     'utkoordsys': '4326'
 }
 
-_matrikkel_pattern = re.compile(
-    r'^\s*'
-    r'(?P<kommunenummer>\d{4})'
-    r'(?:(?:\s*(?:/|-)\s*|\s+)(?P<gardsnummer>\d+))?'
-    r'(?:(?:\s*(?:/|-)\s*|\s+)(?P<bruksnummer>\d+))?'
-    r'(?:(?:\s*(?:/|-)\s*|\s+)(?P<festenummer>\d+))?'
-    r'\s*$'
-)
-
-
-@alru_cache(maxsize=None, ttl=86400)
-async def search(kommunenummer: str, search_str: str) -> Dict[str, Any]:
-    search_str = search_str.strip()
-    match = _matrikkel_pattern.match(search_str)
-    
-    if match:
-        return await _search_by_matrikkel_no(match)
-
-    return await _search_by_adresse(kommunenummer, search_str)
-
 
 async def get_eiendom_from_matrikkel(geometry: Dict[str, Any]) -> Dict[str, Any] | None:
     geojson_str = _get_geojson_str(geometry)
 
     return await _get_cached_eiendom_from_matrikkel(geojson_str)
+
+
+async def search_by_matrikkel_no(kommunenummer: str, query_params: Dict[str, Any]) -> Dict[str, Any]:
+    params = {**_matrikkel_query_params, 'kommunenummer': kommunenummer}
+    params.update((key, value)
+                  for key, value in query_params.items() if value is not None)
+
+    async with get_session().get(_MATRIKKEL_API_URL, params=params) as response:
+        response.raise_for_status()
+        data = await response.json()
+
+        return await _map_matrikkel_response(data)
+
+
+async def search_by_adresse(kommunenummer, search_str: str) -> Dict[str, Any]:
+    params = {
+        **_adresse_query_params,
+        'kommunenummer': kommunenummer,
+        'sok': search_str
+    }
+
+    async with get_session().get(_ADRESSE_API_URL, params=params) as response:
+        response.raise_for_status()
+        data = await response.json()
+
+        return await _map_adresse_response(data, search_str)
 
 
 @alru_cache(maxsize=256, ttl=86400)
@@ -74,37 +79,30 @@ async def _get_cached_eiendom_from_matrikkel(geojson_str: str) -> Dict[str, Any]
 
     request_xml = _create_wfs_request_xml(
         _WFS_LAYER, _WFS_GEOM_FIELD, gml_str, _WFS_OUT_CRS)
+
     response = await _query_wfs(_WFS_URL, request_xml)
-    geometries = _get_geometries_from_wfs_response(
-        response, _WFS_LAYER, _WFS_GEOM_FIELD)
 
-    return _wfs_geometries_to_geojson(geometries)
-
-
-async def _search_by_matrikkel_no(match: re.Match) -> Dict[str, Any]:
-    params = {**_matrikkel_query_params}
-    params.update((key, value)
-                  for key, value in match.groupdict().items() if value is not None)
-
-    async with get_session().get(_MATRIKKEL_API_URL, params=params) as response:
-        response.raise_for_status()
-        data = await response.json()
-
-        return await _map_matrikkel_response(data)
-
-
-async def _search_by_adresse(kommunenummer, search_str: str) -> Dict[str, Any]:
-    params = {
-        **_adresse_query_params,
-        'kommunenummer': kommunenummer,
-        'sok': search_str
+    prop_mappings = {
+        'kommunenummer': 'kommunenummer',
+        'matrikkelnummer': 'matrikkelnummerTekst'
     }
-    
-    async with get_session().get(_ADRESSE_API_URL, params=params) as response:
-        response.raise_for_status()
-        data = await response.json()
 
-        return await _map_adresse_response(data, search_str)
+    results = _parse_wfs_response(
+        response, _WFS_LAYER, _WFS_GEOM_FIELD, prop_mappings)
+
+    geometries = [result[0] for result in results]
+
+    if not geometries:
+        return None
+
+    properties = {**results[0][1]}
+    properties['tittel'] = f'Eiendom {properties["kommunenummer"]}-{properties["matrikkelnummer"]}'
+
+    return {
+        'type': 'Feature',
+        'geometry': _wfs_geometries_to_geojson(geometries),
+        'properties': properties
+    }
 
 
 async def _query_wfs(base_url: str, xml_body: str) -> bytes:
@@ -116,13 +114,18 @@ async def _query_wfs(base_url: str, xml_body: str) -> bytes:
         return await response.read()
 
 
-def _get_geometries_from_wfs_response(response: bytes, layer: str, geom_field: str) -> List[ogr.Geometry]:
+def _parse_wfs_response(
+    response: bytes,
+    layer: str,
+    geom_field: str,
+    prop_mappings: Dict[str, str]
+) -> List[Tuple[ogr.Geometry, Dict[str, Any]]]:
     source = BytesIO(response)
     context = ET.iterparse(
         source, events=['end'], tag='{*}' + layer, huge_tree=True)
 
-    geometries: List[ogr.Geometry] = []
     geom_path = f'.//{{*}}{geom_field}/*'
+    results: List[Tuple[ogr.Geometry, Dict[str, Any]]] = []
 
     for _, elem in context:
         geom_elem = elem.find(geom_path)
@@ -135,14 +138,19 @@ def _get_geometries_from_wfs_response(response: bytes, layer: str, geom_field: s
         geometry = _geometry_from_gml(gml_str)
 
         if geometry:
-            geometries.append(geometry)
+            properties: Dict[str, Any] = {}
+
+            for prop_name, path in prop_mappings.items():
+                properties[prop_name] = elem.findtext(f'.//{{*}}{path}')
+
+            results.append((geometry, properties))
 
         geom_elem.clear()
         elem.clear()
 
     del context
 
-    return geometries
+    return results
 
 
 def _wfs_geometries_to_geojson(geometries: List[ogr.Geometry]) -> Dict[str, Any] | None:
@@ -189,10 +197,13 @@ async def _map_matrikkel_response(response: Dict[str, Any]) -> Dict[str, Any]:
             'type': 'Feature',
             'geometry': geometry,
             'properties': {
-                'matrikkelnummer': matrikkelnummer,
-                'adressetekst': None,
-                'kommunenummer': kommunenummer,
-                'kommunenavn': kommune['properties']['kommunenavn'] if kommune else None
+                'type': 'Eiendom',
+                'value': teig['properties']['matrikkelnummertekst'],
+                'data': {
+                    'matrikkelnummer': matrikkelnummer,
+                    'kommunenummer': kommunenummer,
+                    'kommunenavn': kommune['properties']['kommunenavn'] if kommune else None
+                }
             }
         }
 
@@ -212,6 +223,7 @@ async def _map_adresse_response(response: Dict[str, Any], search_str: str) -> Di
         repr_punkt: Dict[str, Any] = adresse['representasjonspunkt']
         kommunenummer: str = adresse['kommunenummer']
         kommune = await get_kommune_by_kommunenummer(kommunenummer)
+        adressetekst = adresse['adressetekst']
 
         feature = {
             'type': 'Feature',
@@ -223,24 +235,22 @@ async def _map_adresse_response(response: Dict[str, Any], search_str: str) -> Di
                 ]
             },
             'properties': {
-                'matrikkelnummer': _get_matrikkelnummer(adresse),
-                'adressetekst': adresse['adressetekst'],
-                'kommunenummer': kommunenummer,
-                'kommunenavn': kommune['properties']['kommunenavn'] if kommune else None
+                'type': 'Vegadresse',
+                'value': adressetekst,
+                'data': {
+                    'matrikkelnummer': _get_matrikkelnummer(adresse),
+                    'adressetekst': adresse['adressetekst'],
+                    'kommunenummer': kommunenummer,
+                    'kommunenavn': kommune['properties']['kommunenavn'] if kommune else None
+                }
             }
         }
 
         features.append(feature)
 
-    sorted_features = sorted(
-        features,
-        key=lambda feature: (Levenshtein.distance(
-            feature['properties']['adressetekst'], search_str), feature['properties']['kommunenavn'])
-    )
-
     return {
         'type': 'FeatureCollection',
-        'features': sorted_features
+        'features': features
     }
 
 
@@ -298,4 +308,5 @@ def _get_geojson_str(geometry: Dict[str, Any]) -> str:
     return json.dumps(geometry, sort_keys=True, separators=(',', ':'))
 
 
-__all__ = ['search', 'get_eiendom_from_matrikkel']
+__all__ = ['get_eiendom_from_matrikkel',
+           'search_by_matrikkel_no', 'search_by_adresse']

@@ -4,3 +4,4 @@
 .python-version
 Dockerfile
 __pycache__
+set_env.sh

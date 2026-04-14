@@ -6,7 +6,7 @@ from fastapi.middleware.gzip import GZipMiddleware
 import uvicorn
 import aiohttp
 from .routers import (dok_tema, eiendom, eksempler,
-                      kommuner, omrade, pygeoapi, reguleringsplaner)
+                      kommuner, omrade, pygeoapi, plan, sok)
 from .services.kommuner import get_and_cache_kommuner
 from .utils import session_registry
 
@@ -15,7 +15,7 @@ locale.setlocale(locale.LC_COLLATE, 'nb_NO.UTF-8')
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    timeout = aiohttp.ClientTimeout(total=10)
+    timeout = aiohttp.ClientTimeout(total=600)
     session = aiohttp.ClientSession(timeout=timeout)
 
     session_registry.set_session(session)
@@ -54,8 +54,9 @@ app.include_router(eiendom.router)
 app.include_router(eksempler.router)
 app.include_router(kommuner.router)
 app.include_router(omrade.router)
+app.include_router(plan.router)
 app.include_router(pygeoapi.router)
-app.include_router(reguleringsplaner.router)
+app.include_router(sok.router)
 
 
 if __name__ == '__main__':

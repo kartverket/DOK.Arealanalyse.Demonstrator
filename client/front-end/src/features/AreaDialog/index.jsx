@@ -12,8 +12,8 @@ import Search from './Search';
 
 export default function AreaDialog({ onOk }) {
     const [open, setOpen] = useState(false);
-    const [selectedSample, setSelectedSample] = useState(null);    
-    const [filename, setFilename] = useState(null);
+    const [selectedSample, setSelectedSample] = useState(null);
+    const [title, setTitle] = useState(null);
     const [geometry, setGeometry] = useState(null);
 
     function ok() {
@@ -34,15 +34,21 @@ export default function AreaDialog({ onOk }) {
 
         if (geoJson !== null) {
             setSelectedSample(null);
-            setFilename(file.name);
+            setTitle(file.name);
             setGeometry(geoJson);
         }
     }
 
     function handleSampleSelected(sample) {
         setSelectedSample(sample)
-        setFilename(sample.fileName);
+        setTitle(sample.fileName);
         setGeometry(sample.geoJson);
+    }
+
+    function handleSearchResponse(feature) {
+        setSelectedSample(null);
+        setTitle(feature.properties.tittel)
+        setGeometry(feature.geometry);
     }
 
     return (
@@ -65,35 +71,41 @@ export default function AreaDialog({ onOk }) {
                 closeButton={false}
                 className={styles.areaDialog}
             >
-                <Heading>Analyseområde{filename !== null ? `: ${filename}` : ''}</Heading>
+                <Heading>Analyseområde{title !== null ? `: ${title}` : ''}</Heading>
 
                 <div className={styles.content}>
                     <div className={styles.top}>
-                        <div className={styles.filePicker}>
-                            <FilePicker
-                                label="Legg til fil"
-                                fileTypes={['json', 'geojson', 'sos', 'sosi', 'gml', 'gpkg']}
-                                onFileSelected={handleFileSelected}
-                            />
-
-                            <Popover.TriggerContext>
-                                <Popover.Trigger 
-                                    icon 
-                                    variant="tertiary"
-                                >
-                                    <QuestionmarkCircleFillIcon width={24} height={24} /> 
-                                </Popover.Trigger>
-                                <Popover placement="top">
-                                    GeoJSON, GML, SOSI, GeoPackage
-                                </Popover>
-                            </Popover.TriggerContext>
+                        <div>
+                            <Search onResponse={handleSearchResponse} />
                         </div>
 
-                        <div className={styles.sampleSelector}>
-                            <SampleSelector 
-                                selectedSample={selectedSample} 
-                                onSampleSelect={handleSampleSelected} 
-                            />
+                        <div className={styles.topRight}>
+                            <div className={styles.filePicker}>
+                                <FilePicker
+                                    label="Legg til fil"
+                                    fileTypes={['json', 'geojson', 'sos', 'sosi', 'gml', 'gpkg']}
+                                    onFileSelected={handleFileSelected}
+                                />
+
+                                <Popover.TriggerContext>
+                                    <Popover.Trigger
+                                        icon
+                                        variant="tertiary"
+                                    >
+                                        <QuestionmarkCircleFillIcon width={24} height={24} />
+                                    </Popover.Trigger>
+                                    <Popover placement="top">
+                                        GeoJSON, GML, SOSI, GeoPackage
+                                    </Popover>
+                                </Popover.TriggerContext>
+                            </div>
+
+                            <div className={styles.sampleSelector}>
+                                <SampleSelector
+                                    selectedSample={selectedSample}
+                                    onSampleSelect={handleSampleSelected}
+                                />
+                            </div>
                         </div>
                     </div>
 
@@ -108,20 +120,7 @@ export default function AreaDialog({ onOk }) {
                         </Tabs.List>
 
                         <Tabs.Panel value="map" className={styles.tabPanel}>
-                            <div className={styles.map}>                                
-                                <div className={styles.search}>
-                                    <Search />
-                                    {/* <Select>
-                                        <Select.Option value="">Velg kommune</Select.Option>
-                                        {
-                                            kommuner.map(kommune => (
-                                                <Select.Option key={}
-                                            ))
-                                        }
-                                    </Select> */}
-                                    {/* <Suggestion */}
-                                </div>
-
+                            <div className={styles.map}>
                                 <MapView geometry={geometry} />
                             </div>
                         </Tabs.Panel>
