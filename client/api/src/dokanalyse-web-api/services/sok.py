@@ -55,9 +55,6 @@ async def search(kommunenummer: str, search_str: str) -> Dict[str, Any]:
         feature['id'] = id
         id += 1
 
-
-    print(sliced_features)
-
     return {
         'type': 'FeatureCollection',
         'features': sliced_features

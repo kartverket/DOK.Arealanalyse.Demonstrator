@@ -1,12 +1,11 @@
 import { useMemo, useState } from 'react';
 import { useGetKommunerQuery } from 'store/api';
 import { Field, Label, Select } from '@digdir/designsystemet-react';
-import styles from './Search.module.scss';
 import Suggestion from './Suggestion';
+import styles from './Search.module.scss';
 
-
-export default function Search({ onResponse }) {
-    const [selectedKommunenummer, setSelectedKommunenummer] = useState('4020');
+export default function Search({ onResponse, kommunenummer }) {
+    const [selectedKommune, setSelectedKommune] = useState(kommunenummer ?? '');
     const { data = null } = useGetKommunerQuery();    
 
     const kommuner = useMemo(
@@ -25,16 +24,15 @@ export default function Search({ onResponse }) {
 
     async function handleKommuneChange(event) {
         const kommunenummer = event.target.value;
-        setSelectedKommunenummer(kommunenummer);
+        setSelectedKommune(kommunenummer);
     }
-
 
     return (
         <div className={styles.search}>
             <Field>
                 <Label>Kommune</Label>
                 <Select
-                    value={selectedKommunenummer}
+                    value={selectedKommune}
                     onChange={handleKommuneChange}
                 >
                     <Select.Option value="">Velg kommune</Select.Option>
@@ -55,7 +53,7 @@ export default function Search({ onResponse }) {
                 <Label>Plan-ID, matrikkelnummer eller adresse</Label>
 
                 <Suggestion
-                    kommunenummer={selectedKommunenummer}
+                    kommunenummer={selectedKommune}
                     onSelected={onResponse}
                 />
             </Field>

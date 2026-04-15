@@ -1,17 +1,15 @@
-import { EXPERIMENTAL_Suggestion as DsSuggestion } from '@digdir/designsystemet-react';
+import { Button, EXPERIMENTAL_Suggestion as DsSuggestion } from '@digdir/designsystemet-react';
 import { useRef, useState } from 'react';
 import { api, apiFetch } from 'store/api';
 import { debounce } from 'utils/helpers';
-import styles from './Suggestion.module.scss';
 import { getApiParams } from './helpers';
-import { HouseIcon } from '@navikt/aksel-icons';
-import AddressIcon from 'assets/gfx/icon-address.svg?react'
-import ZoneIcon from 'assets/gfx/icon-zone.svg?react'
+import styles from './Suggestion.module.scss';
+import { ZoomPlusIcon } from '@navikt/aksel-icons';
 
 export default function Suggestion({ kommunenummer, onSelected }) {
     const [suggestions, setSuggestions] = useState([]);
     const [selected, setSelected] = useState('');
-    const suggestionRef = useRef(null);
+    const suggestionInputRef = useRef(null);
 
     const handleSuggestionInput = debounce(async event => {
         const query = event.target.value.trim();
@@ -20,22 +18,29 @@ export default function Suggestion({ kommunenummer, onSelected }) {
             return;
         }
 
-        const response = await apiFetch(api.endpoints.search, { kommunenummer, query });
-        setSuggestions(response.features);
+        try {
+            const response = await apiFetch(api.endpoints.search, { kommunenummer, query });
+            setSuggestions(response.features);
+        } catch (error) {
+            console.log(error)
+        }
     }, 500);
 
     async function handleSuggestionChange({ value }) {
         setSelected('');
-        suggestionRef.current.clear.click();
+        suggestionInputRef.current.value = '';
 
         const id = parseInt(value);
         const feature = suggestions.find(suggestion => suggestion.id === id);
+        const [endpoint, params] = getApiParams(kommunenummer, feature);
         setSuggestions([])
 
-        const [endpoint, params] = getApiParams(kommunenummer, feature);
-        const response = await apiFetch(endpoint, params);
-
-        onSelected(response);
+        try {
+            const response = await apiFetch(endpoint, params);
+            onSelected(response);
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     function renderLabel(feature) {
@@ -46,33 +51,29 @@ export default function Suggestion({ kommunenummer, onSelected }) {
             case 'Eiendom':
                 return (
                     <>
-                        <HouseIcon width="21" height="21" />
-                        <div>
-                            <span>{props.data.matrikkelnummer}</span>
-                            <span className={styles.type}>{type}</span>
-                        </div>
+                        <span>{props.data.matrikkelnummer}</span>
+                        <span className={styles.type}>{type}</span>
                     </>
                 );
             case 'Vegadresse':
                 return (
                     <>
-                        <AddressIcon height="26" />
                         <div>
                             <span>{props.data.adressetekst}</span>
                             <span className={styles.subTitle}>{props.data.matrikkelnummer}</span>
                             <span className={styles.type}>{type}</span>
                         </div>
+                        <Button variant="tertiary" icon>
+                            <ZoomPlusIcon />
+                        </Button>
                     </>
                 );
             case 'Reguleringsplan':
             case 'Reguleringsplanforslag':
                 return (
                     <>
-                        <ZoneIcon height="26" />
-                        <div>
-                            <span>{props.data.planId}</span>
-                            <span className={styles.type}>{type}</span>
-                        </div>
+                        <span>{props.data.planId}</span>
+                        <span className={styles.type}>{type}</span>
                     </>
                 );
             default:
@@ -82,17 +83,16 @@ export default function Suggestion({ kommunenummer, onSelected }) {
 
     return (
         <DsSuggestion
-            ref={suggestionRef}
             selected={selected}
             onSelectedChange={handleSuggestionChange}
             filter={() => true}
         >
             <DsSuggestion.Input
+                ref={suggestionInputRef}
                 onInput={handleSuggestionInput}
+                disabled={kommunenummer === ''}
             />
-            <DsSuggestion.Clear />
             <DsSuggestion.List className={styles.list}>
-
                 <DsSuggestion.Empty>
                     Ingen treff
                 </DsSuggestion.Empty>

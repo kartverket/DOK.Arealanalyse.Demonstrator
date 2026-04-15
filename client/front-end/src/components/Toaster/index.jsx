@@ -21,7 +21,7 @@ export default function Toaster() {
             if (toast !== null) {
                 setTimeout(() => {
                     handleClose();
-                }, 3000);
+                }, 5000);
             }
         },
         [toast, handleClose]

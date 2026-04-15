@@ -6,12 +6,18 @@ from async_lru import alru_cache
 from .common import is_cache_valid, read_file_from_disk, write_file_to_disk
 from ..utils.session_registry import get_session
 
-_API_URL = 'https://api.kartverket.no/kommuneinfo/v1/fylkerkommuner'
+_FYLKERKOMMUNER_API_URL = 'https://api.kartverket.no/kommuneinfo/v1/fylkerkommuner'
+_PUNKT_API_URL = 'https://api.kartverket.no/kommuneinfo/v1/punkt'
 _TTL = 86400 * 180
 
-_query_params = {
+_fylkerkommuner_query_params = {
     'utkoordsys': 4326,
     'filtrer': 'kommuner.kommunenummer,kommuner.kommunenavnNorsk,kommuner.avgrensningsboks'
+}
+
+_punkt_query_params = {
+    'koordsys': 4326,
+    'filtrer': 'kommunenummer'
 }
 
 _cache_path = Path('/tmp/kommuner.geojson')
@@ -23,6 +29,12 @@ async def get_kommuner() -> Dict[str, Any]:
         return read_file_from_disk(_cache_path)
 
     return await get_and_cache_kommuner()
+
+
+async def get_kommune_by_point(lon: float, lat: float) -> Dict[str, Any] | None:
+    kommunenummer = await _fetch_kommunenummer_by_point(lon, lat)
+
+    return await get_kommune_by_kommunenummer(kommunenummer)
 
 
 @alru_cache(maxsize=None, ttl=_TTL)
@@ -47,7 +59,7 @@ async def get_kommune_by_kommunenummer(kommunenummer: str) -> Dict[str, Any] | N
 
 
 async def get_and_cache_kommuner() -> Dict[str, Any]:
-    async with get_session().get(_API_URL, params=_query_params) as response:
+    async with get_session().get(_FYLKERKOMMUNER_API_URL, params=_fylkerkommuner_query_params) as response:
         response.raise_for_status()
         data = await response.json()
 
@@ -56,6 +68,20 @@ async def get_and_cache_kommuner() -> Dict[str, Any]:
             kommuner, ensure_ascii=False))
 
         return kommuner
+
+
+async def _fetch_kommunenummer_by_point(lon: float, lat: float) -> str:
+    params = {
+        **_punkt_query_params,
+        'ost': lon,
+        'nord': lat
+    }
+
+    async with get_session().get(_PUNKT_API_URL, params=params) as response:
+        response.raise_for_status()
+        data = await response.json()
+
+        return data['kommunenummer']
 
 
 def _map_response(response: List[Dict[str, Any]]) -> Dict[str, Any]:

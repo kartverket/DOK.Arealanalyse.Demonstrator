@@ -1,6 +1,10 @@
 from typing import Any, Dict
 
 
+class DatasetTooLargeError(Exception):
+    ...
+
+
 class InvalidDatasetError(Exception):
     ...
 

@@ -9,12 +9,12 @@ _API_URL = environ['PYGEOAPI_API_URL']
 
 async def analyze(payload: Dict[str, Any]) -> Dict[str, Any]:
     try:
-        async with get_session().post(_API_URL, json=payload) as response:
+        async with get_session().post(_API_URL, json=payload) as response:            
             if response.status == 404:
                 raise HttpError(404)
 
             body = await response.json()
-
+            
             if response.status >= 400:
                 raise HttpError(response.status, body)
 

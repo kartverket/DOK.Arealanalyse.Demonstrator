@@ -1,6 +1,7 @@
 from typing import Any, Dict
 from fastapi import APIRouter, HTTPException, status
 from ..services import pygeoapi
+from ..services.exceptions import HttpError
 
 router = APIRouter()
 
@@ -11,8 +12,16 @@ async def analyze(
 ) -> Dict[str, Any]:
     try:
         return await pygeoapi.analyze(payload)
-    except:
+    except HttpError as err:
+        detail = 'Kunne ikke kjøre DOK-analyse'
+        detail = f'{detail}: {err.body["description"]}' if err.body else detail
+
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail='Kunne ikke analysere'
+            status_code=err.status,
+            detail=detail
+        )
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail='Kunne ikke kjøre DOK-analyse. En unbehandlet feil har oppstått.'
         )

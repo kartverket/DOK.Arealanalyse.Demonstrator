@@ -138,6 +138,15 @@
     }
 
     &.notAnalyzed {
+        &.selected td {
+            background-color: #f2f4f780;
+            border-bottom-color: #babfc9;
+
+            &:first-child {
+                border-left-color: #babfc9;
+            }
+        }
+
         .status {
             background-color: #F2F4F7;
 

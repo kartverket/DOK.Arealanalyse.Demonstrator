@@ -66,7 +66,10 @@ export function filterResults(resultList, statusFilters, selectedThemes, searchT
 
     if (normalized !== '') {
         filtered = filtered
-            .filter(resultItem => resultItem.description.toLowerCase().includes(normalized));
+            .filter(resultItem => {
+                const title = resultItem.title ?? resultItem.datasetTitle ?? '';
+                return title.toLowerCase().includes(normalized);
+            });
     }
 
     return filtered;

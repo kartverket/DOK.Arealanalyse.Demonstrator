@@ -1,12 +1,12 @@
 import { useRef, useState } from 'react';
-import { useFetcher } from 'hooks';
+import { useGetEksemplerQuery } from 'store/api';
 import { Dropdown } from '@digdir/designsystemet-react';
 import { ChevronDownIcon, ChevronUpIcon } from '@navikt/aksel-icons';
 import styles from './SampleSelector.module.scss';
 
 export default function SampleSelector({ selectedSample, onSampleSelect }) {
     const [dropdownOpen, setDropdownOpen] = useState(false);
-    const { data: samples = [] } = useFetcher('/eksempler');
+    const { data: samples = [] } = useGetEksemplerQuery();
     const dropdownTriggerRef = useRef(null);
 
     function handleSampleSelect(sample) {

@@ -20,32 +20,15 @@ async def get_kommuner(
         )
 
 
-@router.get('/kommuner/plan')
-async def get_kommuner_for_plan(
-    response: Response
-) -> Dict[str, Any]:
-    response.headers['Cache-Control'] = 'public, max-age=86400'
-
-    try:
-        return await kommuner.get_kommuner_for_plan()
-    except:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail='Kunne ikke hente kommuner for plan'
-        )
-
-
-@router.get('/kommuner/{kommunenummer}')
-async def get_kommune_by_kommunenummer(
-    kommunenummer: str,
-    response: Response
+@router.get('/kommuner/punkt/{lon}/{lat}')
+async def get_kommune_by_point(
+    lon: float,
+    lat: float
 ) -> Dict[str, Any] | None:
-    response.headers['Cache-Control'] = 'public, max-age=86400'
-
     try:
-        return await kommuner.get_kommune_by_kommunenummer()
+        return await kommuner.get_kommune_by_point(lon, lat)
     except:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f'Kunne ikke hente kommune med kommunenummer {kommunenummer}'
+            detail=f'Kunne ikke finne kommune for punktet {lon}, {lat}'
         )

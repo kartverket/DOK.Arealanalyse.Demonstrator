@@ -40,9 +40,12 @@ export async function createMap({ geometry, bufferedGeometry, wmsUrl }) {
 
 export async function createAreaMap(geometry) {
     const layers = [
-        await createWmtsLayer(basemap.layers.topograatone),
-        createAreaFeaturesLayer(geometry)
+        await createWmtsLayer(basemap.layers.topograatone)
     ];
+
+    if (geometry !== null) {
+        layers.push(createAreaFeaturesLayer(geometry));
+    }
 
     const map = new OlMap({
         interactions: defaultInteractions().extend([new DragRotateAndZoom()]),
@@ -95,6 +98,32 @@ export async function createMapImage({ geometry, bufferedGeometry, wmtsLayer, wm
 export function getLayer(map, id) {
     return map.getLayers().getArray()
         .find(layer => layer.get('id') === id);
+}
+
+export async function getCurrentPosition() {
+    return new Promise(resolve => {
+        if ('geolocation' in navigator) {
+            const options = {
+                enableHighAccuracy: true,
+                timeout: 5000,
+                maximumAge: 0
+            };
+
+            navigator.geolocation.getCurrentPosition(
+                position => {
+                    resolve([position.coords.longitude, position.coords.latitude]);
+                },
+                error => {
+                    console.log(`Error (${error.code}): ${error.message}`);
+                    resolve(null);
+                },
+                options
+            );
+        } else {
+            console.log('Geolocation er ikke støttet');
+            resolve(null);
+        }
+    });
 }
 
 async function createTempMap(geometry, bufferedGeometry, wmtsLayer, wmsUrl, options) {

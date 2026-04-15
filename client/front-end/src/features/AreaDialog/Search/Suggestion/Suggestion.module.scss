@@ -1,19 +1,10 @@
 .label {
     display: flex;
-    gap: var(--ds-size-3);
+    flex-direction: column;
     align-items: flex-start;
     user-select: none;
     padding: var(--ds-size-2) var(--ds-size-3);
     border-inline-start: 5px solid transparent;
-
-    &>div {
-        display: flex;
-        flex-direction: column;
-    }
-
-    svg {
-        margin-top: 3px;
-    }
 
     .subTitle {
         font-size: 12px;

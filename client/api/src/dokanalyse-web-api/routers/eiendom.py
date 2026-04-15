@@ -4,6 +4,7 @@ from ..services import eiendom
 
 router = APIRouter()
 
+
 @router.post('/eiendom')
 async def get_eiendom(geometry: Dict[str, Any]) -> Dict[str, Any] | None:
     try:
