@@ -9,3 +9,5 @@ wheels/
 # Virtual environments
 .venv
 set_env.sh
+
+.env

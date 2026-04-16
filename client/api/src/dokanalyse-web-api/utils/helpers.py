@@ -1,7 +1,14 @@
 import math
 import locale
+from os import getenv
 
 locale.setlocale(locale.LC_ALL, 'nb_NO.UTF-8')
+
+
+def is_development() -> bool:
+    environment = getenv('ENVIRONMENT', '').strip().lower()
+
+    return environment == 'dev' or environment == 'development'
 
 
 def format_bytes(size_bytes: int | float) -> str:
@@ -23,4 +30,4 @@ def _format_no(value: float) -> str:
         return locale.format_string('%.15g', value, grouping=True)
 
 
-__all__ = ['format_bytes']
+__all__ = ['is_development', 'format_bytes']

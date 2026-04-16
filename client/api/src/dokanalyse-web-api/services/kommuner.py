@@ -40,7 +40,7 @@ async def get_kommune_by_point(lon: float, lat: float) -> Dict[str, Any] | None:
 @alru_cache(maxsize=None, ttl=_TTL)
 async def get_kommuner_for_plan() -> Dict[str, Any]:
     kommuner = await get_kommuner()
-    excluded = _get_excluded_kommuner()
+    excluded = _get_excluded_kommuner_for_plan()
     features = [feature for feature in kommuner['features']
                 if feature['properties']['kommunenummer'] not in excluded]
 
@@ -118,8 +118,8 @@ def _map_response(response: List[Dict[str, Any]]) -> Dict[str, Any]:
     }
 
 
-def _get_excluded_kommuner() -> List[str]:
-    to_exclude = os.getenv('EXCLUDED_KOMMUNER')
+def _get_excluded_kommuner_for_plan() -> List[str]:
+    to_exclude = os.getenv('EXCLUDED_KOMMUNER_PLAN')
 
     if not to_exclude:
         return []

@@ -9,6 +9,7 @@ from .routers import (dok_tema, eiendom, eksempler,
                       kommuner, omrade, pygeoapi, plan, sok)
 from .services.kommuner import get_and_cache_kommuner
 from .utils import session_registry
+from .utils.helpers import is_development
 
 locale.setlocale(locale.LC_COLLATE, 'nb_NO.UTF-8')
 
@@ -61,4 +62,4 @@ app.include_router(sok.router)
 
 if __name__ == '__main__':
     uvicorn.run('dokanalyse-web-api.main:app',
-                host='0.0.0.0', port=5001, reload=True)
+                host='0.0.0.0', port=5001, reload=is_development())

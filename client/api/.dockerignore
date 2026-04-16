@@ -1,7 +1,13 @@
+.env
 .venv
 .dockerignore
 .gitignore
 .python-version
 Dockerfile
-__pycache__
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
 set_env.sh
