@@ -1,0 +1,1 @@
+export const MAP_EPSG = 'EPSG:25833';

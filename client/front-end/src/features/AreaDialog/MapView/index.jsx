@@ -3,10 +3,13 @@ import { createAreaMap } from 'utils/map';
 import { setupMap } from './helpers';
 import { Zoom, ZoomToExtent } from 'components/Map';
 import styles from './MapView.module.scss';
+import { Editor } from 'features';
+import { useSelector } from 'react-redux';
 
 export default function MapView({ geometry, currentLocation }) {
     const [map, setMap] = useState(null);
     const mapElementRef = useRef(null);
+    const mapRendered = useSelector(state => state.app.mapRendered);
 
     useEffect(
         () => {
@@ -46,6 +49,13 @@ export default function MapView({ geometry, currentLocation }) {
                     <div className={styles.buttons}>
                         <Zoom map={map} />
                         <ZoomToExtent map={map} />
+                    </div>
+                )
+            }
+            {
+                mapRendered && (
+                    <div className={styles.editor}>
+                        <Editor map={map} />
                     </div>
                 )
             }

@@ -21,7 +21,8 @@ const initialState = {
     errorMessage: null,
     analyzisId: 0,
     busy: false,
-    factInfoOpen: false
+    factInfoOpen: false,
+    mapRendered: false
 };
 
 export const appSlice = createSlice({
@@ -80,6 +81,12 @@ export const appSlice = createSlice({
                 ...state,
                 factInfoOpen: action.payload
             };
+        },
+        setMapRendered: (state) => {
+            return {
+                ...state,
+                mapRendered: true
+            };
         }
     }
 });
@@ -92,7 +99,8 @@ export const {
     setToast,
     analyzeStart,
     analyzeFinish,
-    toggleFactInfo
+    toggleFactInfo,
+    setMapRendered
 } = appSlice.actions;
 
 export default appSlice.reducer;

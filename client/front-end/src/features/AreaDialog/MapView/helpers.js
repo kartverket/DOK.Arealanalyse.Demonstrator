@@ -10,7 +10,9 @@ export function setupMap(map, currentLocation) {
     let extent = getFeatureExtent(map);
 
     if (extent !== null) {
-        view.fit(extent, map.getSize());
+        // view.fit(extent, map.getSize());
+        view.fit(extent);
+        view.setZoom(16);
     } else {
         extent = getCurrentLocationExtent(currentLocation);
 
@@ -25,11 +27,14 @@ export function setupMap(map, currentLocation) {
 }
 
 function getFeatureExtent(map) {
-    const vectorLayer = getLayer(map, 'features');
+    const layer = getLayer(map, 'feature');
+    const source = layer.getSource();
 
-    return vectorLayer !== undefined ?
-        vectorLayer.getSource().getExtent() :
-        null;
+    if (source.getFeatures().length === 0) {
+        return null;
+    }
+
+    return source.getExtent();
 }
 
 function getCurrentLocationExtent(coordinates) {

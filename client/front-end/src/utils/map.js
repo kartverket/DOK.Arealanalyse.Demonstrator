@@ -1,16 +1,20 @@
-import { Feature, Map as OlMap, View } from 'ol';
-import GeoJSON from 'ol/format/GeoJSON';
+import { Map as OlMap, View } from 'ol';
 import TileLayer from 'ol/layer/Tile';
 import TileWMS from 'ol/source/TileWMS';
 import WMTS, { optionsFromCapabilities } from 'ol/source/WMTS';
 import { WMTSCapabilities } from 'ol/format';
-import VectorSource from 'ol/source/Vector';
-import { Vector as VectorLayer } from 'ol/layer';
 import { defaults as defaultInteractions, DragRotateAndZoom } from 'ol/interaction';
 import Style from 'ol/style/Style';
 import Stroke from 'ol/style/Stroke';
-import { getProjection } from './helpers';
 import basemap from 'config/basemap.config';
+import { Fill } from 'ol/style';
+import { createAreaFeatureLayer, createFeatureLayer } from './map/features';
+import SelectGeometry from 'features/Editor/SelectGeometry';
+import DrawPolygon from 'features/Editor/DrawPolygon';
+import DrawPolygonHole from 'features/Editor/DrawPolygonHole';
+import UndoRedo from 'features/Editor/UndoRedo';
+import store from 'store';
+import { setMapRendered } from 'store/slices/appSlice';
 
 const MAP_WIDTH = 720;
 const MAP_HEIGHT = 480;
@@ -21,7 +25,7 @@ export async function createMap({ geometry, bufferedGeometry, wmsUrl }) {
     const layers = [
         await createWmtsLayer(basemap.layers.topograatone),
         createWmsLayer(wmsUrl),
-        createFeaturesLayer(geometry, bufferedGeometry)
+        createFeatureLayer(geometry, bufferedGeometry)
     ];
 
     const map = new OlMap({
@@ -40,17 +44,28 @@ export async function createMap({ geometry, bufferedGeometry, wmsUrl }) {
 
 export async function createAreaMap(geometry) {
     const layers = [
-        await createWmtsLayer(basemap.layers.topograatone)
+        await createWmtsLayer(basemap.layers.topograatone),
+        createAreaFeatureLayer(geometry),
+        // createFeatureEditLayer()
     ];
 
-    if (geometry !== null) {
-        layers.push(createAreaFeaturesLayer(geometry));
-    }
+    // if (geometry !== null) {
+    //     layers.push(createAreaFeatureLayer(geometry));
+    // }
+
+    // layers.push(createFeatureEditLayer());
+
 
     const map = new OlMap({
         interactions: defaultInteractions().extend([new DragRotateAndZoom()]),
         layers
     });
+
+    map.once('loadend', () => {
+        addInteractions(map);
+        store.dispatch(setMapRendered());
+    })
+    
 
     map.setView(new View({
         padding: [50, 50, 50, 50],
@@ -61,10 +76,20 @@ export async function createAreaMap(geometry) {
     return map;
 }
 
+export function addInteractions(map) {
+   SelectGeometry.addInteraction(map);
+   DrawPolygon.addInteraction(map);
+   DrawPolygonHole.addInteraction(map);
+//    DrawLineString.addInteraction(map);
+//    ModifyGeometry.addInteraction(map);
+   UndoRedo.addInteraction(map);
+}
+
+
 export async function createFactInfoMap({ geometry, bufferedGeometry }) {
     const layers = [
         await createWmtsLayer(basemap.layers.topo),
-        createFeaturesLayer(geometry, bufferedGeometry)
+        createFeatureLayer(geometry, bufferedGeometry)
     ];
 
     const map = new OlMap({
@@ -97,37 +122,15 @@ export async function createMapImage({ geometry, bufferedGeometry, wmtsLayer, wm
 
 export function getLayer(map, id) {
     return map.getLayers().getArray()
-        .find(layer => layer.get('id') === id);
+        .find(layer => layer.get('id') === id) || null;
 }
 
-export async function getCurrentPosition() {
-    return new Promise(resolve => {
-        if ('geolocation' in navigator) {
-            const options = {
-                enableHighAccuracy: true,
-                timeout: 5000,
-                maximumAge: 0
-            };
-
-            navigator.geolocation.getCurrentPosition(
-                position => {
-                    resolve([position.coords.longitude, position.coords.latitude]);
-                },
-                error => {
-                    console.log(`Error (${error.code}): ${error.message}`);
-                    resolve(null);
-                },
-                options
-            );
-        } else {
-            console.log('Geolocation er ikke støttet');
-            resolve(null);
-        }
-    });
+export function getEditLayer(map) {
+    return getLayer(map, 'feature-edit');
 }
 
 async function createTempMap(geometry, bufferedGeometry, wmtsLayer, wmsUrl, options) {
-    const featuresLayer = createFeaturesLayer(geometry, bufferedGeometry);
+    const featuresLayer = createFeatureLayer(geometry, bufferedGeometry);
 
     const layers = [
         await createWmtsLayer(wmtsLayer)
@@ -165,43 +168,7 @@ async function createTempMap(geometry, bufferedGeometry, wmtsLayer, wmsUrl, opti
     return [map, mapElement];
 }
 
-function createFeaturesLayer(geometry, bufferedGeometry = null) {
-    const projection = getProjection(geometry);
-    const source = new VectorSource();
 
-    if (bufferedGeometry !== null) {
-        source.addFeature(createFeature(bufferedGeometry, projection, getBufferStyle()));
-    }
-
-    source.addFeature(createFeature(geometry, projection, getOutlineStyle()));
-
-    const vectorLayer = new VectorLayer({ source });
-    vectorLayer.set('id', 'features');
-
-    return vectorLayer;
-}
-
-function createAreaFeaturesLayer(geometry) {
-    const projection = getProjection(geometry);
-    const source = new VectorSource();
-
-    source.addFeature(createFeature(geometry, projection, getOutlineStyle()));
-
-    const vectorLayer = new VectorLayer({ source });
-    vectorLayer.set('id', 'features');
-
-    return vectorLayer;
-}
-
-function createFeature(geoJson, projection, style) {
-    const reader = new GeoJSON();
-    const geometry = reader.readGeometry(geoJson, { dataProjection: projection, featureProjection: 'EPSG:25833' });
-    const feature = new Feature(geometry);
-
-    feature.setStyle(style);
-
-    return feature;
-}
 
 async function createWmtsLayer(wmtsLayer) {
     const options = await getWmtsOptions(wmtsLayer);
@@ -306,9 +273,25 @@ function getOutlineStyle() {
         stroke: new Stroke({
             color: '#d33333',
             width: 4
+        }),
+        fill: new Fill({
+            color: 'transparent'
         })
     });
 }
+
+export function getEditStyle() {
+    return new Style({
+        stroke: new Stroke({
+            color: '#d33333',
+            width: 4
+        }),
+        fill: new Fill({
+            color: '#d333333d'
+        })
+    });
+}
+
 
 function getBufferStyle() {
     return new Style({

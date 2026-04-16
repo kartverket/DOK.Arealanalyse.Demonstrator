@@ -3,7 +3,7 @@ import styles from './ZoomToExtent.module.scss';
 
 export default function ZoomToExtent({ map }) {
     function zoomToExtent() {
-        const vectorLayer = getLayer(map, 'features');
+        const vectorLayer = getLayer(map, 'feature');
         const vectorSource = vectorLayer.getSource();
         const features = vectorSource.getFeatures();
 

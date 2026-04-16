@@ -2,23 +2,25 @@ import { useEffect, useState } from 'react';
 
 export default function useGeolocation() {
     const [coordinates, setCoordinates] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [resolved, setResolved] = useState(false);
 
     useEffect(
         () => {
+            const resolve = () => setResolved(true);
+
             if (!('geolocation' in navigator)) {
-                setLoading(false);
+                queueMicrotask(resolve);
                 return;
             }
 
             navigator.geolocation.getCurrentPosition(
                 position => {
                     setCoordinates([position.coords.longitude, position.coords.latitude]);
-                    setLoading(false);
+                    resolve();
                 },
                 () => {
                     setCoordinates(null);
-                    setLoading(false);
+                    resolve();
                 }
             );
         },
@@ -27,6 +29,6 @@ export default function useGeolocation() {
 
     return { 
         coordinates, 
-        loading 
+        loading: !resolved
     };
 }

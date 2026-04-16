@@ -1496,6 +1496,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@turf/union@npm:^7.3.4":
+  version: 7.3.4
+  resolution: "@turf/union@npm:7.3.4"
+  dependencies:
+    "@turf/helpers": "npm:7.3.4"
+    "@turf/meta": "npm:7.3.4"
+    "@types/geojson": "npm:^7946.0.10"
+    polyclip-ts: "npm:^0.16.8"
+    tslib: "npm:^2.8.1"
+  checksum: 10c0/44a6b3c5481d69791d4597e0912f5a25735311854b204948e4378f916e3925340be1ec491aff7e031d8ac2af562cf75a0700de086b2c3f5f708bbeb809f71168
+  languageName: node
+  linkType: hard
+
 "@types/estree@npm:1.0.8, @types/estree@npm:^1.0.0, @types/estree@npm:^1.0.6":
   version: 1.0.8
   resolution: "@types/estree@npm:1.0.8"
@@ -1827,6 +1840,13 @@ __metadata:
   bin:
     baseline-browser-mapping: dist/cli.cjs
   checksum: 10c0/da9c3ec0fcd7f325226a47d2142794d41706b6e0a405718a2c15410bbdb72aacadd65738bedef558c6f1b106ed19458cb25b06f63b66df2c284799905dbbd003
+  languageName: node
+  linkType: hard
+
+"bignumber.js@npm:^9.1.0":
+  version: 9.3.1
+  resolution: "bignumber.js@npm:9.3.1"
+  checksum: 10c0/61342ba5fe1c10887f0ecf5be02ff6709271481aff48631f86b4d37d55a99b87ce441cfd54df3d16d10ee07ceab7e272fc0be430c657ffafbbbf7b7d631efb75
   languageName: node
   linkType: hard
 
@@ -2201,6 +2221,7 @@ __metadata:
     "@reduxjs/toolkit": "npm:^2.11.2"
     "@turf/bbox": "npm:^7.3.3"
     "@turf/buffer": "npm:^7.3.4"
+    "@turf/union": "npm:^7.3.4"
     "@types/react": "npm:^19.2.10"
     "@types/react-dom": "npm:^19.2.3"
     "@vitejs/plugin-react-swc": "npm:^4.2.3"
@@ -2216,6 +2237,7 @@ __metadata:
     lodash.groupby: "npm:^4.6.0"
     marked: "npm:^17.0.1"
     ol: "npm:^10.8.0"
+    ol-ext: "npm:^4.0.38"
     pretty-print-json: "npm:^3.0.6"
     progressbar.js: "npm:^1.1.1"
     proj4: "npm:^2.20.2"
@@ -4086,6 +4108,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ol-ext@npm:^4.0.38":
+  version: 4.0.38
+  resolution: "ol-ext@npm:4.0.38"
+  peerDependencies:
+    ol: ">= 5.3.0"
+  checksum: 10c0/90115fc6e0e8689bf4caa0be2f460b4a37229a01151529efc8b0b9f5eb2cb974669f4c830d7704feba642fa71c918297889e6b433ef10467cd82a0f4165336be
+  languageName: node
+  linkType: hard
+
 "ol@npm:^10.8.0":
   version: 10.8.0
   resolution: "ol@npm:10.8.0"
@@ -4261,6 +4292,16 @@ __metadata:
   version: 4.0.7
   resolution: "pirates@npm:4.0.7"
   checksum: 10c0/a51f108dd811beb779d58a76864bbd49e239fa40c7984cd11596c75a121a8cc789f1c8971d8bb15f0dbf9d48b76c05bb62fcbce840f89b688c0fa64b37e8478a
+  languageName: node
+  linkType: hard
+
+"polyclip-ts@npm:^0.16.8":
+  version: 0.16.8
+  resolution: "polyclip-ts@npm:0.16.8"
+  dependencies:
+    bignumber.js: "npm:^9.1.0"
+    splaytree-ts: "npm:^1.0.2"
+  checksum: 10c0/8de02c32e566421875c70890fe6d3d7bd55a92fc39867446e65999e042c4632fb27ab1a7e106e96edd12d63b32a643f3a690d9a980aeda655a41ddf4e8750f5d
   languageName: node
   linkType: hard
 
@@ -5171,6 +5212,13 @@ __metadata:
   version: 1.2.1
   resolution: "source-map-js@npm:1.2.1"
   checksum: 10c0/7bda1fc4c197e3c6ff17de1b8b2c20e60af81b63a52cb32ec5a5d67a20a7d42651e2cb34ebe93833c5a2a084377e17455854fee3e21e7925c64a51b6a52b0faf
+  languageName: node
+  linkType: hard
+
+"splaytree-ts@npm:^1.0.2":
+  version: 1.0.2
+  resolution: "splaytree-ts@npm:1.0.2"
+  checksum: 10c0/4c34573891a749055ffe22381ea841ae03dbf7b55a3ea4a1d7df5013bfbe128e79f6c468579358ec573734cdbdf5f77a97ae7185f155248eb8be58151428c85e
   languageName: node
   linkType: hard
 

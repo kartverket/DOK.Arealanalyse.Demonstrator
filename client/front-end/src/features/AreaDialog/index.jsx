@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { api, apiFetch } from 'store/api';
 import { useCurrentLocation } from 'hooks';
 import { Button, Heading, Popover, Tabs } from '@digdir/designsystemet-react';
@@ -10,6 +11,7 @@ import Search from './Search';
 import AreaIcon from 'assets/gfx/icon-area.svg?react'
 import { QuestionmarkCircleFillIcon } from '@navikt/aksel-icons';
 import styles from './AreaDialog.module.scss';
+import { setFormData } from 'store/slices/appSlice';
 
 const DEFAULT_EPSG = 25833;
 
@@ -18,9 +20,10 @@ export default function AreaDialog({ onOk }) {
     const [selectedTab, setSelectedTab] = useState('map');
     const [selectedSample, setSelectedSample] = useState(null);
     const [title, setTitle] = useState(null);
-    const [geometry, setGeometry] = useState(null);
+    const geometry = useSelector(state => state.app.formData.inputGeometry);
     const currentLocation = useCurrentLocation();
-    
+    const dispatch = useDispatch();
+
     function ok() {
         setOpen(false)
         onOk(geometry);
@@ -42,7 +45,7 @@ export default function AreaDialog({ onOk }) {
             if (geoJson !== null) {
                 setSelectedSample(null);
                 setTitle(file.name);
-                setGeometry(geoJson);
+                dispatch(setFormData({ name: 'inputGeometry', value: geoJson }))
             }
         } catch (error) {
             console.log(error);
@@ -52,13 +55,13 @@ export default function AreaDialog({ onOk }) {
     function handleSampleSelected(sample) {
         setSelectedSample(sample)
         setTitle(sample.fileName);
-        setGeometry(sample.geoJson);
+        dispatch(setFormData({ name: 'inputGeometry', value: sample.geoJson }))
     }
 
     function handleSearchResponse(feature) {
         setSelectedSample(null);
         setTitle(feature.properties.tittel)
-        setGeometry(feature.geometry);
+        dispatch(setFormData({ name: 'inputGeometry', value: feature.geometry }))
     }
 
     function renderDialog() {
@@ -78,9 +81,9 @@ export default function AreaDialog({ onOk }) {
                 <div className={styles.content}>
                     <div className={styles.top}>
                         <div>
-                            <Search 
+                            <Search
                                 onResponse={handleSearchResponse}
-                                kommunenummer={currentLocation.kommunenummer}    
+                                kommunenummer={currentLocation.kommunenummer}
                             />
                         </div>
 
@@ -130,9 +133,9 @@ export default function AreaDialog({ onOk }) {
 
                         <Tabs.Panel value="map" className={styles.tabPanel}>
                             <div className={styles.map}>
-                                <MapView 
-                                    geometry={geometry} 
-                                    currentLocation={currentLocation.coordinates}    
+                                <MapView
+                                    geometry={geometry}
+                                    currentLocation={currentLocation.coordinates}
                                 />
                             </div>
                         </Tabs.Panel>
@@ -182,3 +185,127 @@ export default function AreaDialog({ onOk }) {
         </>
     );
 }
+
+const _geometry = {
+    "type": "MultiPolygon",
+    "coordinates": [
+        [
+            [
+                [
+                    196245.008,
+                    6562107.572
+                ],
+                [
+                    196229.591,
+                    6562103.926
+                ],
+                [
+                    196222.105,
+                    6562110.753
+                ],
+                [
+                    196199.112,
+                    6562159.204
+                ],
+                [
+                    196268.705,
+                    6562181.558
+                ],
+                [
+                    196265.603,
+                    6562198.885
+                ],
+                [
+                    196264.261,
+                    6562206.183
+                ],
+                [
+                    196273.401,
+                    6562215.36
+                ],
+                [
+                    196281.051,
+                    6562202.106
+                ],
+                [
+                    196285.908,
+                    6562182.168
+                ],
+                [
+                    196297.046,
+                    6562141.811
+                ],
+                [
+                    196276.525,
+                    6562135.399
+                ],
+                [
+                    196253.464,
+                    6562118.641
+                ],
+                [
+                    196245.008,
+                    6562107.572
+                ]
+            ]
+        ],
+        [
+            [
+                [
+                    196343.502,
+                    6562224.953
+                ],
+                [
+                    196344.651,
+                    6562222.869
+                ],
+                [
+                    196344.928,
+                    6562221.929
+                ],
+                [
+                    196345.622,
+                    6562219.926
+                ],
+                [
+                    196346.472,
+                    6562216.975
+                ],
+                [
+                    196347.067,
+                    6562215.554
+                ],
+                [
+                    196347.084,
+                    6562215.513
+                ],
+                [
+                    196345.606,
+                    6562214.842
+                ],
+                [
+                    196338.31,
+                    6562211.63
+                ],
+                [
+                    196334.274,
+                    6562220.829
+                ],
+                [
+                    196341.57,
+                    6562224.041
+                ],
+                [
+                    196343.502,
+                    6562224.953
+                ]
+            ]
+        ]
+    ],
+    "crs": {
+        "type": "name",
+        "properties": {
+            "name": "urn:ogc:def:crs:EPSG::25833"
+        }
+    }
+};

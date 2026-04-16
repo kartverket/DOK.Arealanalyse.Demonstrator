@@ -1,5 +1,6 @@
 export { default as AreaDialog } from './AreaDialog';
 export { default as Drawer } from './Drawer';
+export { default as Editor } from './Editor';
 export { default as FactInfo } from './FactInfo';
 export { default as Form } from './Form';
 export { default as MapDialog } from './MapDialog';
