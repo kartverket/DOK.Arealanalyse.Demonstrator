@@ -1,9 +1,8 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { useFetcher } from 'hooks';
+import { api, apiFetch, useGetDokTemaQuery } from 'store/api';
 import { resetProgress } from 'store/slices/progressSlice';
-import { analyzeStart, analyzeFinish, setFormData, setToast } from 'store/slices/appSlice';
+import { analyzeStart, analyzeFinish, setFormData } from 'store/slices/appSlice';
 import { setResponse, resetResponseState } from 'store/slices/responseSlice';
-import { analyze } from 'utils/api';
 import { createPayload, mapResponse } from './helpers';
 import { Button, Checkbox, Field, Input, Label, Select } from '@digdir/designsystemet-react';
 import { AreaDialog } from 'features';
@@ -14,7 +13,7 @@ export default function Form() {
     const correlationId = useSelector(state => state.app.correlationId);
     const formData = useSelector(state => state.app.formData);
     const busy = useSelector(state => state.app.busy);
-    const { data: themes = [] } = useFetcher('/dokthemes');
+    const { data: themes = [] } = useGetDokTemaQuery();
     const dispatch = useDispatch();
 
     function handleChange(event) {
@@ -46,11 +45,10 @@ export default function Form() {
 
         try {
             dispatch(analyzeStart());
-            const response = await analyze(payload);
+            const response = await apiFetch(api.endpoints.analyze, { payload });
             const mapped = mapResponse(response);
             dispatch(setResponse(mapped));
         } catch (error) {
-            dispatch(setToast({ message: 'Kunne ikke kjøre DOK-analyse. En feil har oppstått.' }));
             console.log(error);
         } finally {
             setTimeout(() => {

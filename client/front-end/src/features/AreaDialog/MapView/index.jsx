@@ -4,13 +4,13 @@ import { setupMap } from './helpers';
 import { Zoom, ZoomToExtent } from 'components/Map';
 import styles from './MapView.module.scss';
 
-export default function MapView({ geometry }) {
+export default function MapView({ geometry, currentLocation }) {
     const [map, setMap] = useState(null);
     const mapElementRef = useRef(null);
 
     useEffect(
         () => {
-            if (geometry === null) {
+            if (geometry === null && currentLocation === null) {
                 return;
             }
 
@@ -19,7 +19,7 @@ export default function MapView({ geometry }) {
                 setMap(olMap);
             })();
         },
-        [geometry]
+        [geometry, currentLocation]
     );
 
     useEffect(
@@ -29,13 +29,13 @@ export default function MapView({ geometry }) {
             }
 
             map.setTarget(mapElementRef.current);
-            setupMap(map);
+            setupMap(map, currentLocation);
 
             return () => {
                 map.dispose();
             }
         },
-        [map]
+        [map, currentLocation]
     );
 
     return (

@@ -1,0 +1,15 @@
+.errorBoundary {
+    margin: 18px auto;
+    border: 1px solid #E5E7EB;
+    border-radius: var(--ds-border-radius-lg);
+    padding: 24px;
+    width: fit-content;
+
+    h1 {
+        margin-bottom: var(--ds-size-3);
+    }
+
+    p {                
+        margin-bottom: var(--ds-size-6);
+    }
+}

@@ -1,6 +1,9 @@
 import proj4 from 'proj4';
 import { register } from 'ol/proj/proj4';
 
+proj4.defs('OGC:CRS84', '+proj=longlat +datum=WGS84 +no_defs +type=crs');
+proj4.defs('http://www.opengis.net/def/crs/OGC/1.3/CRS84', proj4.defs('OGC:CRS84'));
+
 proj4.defs('EPSG:3006', '+proj=utm +zone=33 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs');
 proj4.defs('http://www.opengis.net/def/crs/EPSG/0/3006', proj4.defs('EPSG:3006'));
 

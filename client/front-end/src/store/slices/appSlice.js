@@ -13,6 +13,10 @@ const initialState = {
         includeFacts: true,
         createBinaries: false
     },
+    currentLocation: {
+        coordinates: null,
+        kommunenummer: null
+    },
     toast: null,
     errorMessage: null,
     analyzisId: 0,
@@ -39,6 +43,12 @@ export const appSlice = createSlice({
                 }
             };
         },
+        setCurrentLocation: (state, action) => {
+            return {
+                ...state,
+                currentLocation: action.payload
+            };
+        },        
         setToast: (state, action) => {
             let toast = null;
 
@@ -77,6 +87,7 @@ export const appSlice = createSlice({
 export const {
     setCorrelationId,
     setFormData,
+    setCurrentLocation,
     setErrorMessage,
     setToast,
     analyzeStart,
