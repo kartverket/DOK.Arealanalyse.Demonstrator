@@ -1,28 +1,17 @@
-import { useMemo } from 'react';
-import { useGetKommuneByPointQuery } from 'store/api';
+
 import useGeolocation from './useGeolocation';
+import { useGetKommuneByPointQuery } from 'store/api';
+import { skipToken } from '@reduxjs/toolkit/query';
 
 export default function useCurrentLocation() {
-    const coordinates = useGeolocation();
-    const { data: kommune } = useGetKommuneByPointQuery({ coordinates }, { skip: coordinates === undefined });
-
-    const currentLocation = useMemo(
-        () => {
-            if (coordinates === undefined || kommune === undefined) {
-                return null;
-            }
-
-            const kommunenummer = kommune !== null ? 
-                kommune.properties.kommunenummer : 
-                null;
-
-            return {
-                coordinates,
-                kommunenummer
-            };
-        },
-        [coordinates, kommune]
-    );
-
-    return currentLocation
+    const { coordinates, loading: geoLoading } = useGeolocation();
+    const queryArg = coordinates ? { coordinates } : skipToken;
+    const { data, error, isLoading: apiLoading } = useGetKommuneByPointQuery(queryArg);
+    
+    return {
+        coordinates,
+        kommunenummer: data?.properties.kommunenummer ?? null,
+        loading: geoLoading || apiLoading,
+        error: error ?? null
+    };
 }

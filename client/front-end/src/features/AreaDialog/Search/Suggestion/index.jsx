@@ -58,14 +58,9 @@ export default function Suggestion({ kommunenummer, onSelected }) {
             case 'Vegadresse':
                 return (
                     <>
-                        <div>
-                            <span>{props.data.adressetekst}</span>
-                            <span className={styles.subTitle}>{props.data.matrikkelnummer}</span>
-                            <span className={styles.type}>{type}</span>
-                        </div>
-                        <Button variant="tertiary" icon>
-                            <ZoomPlusIcon />
-                        </Button>
+                        <span>{props.data.adressetekst}</span>
+                        <span className={styles.subTitle}>{props.data.matrikkelnummer}</span>
+                        <span className={styles.type}>{type}</span>
                     </>
                 );
             case 'Reguleringsplan':

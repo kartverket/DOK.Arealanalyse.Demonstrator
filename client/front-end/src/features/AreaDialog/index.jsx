@@ -20,7 +20,7 @@ export default function AreaDialog({ onOk }) {
     const [title, setTitle] = useState(null);
     const [geometry, setGeometry] = useState(null);
     const currentLocation = useCurrentLocation();
-
+    
     function ok() {
         setOpen(false)
         onOk(geometry);
@@ -62,7 +62,7 @@ export default function AreaDialog({ onOk }) {
     }
 
     function renderDialog() {
-        if (currentLocation === null) {
+        if (currentLocation.loading) {
             return null;
         }
 

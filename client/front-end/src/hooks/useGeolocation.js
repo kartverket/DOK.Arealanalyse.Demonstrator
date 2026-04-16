@@ -1,19 +1,32 @@
 import { useEffect, useState } from 'react';
-import { getCurrentPosition } from 'utils/map';
 
 export default function useGeolocation() {
-    const [coordinates, setCoordinates] = useState();
+    const [coordinates, setCoordinates] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(
         () => {
-            (async () => {
-                const position = await getCurrentPosition();
-                setCoordinates(position);
-            })();
+            if (!('geolocation' in navigator)) {
+                setLoading(false);
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                position => {
+                    setCoordinates([position.coords.longitude, position.coords.latitude]);
+                    setLoading(false);
+                },
+                () => {
+                    setCoordinates(null);
+                    setLoading(false);
+                }
+            );
         },
         []
     );
 
-    return coordinates;
+    return { 
+        coordinates, 
+        loading 
+    };
 }
-
