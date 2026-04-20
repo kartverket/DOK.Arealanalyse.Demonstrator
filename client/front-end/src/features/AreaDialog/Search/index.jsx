@@ -1,12 +1,15 @@
 import { useMemo, useState } from 'react';
 import { useGetKommunerQuery } from 'store/api';
+import { useCurrentLocation } from 'hooks';
 import { Field, Label, Select } from '@digdir/designsystemet-react';
 import Suggestion from './Suggestion';
 import styles from './Search.module.scss';
 
-export default function Search({ onResponse, kommunenummer }) {
-    const [selectedKommune, setSelectedKommune] = useState(kommunenummer ?? '');
-    const { data = null } = useGetKommunerQuery();    
+export default function Search({ onResponse }) {
+    const { data = null } = useGetKommunerQuery();
+    const [selectedKommunenummer, setSelectedKommunenummer] = useState(null);
+    const { kommunenummer: currentKommunenummer } = useCurrentLocation();
+    const kommunenummer = selectedKommunenummer || currentKommunenummer || '';
 
     const kommuner = useMemo(
         () => {
@@ -14,26 +17,23 @@ export default function Search({ onResponse, kommunenummer }) {
                 return [];
             }
 
-            return data.features.map(({ properties }) => ({
-                value: properties.kommunenummer,
-                label: `${properties.kommunenavn} (${properties.kommunenummer})`
-            }))
+            return data.features
+                .map(({ properties }) => ({
+                    value: properties.kommunenummer,
+                    label: `${properties.kommunenavn} (${properties.kommunenummer})`
+                }));
         },
         [data]
-    )
-
-    async function handleKommuneChange(event) {
-        const kommunenummer = event.target.value;
-        setSelectedKommune(kommunenummer);
-    }
+    );
 
     return (
         <div className={styles.search}>
             <Field>
                 <Label>Kommune</Label>
+
                 <Select
-                    value={selectedKommune}
-                    onChange={handleKommuneChange}
+                    value={kommunenummer}
+                    onChange={event => setSelectedKommunenummer(event.target.value)}
                 >
                     <Select.Option value="">Velg kommune</Select.Option>
                     {
@@ -53,7 +53,7 @@ export default function Search({ onResponse, kommunenummer }) {
                 <Label>Plan-ID, matrikkelnummer eller adresse</Label>
 
                 <Suggestion
-                    kommunenummer={selectedKommune}
+                    kommunenummer={kommunenummer}
                     onSelected={onResponse}
                 />
             </Field>

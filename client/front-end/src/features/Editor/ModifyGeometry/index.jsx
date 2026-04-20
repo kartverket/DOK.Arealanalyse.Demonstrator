@@ -1,62 +1,38 @@
-import { useEffect, useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
-// import { GeometryType } from 'context/MapProvider/helpers/constants';
-import { createModifyGeometryStyle, GeometryType } from '../helpers';
-import ModifyFeature from 'ol-ext/interaction/ModifyFeature';
+import { useEffect, useRef } from 'react';
+import { getInteraction } from 'utils/map/interactions';
+import { interactionType } from 'utils/map/constants';
+import { Button } from '@digdir/designsystemet-react';
+import ModifyPolgyonIcon from 'assets/gfx/icon-polygon-modify.svg?react';
 import styles from '../Editor.module.scss';
-import { getLayer } from 'utils/map';
-import { getFeaturesLayer, getInteraction } from 'utils/map/helpers';
 
 export default function ModifyGeometry({ map, active, onClick }) {
-    const interactionRef = useRef(getInteraction(map, ModifyGeometry.name));
-    const [_active, setActive] = useState(false);
-    // const featuresSelected = useSelector(
-    //     (state) => state.map.editor.featuresSelected
-    // );
-    const geomType = GeometryType.Polygon // useSelector((state) => state.geomEditor.geomType);
+    const interactionRef = useRef(getInteraction(map, interactionType.ModifyGeometry));
+    const isActive = active === interactionType.ModifyGeometry;
 
-    useEffect(() => {
-        interactionRef.current.setActive(active === ModifyGeometry.name);
-        setActive(active === ModifyGeometry.name);
-    }, [active]);
+    useEffect(
+        () => {
+            interactionRef.current.setActive(isActive);
+        },
+        [isActive]
+    );
 
     function toggle() {
-        onClick(!_active ? ModifyGeometry.name : null);
+        onClick(!isActive ? interactionType.ModifyGeometry : null);
     }
 
     return (
-        <button
-            className={`${geomType === GeometryType.Polygon
-                    ? styles.modifyPolygon
-                    : styles.modifyLineString
-                } ${_active ? styles.active : ''}`}
+        <Button
+            icon
             onClick={toggle}
-            title='Endre geometri'
-            // disabled={featuresSelected}
+            title="Endre geometri"
+            variant="tertiary"
+            className={isActive ? styles.active : ''}
         >
-            Endre geometri
-        </button>
-    );
+            <ModifyPolgyonIcon 
+                width="22" 
+                height="22" 
+                aria-hidden 
+            />
+        </Button>        
+    );    
 }
-
-ModifyGeometry.addInteraction = (map) => {
-    if (getInteraction(map, ModifyGeometry.name) !== null) {
-        return;
-    }
-
-    const vectorLayer = getFeaturesLayer(map);
-
-    // const vectorLayer = getEditLayer(map);
-    // if (!vectorLayer) return;
-    // const source = getVectorSource(vectorLayer);
-
-    const interaction = new ModifyFeature({
-        source: vectorLayer.getSource(),
-        style: createModifyGeometryStyle(),
-    });
-
-    interaction.set('_name', ModifyGeometry.name);
-    interaction.setActive(false);
-
-    map.addInteraction(interaction);
-};

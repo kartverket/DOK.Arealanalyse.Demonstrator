@@ -53,4 +53,14 @@ export function createDrawStyle() {
     });
 }
 
+export function createModifyStyle() {
+    return new Style({
+        image: new CircleStyle({
+            radius: 9,
+            fill: new Fill({
+                color: '#d33333'
+            })
+        })
+    });
+}
 

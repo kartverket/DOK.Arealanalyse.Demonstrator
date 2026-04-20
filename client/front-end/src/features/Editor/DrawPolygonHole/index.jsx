@@ -1,42 +1,38 @@
-import { useRef } from 'react';
-import { getFeaturesLayer, getInteraction } from 'utils/map/helpers';
-import { createDrawStyle } from 'utils/map/styles';
-import DrawHole from 'ol-ext/interaction/DrawHole';
+import { useEffect, useRef } from 'react';
+import { getInteraction } from 'utils/map/helpers';
+import { interactionType } from 'utils/map/constants';
+import { Button } from '@digdir/designsystemet-react';
+import PolgyonHoleIcon from 'assets/gfx/icon-polygon-hole.svg?react';
 import styles from '../Editor.module.scss';
 
 export default function DrawPolygonHole({ map, active, onClick }) {
-    const interactionRef = useRef(getInteraction(map, DrawPolygonHole.name));
-    const isActive = active === DrawPolygonHole.name;
+    const interactionRef = useRef(getInteraction(map, interactionType.DrawPolygonHole));
+    const isActive = active === interactionType.DrawPolygonHole;
 
-    interactionRef.current.setActive(isActive);
+    useEffect(
+        () => {
+            interactionRef.current.setActive(isActive);
+        },
+        [isActive]
+    );
 
     function toggle() {
-        onClick(!isActive ? DrawPolygonHole.name : null);
+        onClick(!isActive ? interactionType.DrawPolygonHole : null);
     }
 
     return (
-        <button
-            className={`${styles.polygonHole} ${isActive ? styles.active : ''}`}
+        <Button
+            icon
             onClick={toggle}
-            title='Legg til hull'
-        >Hull</button>
+            title="Legg til hull"
+            variant="tertiary"
+            className={isActive ? styles.active : ''}
+        >
+            <PolgyonHoleIcon 
+                width="22" 
+                height="22" 
+                aria-hidden 
+            />
+        </Button>        
     );
 }
-
-DrawPolygonHole.addInteraction = (map) => {
-    if (getInteraction(map, DrawPolygonHole.name) !== null) {
-        return;
-    }
-
-    const vectorLayer = getFeaturesLayer(map);
-
-    const interaction = new DrawHole({
-        layers: [vectorLayer],
-        style: createDrawStyle(),
-    });
-
-    interaction.set('_name', DrawPolygonHole.name);
-    interaction.setActive(false);
-
-    map.addInteraction(interaction);
-};

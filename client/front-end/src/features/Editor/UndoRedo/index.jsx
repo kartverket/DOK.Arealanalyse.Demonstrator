@@ -1,11 +1,13 @@
 import { useRef } from 'react';
-import _UndoRedo from 'ol-ext/interaction/UndoRedo';
-import styles from '../Editor.module.scss';
-import { getEditLayer } from 'utils/map';
-import { getFeature, getInteraction, readGeometry } from 'utils/map/helpers';
+import { useSelector } from 'react-redux';
+import { getInteraction } from 'utils/map/helpers';
+import { interactionType } from 'utils/map/constants';
+import { Button } from '@digdir/designsystemet-react';
+import { ArrowRedoIcon, ArrowUndoIcon } from '@navikt/aksel-icons';
 
 export default function UndoRedo({ map }) {
-    const interactionRef = useRef(getInteraction(map, UndoRedo.name));
+    const interactionRef = useRef(getInteraction(map, interactionType.UndoRedo));
+    const undoRedo = useSelector(state => state.areaMap.undoRedo);
 
     function undo() {
         interactionRef.current.undo();
@@ -17,52 +19,35 @@ export default function UndoRedo({ map }) {
 
     return (
         <>
-            <button className={styles.undo} onClick={undo} title='Angre'></button>
-            <button
-                className={styles.redo}
+            <Button
+                icon
+                onClick={undo}
+                title="Angre"
+                variant="tertiary"
+                disabled={!undoRedo.hasUndo}
+            >
+                <ArrowUndoIcon
+                    width="22"
+                    height="22"
+                    color="#000000"
+                    aria-hidden
+                />
+            </Button>
+
+            <Button
+                icon
                 onClick={redo}
-                title='Gjør om'
-            ></button>
+                title="Gjør om"
+                variant="tertiary"
+                disabled={!undoRedo.hasRedo}                
+            >
+                <ArrowRedoIcon
+                    width="22"
+                    height="22"
+                    color="#000000"
+                    aria-hidden
+                />
+            </Button>
         </>
     );
-}
-
-UndoRedo.addInteraction = (map) => {
-    if (getInteraction(map, UndoRedo.name) !== null) {
-        return;
-    }
-
-    const vectorLayer = getEditLayer(map);
-
-    const interaction = new _UndoRedo({
-        layers: [vectorLayer],
-    });
-
-    addCustomUndoRedo(interaction, map);
-
-    interaction.set('_name', UndoRedo.name);
-    interaction.setActive(true);
-
-    map.addInteraction(interaction);
-};
-
-function addCustomUndoRedo(interaction, map) {
-    let _geometry;
-
-    interaction.define(
-        'replaceGeometry',
-        (event) => {
-            _geometry = event.before;
-        },
-        (event) => {
-            _geometry = event.after;
-        }
-    );
-
-    interaction.on(['undo', 'redo'], (event) => {
-        if (event.action.type === 'replaceGeometry') {
-            const feature = getFeature(map);
-            feature.setGeometry(readGeometry(_geometry));
-        }
-    });
 }

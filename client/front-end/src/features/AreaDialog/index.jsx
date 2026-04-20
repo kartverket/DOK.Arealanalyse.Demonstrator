@@ -1,9 +1,8 @@
-import { useMemo, useRef, useState } from 'react';
+import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { api, apiFetch } from 'store/api';
-import { useCurrentLocation } from 'hooks';
 import { Button, Heading, Popover, Tabs } from '@digdir/designsystemet-react';
-import { Dialog, FilePicker } from 'components';
+import { Dialog, FilePicker, FileUpload } from 'components';
 import GeoJson from './GeoJson';
 import MapView from './MapView';
 import SampleSelector from './SampleSelector';
@@ -20,8 +19,7 @@ export default function AreaDialog({ onOk }) {
     const [selectedTab, setSelectedTab] = useState('map');
     const [selectedSample, setSelectedSample] = useState(null);
     const [title, setTitle] = useState(null);
-    const geometry = useSelector(state => state.app.formData.inputGeometry);
-    const currentLocation = useCurrentLocation();
+    const geometry = _geometry; // useSelector(state => state.app.formData.inputGeometry);
     const dispatch = useDispatch();
 
     function ok() {
@@ -65,10 +63,6 @@ export default function AreaDialog({ onOk }) {
     }
 
     function renderDialog() {
-        if (currentLocation.loading) {
-            return null;
-        }
-
         return (
             <Dialog
                 open={open}
@@ -83,7 +77,6 @@ export default function AreaDialog({ onOk }) {
                         <div>
                             <Search
                                 onResponse={handleSearchResponse}
-                                kommunenummer={currentLocation.kommunenummer}
                             />
                         </div>
 
@@ -133,9 +126,44 @@ export default function AreaDialog({ onOk }) {
 
                         <Tabs.Panel value="map" className={styles.tabPanel}>
                             <div className={styles.map}>
+                                <div className={styles.addArea}>
+                                    <Heading level={3}>Legg til område</Heading>
+
+                                    <Tabs defaultValue="upload">
+                                        <Tabs.List>
+                                            <Tabs.Tab value="search">Søk</Tabs.Tab>
+                                            <Tabs.Tab value="upload">Last opp</Tabs.Tab>
+                                            <Tabs.Tab value="draw">Tegn</Tabs.Tab>
+                                            <Tabs.Tab value="samples">Eksempler</Tabs.Tab>
+                                        </Tabs.List>
+
+                                        <Tabs.Panel value="search">
+                                            <Search
+                                                onResponse={handleSearchResponse}
+                                            />
+                                        </Tabs.Panel>
+                                        <Tabs.Panel value="upload">
+                                            <div className={styles.panel}>
+                                                <FileUpload
+                                                    onFileSelected={handleFileSelected}
+                                                />
+                                            </div>
+                                        </Tabs.Panel>
+                                        <Tabs.Panel>Tegn</Tabs.Panel>
+                                        <Tabs.Panel>
+                                            <div className={styles.panel}>
+                                                <SampleSelector
+                                                    selectedSample={selectedSample}
+                                                    onSampleSelect={handleSampleSelected}
+                                                />
+                                            </div>
+                                        </Tabs.Panel>
+                                    </Tabs>
+                                </div>
+
                                 <MapView
+                                    dialogOpen={open}
                                     geometry={geometry}
-                                    currentLocation={currentLocation.coordinates}
                                 />
                             </div>
                         </Tabs.Panel>
@@ -170,7 +198,6 @@ export default function AreaDialog({ onOk }) {
         <>
             <Button
                 onClick={() => setOpen(true)}
-                disabled={currentLocation === null}
                 variant="secondary"
             >
                 <AreaIcon

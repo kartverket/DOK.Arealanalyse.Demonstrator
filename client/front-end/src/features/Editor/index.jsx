@@ -1,108 +1,39 @@
-import { useEffect, useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
-// import DeleteGeometry from './DeleteGeometry';
+import { useEffect, useState } from 'react';
+import DeleteGeometry from './DeleteGeometry';
 import DrawPolygon from './DrawPolygon';
 import DrawPolygonHole from './DrawPolygonHole';
-// import DrawLineString from './DrawLineString';
 import ModifyGeometry from './ModifyGeometry';
 import SelectGeometry from './SelectGeometry';
 import UndoRedo from './UndoRedo';
 import styles from './Editor.module.scss';
-import { GeometryType } from './helpers';
-import { getEditLayer, getLayer } from 'utils/map';
-import { getFeature, getFeaturesLayer, getInteraction, writeGeometryObject } from 'utils/map/helpers';
-import { createFeature, setFeature } from 'utils/map/features';
-import DeleteGeometry from './DeleteGeometry';
-import { polygon as createPolygon } from '@turf/helpers';
-import { MAP_EPSG } from 'utils/map/constants';
+import { getInteraction, writeGeometryObject } from 'utils/map/helpers';
+import { interactionType, MAP_EPSG } from 'utils/map/constants';
+import { useDispatch } from 'react-redux';
+import { setUndoRedo } from 'store/slices/areaMapSlice';
 
 export default function Editor({ map }) {
     const [active, setActive] = useState(null);
-    const geomType = GeometryType.Polygon
-    // const geomType = useSelector((state) => state.geomEditor.geomType);
+    const dispatch = useDispatch();
 
-    // useEffect(
-    //     () => {
-    //         if (map === null) {
-    //             return;
-    //         }
+    useEffect(
+        () => {
+            if (map === null) {
+                return;
+            }
 
-    //         const undoRedoInteraction = getInteraction(map, UndoRedo.name);
-    //         undoRedoInteraction.clear();
-    //     },
-    //     [map]
-    // );
+            const undoRedoInteraction = getInteraction(map, UndoRedo.name);
+            undoRedoInteraction.clear();
+        },
+        [map]
+    );
 
-    // useEffect(
-    //     () => {
-    //         if (map === null) {
-    //             return;
-    //         }
-
-    //         if (geomType === GeometryType.Polygon) {
-    //             setActive(DrawPolygon.name);
-    //         } else {
-    //             setActive(null);
-    //         }
-
-    //         const undoRedoInteraction = getInteraction(map, UndoRedo.name);
-    //         undoRedoInteraction.clear();
-    //     },
-    //     [geomType, map]
-    // );
-
-    // const initRef = useRef(true);
-
-    // useEffect(
-    //     () => {
-    //         if (map === null || !initRef.current) {
-    //             return;
-    //         }
-
-    //         initRef.current = false;
-    //         const featuresLayer = getFeaturesLayer(map);
-    //         featuresLayer.setVisible(false);
-
-    //         const features = featuresLayer.getSource().getFeatures();
-
-    //         if (!features.length) {
-    //             return;
-    //         }
-
-    //         const editLayer = getEditLayer(map);
-    //         editLayer.getSource().addFeature(features[0]);
-    //     },
-    //     [map]
-    // )
 
     const [editMode, setEditMode] = useState(false);
 
     function toggleEditMode() {
         setEditMode(!editMode);
 
-        // const layer = getLayer(map, 'feature');
-        // const source = layer.getSource();
-        // const feature = source.getFeatures()[0];
-        // const geometry = feature?.getGeometry();
-
-        // if (geometry === null || geometry.getType() !== GeometryType.MultiPolygon) {
-        //     return;
-        // }
-
-        // source.clear();
-
-        // const geoJson = writeGeometryObject(geometry);
-        // const features = [];
-
-        // geoJson.coordinates.forEach(coords => {
-        //     const polygon = createPolygon(coords);
-        //     features.push(createFeature(polygon.geometry, MAP_EPSG));
-        // });
-
-        // source.addFeatures(features);
-
-        const undoRedoInteraction = getInteraction(map, UndoRedo.name);
-
+        const undoRedoInteraction = getInteraction(map, interactionType.UndoRedo);
         undoRedoInteraction.clear();
     }
 
@@ -117,7 +48,6 @@ export default function Editor({ map }) {
     return (
         <div
             className={styles.editor}
-            style={{ display: geomType !== null ? 'flex' : 'none' }}
         >
             <button onClick={toggleEditMode} style={{ background: editMode ? 'green' : 'none' }}>
                 Rediger
@@ -144,35 +74,11 @@ export default function Editor({ map }) {
                             onClick={handleClick}
                         />
 
-                        {/* 
-         <div
-            style={{
-               display: geomType === GeometryType.Polygon ? 'flex' : 'none',
-            }}
-         >
-            <DrawPolygon map={map} active={active} onClick={handleClick} />
-            <DrawPolygonHole map={map} active={active} onClick={handleClick} />
-         </div>
-
-         <div
-            style={{
-               display: geomType === GeometryType.LineString ? 'flex' : 'none',
-            }}
-         >
-            <DrawLineString map={map} active={active} onClick={handleClick} />
-         </div>*/}
-
-                        {/* <ModifyGeometry
-                map={map}
-                active={active}
-                onClick={handleClick}
-            /> */}
-
-                        {/* <div className={styles.separator} />
-
-         
-
-         <div className={styles.separator} /> */}
+                        <ModifyGeometry
+                            map={map}
+                            active={active}
+                            onClick={handleClick}
+                        />
 
                         <UndoRedo map={map} />
 
@@ -180,7 +86,6 @@ export default function Editor({ map }) {
                     </>
                 )
             }
-
         </div>
     );
 }

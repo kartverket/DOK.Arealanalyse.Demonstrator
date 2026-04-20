@@ -1,5 +1,5 @@
 .areaDialog {
-    width: calc(var(--page-width) * 0.75);
+    width: calc(var(--page-width) * 0.9);
     max-width: none;
     max-height: none;
 
@@ -71,4 +71,26 @@
 .buttons {
     display: flex;
     gap: 12px;
+}
+
+.addArea {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 17px;
+    z-index: 9;
+    background: white;
+    left: 17px;
+    border-radius: 14px;
+
+    h3 {
+        font-size: 16px;
+        margin-bottom: 6px;
+        padding: 12px;
+    }
+
+    .panel {
+        display: flex;
+        flex-direction: column;
+    }
 }

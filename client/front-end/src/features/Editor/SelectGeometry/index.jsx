@@ -1,49 +1,43 @@
-import { useRef } from 'react';
-import { Select } from 'ol/interaction';
-import { getLayer } from 'utils/map';
+import { useEffect, useRef } from 'react';
 import { getInteraction } from 'utils/map/helpers';
-import { createEditStyle } from 'utils/map/styles';
+import { interactionType } from 'utils/map/constants';
+import { Button } from '@digdir/designsystemet-react';
+import MouseArrowIcon from 'assets/gfx/icon-mouse-arrow.svg?react';
 import styles from '../Editor.module.scss';
 
 export default function SelectGeometry({ map, active, onClick }) {
-    const interactionRef = useRef(getInteraction(map, SelectGeometry.name));
-    const isActive = active === SelectGeometry.name;
+    const interactionRef = useRef(getInteraction(map, interactionType.SelectGeometry));
+    const isActive = active === interactionType.SelectGeometry;
 
-    interactionRef.current.setActive(isActive);
+    useEffect(
+        () => {
+            interactionRef.current.setActive(isActive);
 
-    if (!isActive) {
-        interactionRef.current.getFeatures().clear();
-    }
+            if (!isActive) {
+                interactionRef.current.getFeatures().clear();
+            }
+        },
+        [isActive]
+    );
 
     function toggle() {
-        onClick(!isActive ? SelectGeometry.name : null);
+        onClick(!isActive ? interactionType.SelectGeometry : null);
     }
 
     return (
-        <button
-            className={`${styles.select} ${active ? styles.active : ''}`}
+        <Button
+            icon
             onClick={toggle}
-            title='Velg geometri'
+            title="Velg geometri"
+            variant="tertiary"
+            className={isActive ? styles.active : ''}
         >
-            Velg geometri
-        </button>
+            <MouseArrowIcon
+                width="16"
+                height="16"
+                color="#000000"
+                aria-hidden
+            />
+        </Button>
     );
 }
-
-SelectGeometry.addInteraction = (map) => {
-    if (getInteraction(map, SelectGeometry.name) !== null) {
-        return;
-    }
-
-    const layer = getLayer(map, 'feature');
-
-    const interaction = new Select({
-        layers: [layer],
-        style: createEditStyle()
-    });
-
-    interaction.set('_name', SelectGeometry.name);
-    interaction.setActive(false);
-
-    map.addInteraction(interaction);
-};

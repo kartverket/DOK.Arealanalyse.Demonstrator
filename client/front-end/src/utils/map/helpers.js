@@ -15,10 +15,10 @@ export function getEditLayer(map) {
     return getLayer(map, 'features-edit');
 }
 
-export function getFeature(map) {
-    const layer = getFeaturesLayer(map);
+export function getFeature(map, layerId) {
+    const layer = getLayer(map, layerId);
 
-    return layer.getSource().getFeatures()[0] || null;
+    return layer?.getSource().getFeatures()[0] || null;
 }
 
 export function getProjection(geometry) {
@@ -121,6 +121,23 @@ export function writeGeometryObject(geometry, options = {}) {
     }
 
     return new GeoJSON().writeGeometryObject(geometry, geoJsonOptions);
+}
+
+export async function getCurrentLocation() {
+    return new Promise((resolve) => {
+        if (!('geolocation' in navigator)) {
+            resolve(null);
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            position => {
+                resolve([position.coords.longitude, position.coords.latitude]);
+            },
+            () => {
+                resolve(null);
+            }
+        );
+    });
 }
 
 export function getInteraction(map, name) {

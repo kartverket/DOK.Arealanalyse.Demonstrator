@@ -9,12 +9,9 @@ import Stroke from 'ol/style/Stroke';
 import basemap from 'config/basemap.config';
 import { Fill } from 'ol/style';
 import { createAreaFeatureLayer, createFeatureLayer } from './map/features';
-import SelectGeometry from 'features/Editor/SelectGeometry';
-import DrawPolygon from 'features/Editor/DrawPolygon';
-import DrawPolygonHole from 'features/Editor/DrawPolygonHole';
-import UndoRedo from 'features/Editor/UndoRedo';
 import store from 'store';
 import { setMapRendered } from 'store/slices/appSlice';
+import { addInteractions } from './map/interactions';
 
 const MAP_WIDTH = 720;
 const MAP_HEIGHT = 480;
@@ -42,6 +39,14 @@ export async function createMap({ geometry, bufferedGeometry, wmsUrl }) {
     return map;
 }
 
+function createMapElement() {
+    const mapElement = document.createElement('div');
+    Object.assign(mapElement.style, { position: 'absolute', top: '-9999px', left: '-9999px', width: `1102px`, height: `485px` });
+    document.getElementsByTagName('body')[0].appendChild(mapElement);
+
+    return mapElement;
+}
+
 export async function createAreaMap(geometry) {
     const layers = [
         await createWmtsLayer(basemap.layers.topograatone),
@@ -61,11 +66,10 @@ export async function createAreaMap(geometry) {
         layers
     });
 
-    map.once('loadend', () => {
-        addInteractions(map);
-        store.dispatch(setMapRendered());
-    })
-    
+    // map.once('loadend', () => {
+    //     addInteractions(map);
+    //     store.dispatch(setMapRendered());
+    // })
 
     map.setView(new View({
         padding: [50, 50, 50, 50],
@@ -73,18 +77,13 @@ export async function createAreaMap(geometry) {
         maxZoom: basemap.maxZoom
     }));
 
+    const mapElement = createMapElement();
+    map.setTarget(mapElement);
+
+    addInteractions(map)
+
     return map;
 }
-
-export function addInteractions(map) {
-   SelectGeometry.addInteraction(map);
-   DrawPolygon.addInteraction(map);
-   DrawPolygonHole.addInteraction(map);
-//    DrawLineString.addInteraction(map);
-//    ModifyGeometry.addInteraction(map);
-   UndoRedo.addInteraction(map);
-}
-
 
 export async function createFactInfoMap({ geometry, bufferedGeometry }) {
     const layers = [

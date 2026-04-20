@@ -1,35 +1,54 @@
+import { useSelector } from 'react-redux';
 import { getInteraction, writeGeometryObject } from 'utils/map/helpers';
-import styles from '../Editor.module.scss';
-import SelectGeometry from '../SelectGeometry';
-import UndoRedo from '../UndoRedo';
+import { interactionType } from 'utils/map/constants';
+import { Button } from '@digdir/designsystemet-react';
+import { TrashIcon } from '@navikt/aksel-icons';
 
 export default function DeleteGeometry({ map }) {
-    function _delete() {
-        const selectInteraction = getInteraction(map, SelectGeometry.name);
+    const selectedGeometry = useSelector(state => state.areaMap.selectedGeometry);
+
+    function deleteGeometry() {
+        const selectInteraction = getInteraction(map, interactionType.SelectGeometry);
+
+        if (selectInteraction === null) {
+            return;
+        }
+
         const feature = selectInteraction.getFeatures().item(0);
 
         if (feature === undefined) {
             return;
         }
 
-        const undoRedoInteraction = getInteraction(map, UndoRedo.name);
-        const geometry = writeGeometryObject(feature.getGeometry());
-        console.log(geometry);
-        selectInteraction.getFeatures().clear();
+        const undoRedoInteraction = getInteraction(map, interactionType.UndoRedo);
 
-        feature.setGeometry(null);
+        if (undoRedoInteraction === null) {
+            return;
+        }
 
         undoRedoInteraction.push('replaceGeometry', {
-            before: geometry,
+            before: writeGeometryObject(feature.getGeometry()),
             after: null,
         });
+
+        selectInteraction.getFeatures().clear();
+        feature.setGeometry(null);
     }
 
     return (
-        <button
-            className={styles.delete}
-            onClick={_delete}
-            title='Slett geometri'
-        >Slett</button>
+        <Button
+            icon
+            onClick={deleteGeometry}
+            title="Slett geometri"
+            variant="tertiary"
+            disabled={selectedGeometry === null}
+        >
+            <TrashIcon
+                width="22"
+                height="22"
+                color="#000000"
+                aria-hidden
+            />
+        </Button>
     );
 }

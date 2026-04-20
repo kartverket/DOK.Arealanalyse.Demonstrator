@@ -2,7 +2,7 @@ import { Feature } from 'ol';
 import GeoJSON from 'ol/format/GeoJSON';
 import VectorSource from 'ol/source/Vector';
 import { Vector as VectorLayer } from 'ol/layer';
-import { getFeaturesLayer, getLayer, getProjection } from './helpers';
+import { getLayer, getProjection } from './helpers';
 import { createAreaStyle, createBufferStyle } from './styles';
 import { MAP_EPSG } from './constants';
 

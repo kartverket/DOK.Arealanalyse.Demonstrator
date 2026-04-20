@@ -2,6 +2,7 @@ export { default as DatafunnButton } from './DatafunnButton';
 export { default as Dialog } from './Dialog';
 export { default as ErrorBoundary } from './ErrorBoundary';
 export { default as FilePicker } from './FilePicker';
+export { default as FileUpload } from './FileUpload';
 export { default as FormattedText } from './FormattedText';
 export { default as Heading } from './Heading';
 export { default as InternalLinks } from './InternalLinks';

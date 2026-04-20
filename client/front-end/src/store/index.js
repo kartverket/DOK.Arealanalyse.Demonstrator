@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import { api } from './api';
 import { rtkQueryErrorCatcher } from './middleware';
 import appReducer from './slices/appSlice';
+import areaMapReducer from './slices/areaMapSlice';
 import progressReducer from './slices/progressSlice';
 import responseReducer from './slices/responseSlice';
 
@@ -9,6 +10,7 @@ export default configureStore({
     reducer: {
         [api.reducerPath]: api.reducer,
         app: appReducer,
+        areaMap: areaMapReducer,
         progress: progressReducer,
         response: responseReducer
     },

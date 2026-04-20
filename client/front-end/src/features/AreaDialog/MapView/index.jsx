@@ -1,19 +1,20 @@
 import { useEffect, useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { useCurrentLocation } from 'hooks';
 import { createAreaMap } from 'utils/map';
 import { setupMap } from './helpers';
+import { Editor } from 'features';
 import { Zoom, ZoomToExtent } from 'components/Map';
 import styles from './MapView.module.scss';
-import { Editor } from 'features';
-import { useSelector } from 'react-redux';
 
-export default function MapView({ geometry, currentLocation }) {
+export default function MapView({ dialogOpen, geometry }) {
     const [map, setMap] = useState(null);
     const mapElementRef = useRef(null);
-    const mapRendered = useSelector(state => state.app.mapRendered);
+    const { coordinates } = useCurrentLocation();
 
     useEffect(
         () => {
-            if (geometry === null && currentLocation === null) {
+            if (geometry === null && coordinates === null) {
                 return;
             }
 
@@ -22,8 +23,17 @@ export default function MapView({ geometry, currentLocation }) {
                 setMap(olMap);
             })();
         },
-        [geometry, currentLocation]
+        [geometry, coordinates]
     );
+
+    useEffect(
+        () => {
+            if (dialogOpen && map !== null) {
+                map.setTarget(mapElementRef.current);
+            }
+        },
+        [dialogOpen, map]
+    )
 
     useEffect(
         () => {
@@ -31,14 +41,18 @@ export default function MapView({ geometry, currentLocation }) {
                 return;
             }
 
-            map.setTarget(mapElementRef.current);
-            setupMap(map, currentLocation);
+            // const mapElement = document.createElement('div');
+            // Object.assign(mapElement.style, { position: 'absolute', top: '-9999px', left: '-9999px', width: `600px`, height: `600px` });
+            // document.getElementsByTagName('body')[0].appendChild(mapElement);
+
+            // map.setTarget(mapElementRef.current);
+            setupMap(map, coordinates);
 
             return () => {
                 map.dispose();
             }
         },
-        [map, currentLocation]
+        [map, coordinates]
     );
 
     return (
@@ -52,13 +66,9 @@ export default function MapView({ geometry, currentLocation }) {
                     </div>
                 )
             }
-            {
-                mapRendered && (
-                    <div className={styles.editor}>
-                        <Editor map={map} />
-                    </div>
-                )
-            }
+            <div className={styles.editor}>
+                <Editor map={map} />
+            </div>
         </div>
     );
 }
