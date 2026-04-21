@@ -10,6 +10,12 @@ import { createDrawStyle, createEditStyle, createModifyStyle } from './styles';
 import { setFeature } from './features';
 import { setSelectedGeometry, setUndoRedo } from 'store/slices/areaMapSlice';
 import store from 'store';
+import booleanValid from '@turf/boolean-valid';
+import area from '@turf/area';
+import kinks from '@turf/kinks';
+import { reproject } from 'reproject';
+import { api, apiFetch } from 'store/api';
+import { setToast } from 'store/slices/appSlice';
 
 export function addInteractions(map) {
     addDrawPolygonInteraction(map);
@@ -164,23 +170,9 @@ function addUndoRedoInteraction(map) {
 
     addCustomUndoRedo(interaction, map);
 
-    interaction.on('stack:add', () => {
-        setTimeout(() => {
-            const hasUndo = hasUndoRedo(interaction.getStack());
-            const hasRedo = hasUndoRedo(interaction.getStack('redo'));
+    interaction.on('stack:add', () => handleStackAddRemove(interaction, map));
 
-            store.dispatch(setUndoRedo({ hasUndo, hasRedo }));
-        }, 0);
-    });
-
-    interaction.on('stack:remove', () => {
-        setTimeout(() => {
-            const hasUndo = hasUndoRedo(interaction.getStack());
-            const hasRedo = hasUndoRedo(interaction.getStack('redo'));
-
-            store.dispatch(setUndoRedo({ hasUndo, hasRedo }));
-        }, 0);
-    });
+    interaction.on('stack:remove', () => handleStackAddRemove(interaction, map));
 
     interaction.on('stack:clear', () => {
         store.dispatch(setUndoRedo({ hasUndo: false, hasRedo: false }));
@@ -211,6 +203,39 @@ function addCustomUndoRedo(interaction, map) {
             feature.setGeometry(readGeometry(_geometry));
         }
     });
+}
+
+function handleStackAddRemove(interaction, map) {
+    setTimeout(async () => {
+        const hasUndo = hasUndoRedo(interaction.getStack());
+        const hasRedo = hasUndoRedo(interaction.getStack('redo'));
+
+        store.dispatch(setUndoRedo({ hasUndo, hasRedo }));
+
+        await validateGeometry(map);
+    }, 0);
+}
+
+async function validateGeometry(map) {
+    const geometry = getGeometry(map)
+
+    if (geometry === null) {
+        return;
+    }
+
+    const { message } = await apiFetch(api.endpoints.validate, { geometry });
+    
+    if (message !== null) {
+        store.dispatch(setToast({ message }));
+    } else {
+        store.dispatch(setToast(null));
+    }
+}
+
+function getGeometry(map) {
+    const feature = getFeature(map, 'feature');
+
+    return writeGeometryObject(feature?.getGeometry() || null);
 }
 
 function hasUndoRedo(stack) {

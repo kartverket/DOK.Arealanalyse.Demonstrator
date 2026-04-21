@@ -38,7 +38,7 @@ export default function FileUpload({ onFileSelected }) {
 
                 <Paragraph>Dra og slipp en fil her, eller klikk for å velge</Paragraph>
 
-                <span className={styles.acceptedFileTypes}>Støttede formater: GeoJSON, GML, SOSI, GeoPackage</span>
+                <span className={styles.acceptedFileTypes}>GeoJSON, GML, SOSI eller GeoPackage</span>
             </div>
         </section>
     );

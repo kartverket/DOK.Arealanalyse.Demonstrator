@@ -55,7 +55,14 @@ export const api = createApi({
         }),
         search: builder.query({
             query: ({ kommunenummer, query }) => `sok/${kommunenummer}?q=${query}`
-        })
+        }),
+        validate: builder.mutation({
+            query: ({ geometry }) => ({
+                url: 'valider',
+                body: geometry,
+                method: 'POST'
+            })
+        })    
     })
 });
 
@@ -79,5 +86,6 @@ export const {
     useSearchQuery,
     useAnalyzeMutation,
     useGetEiendomMutation,
-    useGetOmrådeMutation
+    useGetOmrådeMutation,
+    useValidateMutation
 } = api;

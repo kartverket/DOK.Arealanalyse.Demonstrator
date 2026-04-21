@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { api, apiFetch } from 'store/api';
 import { Button, Heading, Popover, Tabs } from '@digdir/designsystemet-react';
@@ -11,16 +11,35 @@ import AreaIcon from 'assets/gfx/icon-area.svg?react'
 import { QuestionmarkCircleFillIcon } from '@navikt/aksel-icons';
 import styles from './AreaDialog.module.scss';
 import { setFormData } from 'store/slices/appSlice';
+import { useCurrentLocation } from 'hooks';
+import { Editor } from 'features';
+import { createAreaMap } from 'utils/map';
 
 const DEFAULT_EPSG = 25833;
 
 export default function AreaDialog({ onOk }) {
     const [open, setOpen] = useState(false);
+    const [map, setMap] = useState(null);
     const [selectedTab, setSelectedTab] = useState('map');
     const [selectedSample, setSelectedSample] = useState(null);
     const [title, setTitle] = useState(null);
     const geometry = _geometry; // useSelector(state => state.app.formData.inputGeometry);
+    const { coordinates } = useCurrentLocation();
     const dispatch = useDispatch();
+
+    useEffect(
+        () => {
+            if (geometry === null && coordinates === null) {
+                return;
+            }
+
+            (async () => {
+                const olMap = await createAreaMap(geometry);
+                setMap(olMap);
+            })();
+        },
+        [geometry, coordinates]
+    );
 
     function ok() {
         setOpen(false)
@@ -73,43 +92,6 @@ export default function AreaDialog({ onOk }) {
                 <Heading>Analyseområde{title !== null ? `: ${title}` : ''}</Heading>
 
                 <div className={styles.content}>
-                    <div className={styles.top}>
-                        <div>
-                            <Search
-                                onResponse={handleSearchResponse}
-                            />
-                        </div>
-
-                        <div className={styles.topRight}>
-                            <div className={styles.filePicker}>
-                                <FilePicker
-                                    label="Legg til fil"
-                                    fileTypes={['json', 'geojson', 'sos', 'sosi', 'gml', 'gpkg']}
-                                    onFileSelected={handleFileSelected}
-                                />
-
-                                <Popover.TriggerContext>
-                                    <Popover.Trigger
-                                        icon
-                                        variant="tertiary"
-                                    >
-                                        <QuestionmarkCircleFillIcon width={24} height={24} />
-                                    </Popover.Trigger>
-                                    <Popover placement="top">
-                                        GeoJSON, GML, SOSI, GeoPackage
-                                    </Popover>
-                                </Popover.TriggerContext>
-                            </div>
-
-                            <div className={styles.sampleSelector}>
-                                <SampleSelector
-                                    selectedSample={selectedSample}
-                                    onSampleSelect={handleSampleSelected}
-                                />
-                            </div>
-                        </div>
-                    </div>
-
                     <Tabs
                         value={selectedTab}
                         onChange={setSelectedTab}
@@ -149,8 +131,10 @@ export default function AreaDialog({ onOk }) {
                                                 />
                                             </div>
                                         </Tabs.Panel>
-                                        <Tabs.Panel>Tegn</Tabs.Panel>
-                                        <Tabs.Panel>
+                                        <Tabs.Panel value="draw">
+                                            <Editor map={map} />
+                                        </Tabs.Panel>
+                                        <Tabs.Panel value="samples">
                                             <div className={styles.panel}>
                                                 <SampleSelector
                                                     selectedSample={selectedSample}
@@ -162,8 +146,9 @@ export default function AreaDialog({ onOk }) {
                                 </div>
 
                                 <MapView
+                                    map={map}
+                                    currentLocation={coordinates}
                                     dialogOpen={open}
-                                    geometry={geometry}
                                 />
                             </div>
                         </Tabs.Panel>

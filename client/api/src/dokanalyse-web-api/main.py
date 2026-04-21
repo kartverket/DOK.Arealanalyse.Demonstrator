@@ -5,8 +5,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 import uvicorn
 import aiohttp
-from .routers import (dok_tema, eiendom, eksempler,
-                      kommuner, omrade, pygeoapi, plan, sok)
+from .routers import (dok_tema, eiendom, eksempler, kommuner,
+                      omrade, pygeoapi, plan, sok, validering)
 from .services.kommuner import get_and_cache_kommuner
 from .utils import session_registry
 from .utils.helpers import is_development
@@ -58,6 +58,7 @@ app.include_router(omrade.router)
 app.include_router(plan.router)
 app.include_router(pygeoapi.router)
 app.include_router(sok.router)
+app.include_router(validering.router)
 
 
 if __name__ == '__main__':

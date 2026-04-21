@@ -20,14 +20,14 @@ def format_bytes(size_bytes: int | float) -> str:
     pow = math.pow(1024, idx)
     size = round(size_bytes / pow, 2)
 
-    return f'{_format_no(size)} {size_name[idx]}'
+    return f'{format_no(size)} {size_name[idx]}'
 
 
-def _format_no(value: float) -> str:
+def format_no(value: int | float) -> str:
     if abs(value - round(value)) < 1e-9:
         return locale.format_string('%d', int(round(value)), grouping=True)
     else:
         return locale.format_string('%.15g', value, grouping=True)
 
 
-__all__ = ['is_development', 'format_bytes']
+__all__ = ['is_development', 'format_bytes', 'format_no']
