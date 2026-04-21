@@ -18,7 +18,7 @@
     padding: 18px;
     border-radius: 14px;
 
-    &> div {
+    &>div {
         display: flex;
         align-items: flex-end;
     }
@@ -92,5 +92,24 @@
     .panel {
         display: flex;
         flex-direction: column;
+    }
+}
+
+.error {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    background: #f8e4e4;
+    padding: 0 6px;
+    border-radius: 4px;
+    border: 1px solid #ce4d4d;
+    color: #590d0d;
+    font-size: 13px;
+    line-height: 1;
+
+    svg {
+        width: 24px;
+        height: 24px;
+        color: #b81a1a;
     }
 }

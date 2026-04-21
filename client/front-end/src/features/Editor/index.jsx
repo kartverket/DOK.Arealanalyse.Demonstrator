@@ -6,36 +6,38 @@ import ModifyGeometry from './ModifyGeometry';
 import SelectGeometry from './SelectGeometry';
 import UndoRedo from './UndoRedo';
 import styles from './Editor.module.scss';
-import { getInteraction, writeGeometryObject } from 'utils/map/helpers';
-import { interactionType, MAP_EPSG } from 'utils/map/constants';
-import { useDispatch } from 'react-redux';
-import { setUndoRedo } from 'store/slices/areaMapSlice';
+import { addInteractions } from 'utils/map/interactions';
+// import { getInteraction, writeGeometryObject } from 'utils/map/helpers';
+// import { interactionType, MAP_EPSG } from 'utils/map/constants';
+// import { useDispatch } from 'react-redux';
+// import { setUndoRedo } from 'store/slices/areaMapSlice';
 
 export default function Editor({ map }) {
     const [active, setActive] = useState(null);
-    const dispatch = useDispatch();
 
-    useEffect(
-        () => {
-            if (map === null) {
-                return;
-            }
+    // const dispatch = useDispatch();
 
-            const undoRedoInteraction = getInteraction(map, UndoRedo.name);
-            undoRedoInteraction.clear();
-        },
-        [map]
-    );
+    // useEffect(
+    //     () => {
+    //         if (map === null) {
+    //             return;
+    //         }
+
+    //         const undoRedoInteraction = getInteraction(map, UndoRedo.name);
+    //         undoRedoInteraction.clear();
+    //     },
+    //     [map]
+    // );
 
 
-    const [editMode, setEditMode] = useState(false);
+    // const [editMode, setEditMode] = useState(false);
 
-    function toggleEditMode() {
-        setEditMode(!editMode);
+    // function toggleEditMode() {
+    //     setEditMode(!editMode);
 
-        const undoRedoInteraction = getInteraction(map, interactionType.UndoRedo);
-        undoRedoInteraction.clear();
-    }
+    //     const undoRedoInteraction = getInteraction(map, interactionType.UndoRedo);
+    //     undoRedoInteraction.clear();
+    // }
 
     function handleClick(name) {
         setActive(name);
@@ -46,46 +48,34 @@ export default function Editor({ map }) {
     }
 
     return (
-        <div
-            className={styles.editor}
-        >
-            <button onClick={toggleEditMode} style={{ background: editMode ? 'green' : 'none' }}>
-                Rediger
-            </button>
+        <div className={styles.editor}>
+            <SelectGeometry
+                map={map}
+                active={active}
+                onClick={handleClick}
+            />
 
-            {
-                editMode && (
-                    <>
-                        <SelectGeometry
-                            map={map}
-                            active={active}
-                            onClick={handleClick}
-                        />
+            <DrawPolygon
+                map={map}
+                active={active}
+                onClick={handleClick}
+            />
 
-                        <DrawPolygon
-                            map={map}
-                            active={active}
-                            onClick={handleClick}
-                        />
+            <DrawPolygonHole
+                map={map}
+                active={active}
+                onClick={handleClick}
+            />
 
-                        <DrawPolygonHole
-                            map={map}
-                            active={active}
-                            onClick={handleClick}
-                        />
+            <ModifyGeometry
+                map={map}
+                active={active}
+                onClick={handleClick}
+            />
 
-                        <ModifyGeometry
-                            map={map}
-                            active={active}
-                            onClick={handleClick}
-                        />
+            <UndoRedo map={map} />
 
-                        <UndoRedo map={map} />
-
-                        <DeleteGeometry map={map} />
-                    </>
-                )
-            }
+            <DeleteGeometry map={map} />
         </div>
     );
 }

@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { setupMap } from './helpers';
 import { Zoom, ZoomToExtent } from 'components/Map';
 import styles from './MapView.module.scss';
+import { addInteractions } from 'utils/map/interactions';
 
 export default function MapView({ map, currentLocation, dialogOpen }) {
     const mapElementRef = useRef(null);
@@ -21,6 +22,7 @@ export default function MapView({ map, currentLocation, dialogOpen }) {
                 return;
             }
 
+            
             setupMap(map, currentLocation);
 
             return () => {

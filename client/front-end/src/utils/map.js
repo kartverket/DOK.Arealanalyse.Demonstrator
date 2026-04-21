@@ -66,10 +66,7 @@ export async function createAreaMap(geometry) {
         layers
     });
 
-    // map.once('loadend', () => {
-    //     addInteractions(map);
-    //     store.dispatch(setMapRendered());
-    // })
+    
 
     map.setView(new View({
         padding: [50, 50, 50, 50],
@@ -79,8 +76,6 @@ export async function createAreaMap(geometry) {
 
     const mapElement = createMapElement();
     map.setTarget(mapElement);
-
-    addInteractions(map)
 
     return map;
 }

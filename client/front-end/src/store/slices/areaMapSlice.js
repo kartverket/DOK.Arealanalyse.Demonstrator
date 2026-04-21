@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
     selectedGeometry: null,
+    isValid: true,
     undoRedo: {
         hasUndo: false,
         hasRedo: false
@@ -18,6 +19,12 @@ export const areaMapSlice = createSlice({
                 selectedGeometry: action.payload
             };
         },
+        setValid: (state, action) => {
+            return {
+                ...state,
+                isValid: action.payload
+            };
+        },
         setUndoRedo: (state, action) => {
             return {
                 ...state,
@@ -26,12 +33,13 @@ export const areaMapSlice = createSlice({
                     ...action.payload
                 }
             };
-        }      
+        }    
     }
 });
 
 export const { 
     setSelectedGeometry,
+    setValid,
     setUndoRedo
 } = areaMapSlice.actions;
 

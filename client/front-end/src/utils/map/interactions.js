@@ -8,12 +8,8 @@ import { interactionType } from './constants';
 import { getFeature, getLayer, readGeometry, writeGeometryObject } from './helpers';
 import { createDrawStyle, createEditStyle, createModifyStyle } from './styles';
 import { setFeature } from './features';
-import { setSelectedGeometry, setUndoRedo } from 'store/slices/areaMapSlice';
+import { setSelectedGeometry, setUndoRedo, setValid } from 'store/slices/areaMapSlice';
 import store from 'store';
-import booleanValid from '@turf/boolean-valid';
-import area from '@turf/area';
-import kinks from '@turf/kinks';
-import { reproject } from 'reproject';
 import { api, apiFetch } from 'store/api';
 import { setToast } from 'store/slices/appSlice';
 
@@ -223,13 +219,8 @@ async function validateGeometry(map) {
         return;
     }
 
-    const { message } = await apiFetch(api.endpoints.validate, { geometry });
-    
-    if (message !== null) {
-        store.dispatch(setToast({ message }));
-    } else {
-        store.dispatch(setToast(null));
-    }
+    const { valid, message } = await apiFetch(api.endpoints.validate, { geometry });
+    store.dispatch(setValid(valid));
 }
 
 function getGeometry(map) {

@@ -1,19 +1,21 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { api, apiFetch } from 'store/api';
-import { Button, Heading, Popover, Tabs } from '@digdir/designsystemet-react';
-import { Dialog, FilePicker, FileUpload } from 'components';
+import { Button, Heading, Tabs } from '@digdir/designsystemet-react';
+import { Dialog, FileUpload } from 'components';
 import GeoJson from './GeoJson';
 import MapView from './MapView';
 import SampleSelector from './SampleSelector';
 import Search from './Search';
 import AreaIcon from 'assets/gfx/icon-area.svg?react'
-import { QuestionmarkCircleFillIcon } from '@navikt/aksel-icons';
+// import { QuestionmarkCircleFillIcon } from '@navikt/aksel-icons';
 import styles from './AreaDialog.module.scss';
 import { setFormData } from 'store/slices/appSlice';
 import { useCurrentLocation } from 'hooks';
 import { Editor } from 'features';
 import { createAreaMap } from 'utils/map';
+import { addInteractions } from 'utils/map/interactions';
+import { XMarkOctagonFillIcon } from '@navikt/aksel-icons';
 
 const DEFAULT_EPSG = 25833;
 
@@ -26,19 +28,25 @@ export default function AreaDialog({ onOk }) {
     const geometry = _geometry; // useSelector(state => state.app.formData.inputGeometry);
     const { coordinates } = useCurrentLocation();
     const dispatch = useDispatch();
+    const mapRendered = useSelector(state => state.app.mapRendered);
+    const initRef = useRef(true);
+    const isValid = useSelector(state => state.areaMap.isValid);
 
     useEffect(
         () => {
-            if (geometry === null && coordinates === null) {
+            if (geometry === null || !initRef.current) {
                 return;
             }
 
             (async () => {
-                const olMap = await createAreaMap(geometry);
-                setMap(olMap);
+                initRef.current = false;
+                const map = await createAreaMap(geometry);
+
+                addInteractions(map);
+                setMap(map);                
             })();
         },
-        [geometry, coordinates]
+        [geometry]
     );
 
     function ok() {
@@ -162,7 +170,7 @@ export default function AreaDialog({ onOk }) {
                     <div className={styles.buttons}>
                         <Button
                             onClick={ok}
-                            disabled={geometry === null}
+                            disabled={geometry === null || !isValid}
                         >
                             OK
                         </Button>
@@ -173,6 +181,15 @@ export default function AreaDialog({ onOk }) {
                         >
                             Avbryt
                         </Button>
+
+                        {
+                            !isValid && (
+                                <div className={styles.error}>
+                                    <XMarkOctagonFillIcon />
+                                    Analyseområdet er ugyldig
+                                </div>
+                            )
+                        }
                     </div>
                 </div>
             </Dialog>
