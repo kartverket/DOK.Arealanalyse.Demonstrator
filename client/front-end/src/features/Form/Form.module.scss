@@ -1,3 +1,9 @@
+.form {
+    border: 1px solid #E5E7EB;
+    border-radius: var(--ds-border-radius-lg);
+    margin-bottom: 80px;
+}
+
 .input {
     display: flex;
     flex-direction: column;
@@ -7,9 +13,9 @@
         display: flex;
         align-items: center;
         margin-bottom: 24px;
-        border-bottom: 1px solid #e0e0e0;
+        border-bottom: 1px solid #E5E7EB;
         padding-bottom: 24px;
-        gap: 24px;
+        gap: 30px;
 
         &:last-child {
             border-bottom: 0 none;
@@ -18,23 +24,23 @@
         }
 
         .addGeometry {
-            position: relative;
-            margin-right: 48px;
-
-            .icons>* {
-                display: none;
-                position: absolute;
-                top: 6px;
-                right: -30px;
-                z-index: 1;
-            }
+            display: flex;
+            align-items: center;
+            gap: var(--ds-size-2);
+            margin-top: 27px;
+            margin-right: var(--ds-size-8);
         }
     }
+}
+
+.buffer {
+    width: 150px;
 }
 
 .checkboxes {
     display: grid;
     grid-template-columns: auto auto;
+    gap: 12px 24px;
 }
 
 .submit {

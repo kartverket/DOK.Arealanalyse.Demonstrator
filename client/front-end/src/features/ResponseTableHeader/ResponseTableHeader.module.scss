@@ -1,0 +1,114 @@
+.tableHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 40px;
+}
+
+.statusFilters {
+    display: flex;
+    gap: 3px;
+    padding: 2px;
+    border: 1px solid #F3F4F6;
+    border-radius: 16px;
+    width: fit-content;
+
+    .filter {
+        display: flex;
+        user-select: none;
+
+        input {
+            position: absolute;
+            opacity: 0;
+            height: 0;
+            width: 0;
+
+            &:not(:checked)+label {
+                color: #344054;
+            }
+
+            &:checked+label {
+                &.mustHandle {
+                    color: #B42318;
+                    background-color: #FEF3F2;
+                }
+
+                &.mustCheck {
+                    color: #B54708;
+                    background-color: #FEE9CE;
+                }
+
+                &.nearby {
+                    color: #027A48;
+                    background-color: #ECFDF3;
+                }
+
+                &.notAnalyzed {
+                    color: #344054;
+                    background-color: #F2F4F7;
+                }
+            }
+        }
+
+        label {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border: 1px solid #F3F4F6;
+            border-radius: 16px;
+            cursor: pointer;
+        }
+
+        input[disabled]+label {
+            cursor: not-allowed;
+            opacity: var(--ds-opacity-disabled);
+        }
+    }
+}
+
+.themeAndSearch {
+    display: flex;
+    gap: 9px;
+
+    .themes {
+        min-width: 240px;
+
+        ul {
+            max-height: 360px;
+            overflow-y: auto;
+        }
+    }
+
+    div:has(.search[disabled])::before {
+        opacity: var(--ds-opacity-disabled);
+    }
+}
+
+.itemWrapper {
+    padding: 6px 12px;
+
+    &:first-child {
+        border-bottom: 1px solid #dbdbdb;
+        margin-bottom: 2px;
+        padding-bottom: 8px;
+    }
+
+    ds-field {
+        width: 100%;
+    }
+}
+
+.buttons {
+    display: flex;
+    gap: 9px;
+
+    .disabled {
+        cursor: not-allowed;
+        opacity: var(--ds-opacity-disabled);
+
+        a {
+            pointer-events: none;
+        }
+    }
+}

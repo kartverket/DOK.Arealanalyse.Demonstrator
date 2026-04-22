@@ -1,0 +1,44 @@
+.internalLinks {
+    display: flex;
+    border-bottom: 1px solid #F3F4F6;
+}
+
+.internalLink {
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding: var(--ds-size-3) var(--ds-size-5);
+    background: none;
+    border: 0;
+    color: var(--ds-color-neutral-text-subtle);
+    text-align: center;
+    white-space: nowrap;
+    cursor: pointer;
+
+    &::after {
+        content: '';
+        bottom: 0;
+        display: block;
+        height: 0.15em;
+        left: 0;
+        position: absolute;
+        width: 100%;
+        background: none;
+    }
+
+    &:hover {
+        color: var(--ds-color-neutral-text-default);
+
+        &::after {
+            background: #bbbcbd;
+        }
+    }
+
+    &.selected {
+        color: var(--ds-color-text-subtle);
+
+        &::after {
+            background: #3e6272;
+        }
+    }
+}

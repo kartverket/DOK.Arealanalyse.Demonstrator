@@ -1,0 +1,44 @@
+.dialog {
+    width: 1024px;
+    max-width: 1024px;
+    max-height: none;
+
+    h2 {
+        margin-bottom: var(--ds-size-4);
+    }
+}
+
+.dialogContent {
+    border: 1px solid #E5E7EB;
+    border-radius: var(--ds-border-radius-lg);
+    overflow: hidden;
+    margin-bottom: 18px;
+    width: 100%;
+
+    &>div {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        max-height: 80vh;
+        padding: 18px;
+        overflow-y: auto;
+    }
+
+    section {
+        border-bottom: 1px solid #E5E7EB;
+        padding-bottom: 24px;
+
+        &:first-child {
+            margin-top: 6px;
+        }
+
+        &:last-child {
+            border: 0 none;
+        }
+    }
+}
+
+.map {
+    width: 100%;
+    aspect-ratio: 1280 / 720;
+}

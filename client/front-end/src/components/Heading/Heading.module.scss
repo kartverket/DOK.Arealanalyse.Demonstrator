@@ -2,35 +2,16 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #ffffff;
-    padding: 0 24px;
-    position: relative;
+    margin: var(--ds-size-3) 0 var(--ds-size-6) 0;
 
     img {
         width: 108px;
     }
 
-    .apiLink {
-        display: flex;
-        align-items: center;
-        gap: 3px;
-        padding: 6px 12px;
-        border-radius: 4px;
-        font-family: 'Roboto-Medium';
-        text-decoration: none;
-        color: #000000;
-        transition: .5s ease;
-
-        &:hover {
-            text-decoration: underline;
-        }
-
-        &::before {
-            content: '';
-            background: url('../../assets/gfx/icon-cog.svg') no-repeat center;
-            width: 24px;
-            height: 24px;
-            background-size: 24px;
-        }
+    h1 {
+        font-family: 'Inter';
+        font-weight: 600;
+        font-size: 16px;
+        line-height: 1;
     }
 }

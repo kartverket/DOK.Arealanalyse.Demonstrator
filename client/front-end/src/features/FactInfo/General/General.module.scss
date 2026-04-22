@@ -1,0 +1,11 @@
+.general {
+    >div {
+        display: flex;
+        gap: 48px;
+    }
+}
+
+.label {
+    font-weight: 600;
+    margin-right: 6px;
+}

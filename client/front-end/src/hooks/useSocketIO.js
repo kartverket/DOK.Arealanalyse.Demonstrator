@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
-import { setCorrelationId } from 'store/slices/appSlice';
 import { io } from 'socket.io-client';
+import { setCorrelationId } from 'store/slices/appSlice';
 
 const WS_BASE_URL = import.meta.env.VITE_WS_BASE_URL;
 

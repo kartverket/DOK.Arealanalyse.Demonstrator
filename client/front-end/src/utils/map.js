@@ -3,64 +3,26 @@ import GeoJSON from 'ol/format/GeoJSON';
 import TileLayer from 'ol/layer/Tile';
 import TileWMS from 'ol/source/TileWMS';
 import WMTS, { optionsFromCapabilities } from 'ol/source/WMTS';
-import { OSM } from 'ol/source';
 import { WMTSCapabilities } from 'ol/format';
 import VectorSource from 'ol/source/Vector';
 import { Vector as VectorLayer } from 'ol/layer';
-import { defaults as defaultControls, FullScreen } from 'ol/control';
 import { defaults as defaultInteractions, DragRotateAndZoom } from 'ol/interaction';
 import Style from 'ol/style/Style';
 import Stroke from 'ol/style/Stroke';
-import { getEpsgCode } from './helpers';
-import baseMap from 'config/baseMap.config';
+import { getProjection } from './helpers';
+import basemap from 'config/basemap.config';
 
 const MAP_WIDTH = 720;
 const MAP_HEIGHT = 480;
-const BASE_MAP = import.meta.env.VITE_BASE_MAP;
 
-export async function createMap(inputGeometry, result) {
-    const featuresLayer = createFeaturesLayer(inputGeometry, result);
-    const layers = [];
+const _wmtsOptions = {};
 
-    featuresLayer.set('id', 'features');
-
-    if (BASE_MAP === 'OSM') {
-        layers.push(createOsmLayer());
-    } else {
-        layers.push(await createWmtsLayer());
-    }
-
-    layers.push(createWmsLayer(result.rasterResult.mapUri));
-    layers.push(featuresLayer);
-
-    const map = new OlMap({
-        controls: defaultControls().extend([new FullScreen()]),
-        interactions: defaultInteractions().extend([new DragRotateAndZoom()]),
-        layers
-    });
-
-    map.setView(new View({
-        padding: [50, 50, 50, 50],
-        projection: 'EPSG:25833',
-        maxZoom: baseMap.maxZoom
-    }));
-
-    return map;
-}
-
-export async function createOutlineMap(geometry) {
-    const featuresLayer = createOutlineFeaturesLayer(geometry);
-    const layers = [];
-
-    featuresLayer.set('id', 'features');
-
-    if (BASE_MAP === 'OSM') {
-        layers.push(createOsmLayer());
-    } else {
-        layers.push(await createWmtsLayer());
-    }
-
-    layers.push(featuresLayer);
+export async function createMap({ geometry, bufferedGeometry, wmsUrl }) {
+    const layers = [
+        await createWmtsLayer(basemap.layers.topograatone),
+        createWmsLayer(wmsUrl),
+        createFeaturesLayer(geometry, bufferedGeometry)
+    ];
 
     const map = new OlMap({
         interactions: defaultInteractions().extend([new DragRotateAndZoom()]),
@@ -70,14 +32,57 @@ export async function createOutlineMap(geometry) {
     map.setView(new View({
         padding: [50, 50, 50, 50],
         projection: 'EPSG:25833',
-        maxZoom: baseMap.maxZoom
+        maxZoom: basemap.maxZoom
     }));
 
     return map;
 }
 
-export async function createMapImage(inputGeometry, result) {
-    const [map, mapElement] = await createTempMap(inputGeometry, result);
+export async function createAreaMap(geometry) {
+    const layers = [
+        await createWmtsLayer(basemap.layers.topograatone)
+    ];
+
+    if (geometry !== null) {
+        layers.push(createAreaFeaturesLayer(geometry));
+    }
+
+    const map = new OlMap({
+        interactions: defaultInteractions().extend([new DragRotateAndZoom()]),
+        layers
+    });
+
+    map.setView(new View({
+        padding: [50, 50, 50, 50],
+        projection: 'EPSG:25833',
+        maxZoom: basemap.maxZoom
+    }));
+
+    return map;
+}
+
+export async function createFactInfoMap({ geometry, bufferedGeometry }) {
+    const layers = [
+        await createWmtsLayer(basemap.layers.topo),
+        createFeaturesLayer(geometry, bufferedGeometry)
+    ];
+
+    const map = new OlMap({
+        interactions: defaultInteractions().extend([new DragRotateAndZoom()]),
+        layers
+    });
+
+    map.setView(new View({
+        padding: [50, 50, 50, 50],
+        projection: 'EPSG:25833',
+        maxZoom: basemap.maxZoom
+    }));
+
+    return map;
+}
+
+export async function createMapImage({ geometry, bufferedGeometry, wmtsLayer, wmsUrl, options = {} }) {
+    const [map, mapElement] = await createTempMap(geometry, bufferedGeometry, wmtsLayer, wmsUrl, options);
 
     return new Promise((resolve) => {
         map.once('rendercomplete', () => {
@@ -95,17 +100,43 @@ export function getLayer(map, id) {
         .find(layer => layer.get('id') === id);
 }
 
-async function createTempMap(inputGeometry, result) {
-    const featuresLayer = createFeaturesLayer(inputGeometry, result);
-    const layers = [];
+export async function getCurrentPosition() {
+    return new Promise(resolve => {
+        if ('geolocation' in navigator) {
+            const options = {
+                enableHighAccuracy: true,
+                timeout: 5000,
+                maximumAge: 0
+            };
 
-    if (BASE_MAP === 'OSM') {
-        layers.push(createOsmLayer());
-    } else {
-        layers.push(await createWmtsLayer());
+            navigator.geolocation.getCurrentPosition(
+                position => {
+                    resolve([position.coords.longitude, position.coords.latitude]);
+                },
+                error => {
+                    console.log(`Error (${error.code}): ${error.message}`);
+                    resolve(null);
+                },
+                options
+            );
+        } else {
+            console.log('Geolocation er ikke støttet');
+            resolve(null);
+        }
+    });
+}
+
+async function createTempMap(geometry, bufferedGeometry, wmtsLayer, wmsUrl, options) {
+    const featuresLayer = createFeaturesLayer(geometry, bufferedGeometry);
+
+    const layers = [
+        await createWmtsLayer(wmtsLayer)
+    ];
+
+    if (wmsUrl) {
+        layers.push(createWmsLayer(wmsUrl));
     }
 
-    layers.push(createWmsLayer(result.rasterResult.mapUri));
     layers.push(featuresLayer);
 
     const map = new OlMap({ layers });
@@ -113,12 +144,17 @@ async function createTempMap(inputGeometry, result) {
     map.setView(new View({
         padding: [50, 50, 50, 50],
         projection: 'EPSG:25833',
-        maxZoom: baseMap.maxZoom,
-        constrainResolution: true
+        maxZoom: basemap.maxZoom,
+        constrainResolution: options.constrainResolution !== undefined ?
+            options.constrainResolution :
+            true
     }));
 
+    const mapWidth = options.width || MAP_WIDTH;
+    const mapHeight = options.height || MAP_HEIGHT;
+
     const mapElement = document.createElement('div');
-    Object.assign(mapElement.style, { position: 'absolute', top: '-9999px', left: '-9999px', width: `${MAP_WIDTH}px`, height: `${MAP_HEIGHT}px` });
+    Object.assign(mapElement.style, { position: 'absolute', top: '-9999px', left: '-9999px', width: `${mapWidth}px`, height: `${mapHeight}px` });
     document.getElementsByTagName('body')[0].appendChild(mapElement);
 
     map.setTarget(mapElement);
@@ -129,26 +165,32 @@ async function createTempMap(inputGeometry, result) {
     return [map, mapElement];
 }
 
-function createFeaturesLayer(inputGeometry, result) {
-    const projection = getProjection(inputGeometry);
+function createFeaturesLayer(geometry, bufferedGeometry = null) {
+    const projection = getProjection(geometry);
     const source = new VectorSource();
 
-    if (result.buffer > 0) {
-        source.addFeature(createFeature(result.runOnInputGeometry, projection, getBufferStyle()));
+    if (bufferedGeometry !== null) {
+        source.addFeature(createFeature(bufferedGeometry, projection, getBufferStyle()));
     }
 
-    source.addFeature(createFeature(inputGeometry, projection, getOutlineStyle()));
+    source.addFeature(createFeature(geometry, projection, getOutlineStyle()));
 
-    return new VectorLayer({ source });
+    const vectorLayer = new VectorLayer({ source });
+    vectorLayer.set('id', 'features');
+
+    return vectorLayer;
 }
 
-function createOutlineFeaturesLayer(geometry) {
+function createAreaFeaturesLayer(geometry) {
     const projection = getProjection(geometry);
     const source = new VectorSource();
 
     source.addFeature(createFeature(geometry, projection, getOutlineStyle()));
 
-    return new VectorLayer({ source });
+    const vectorLayer = new VectorLayer({ source });
+    vectorLayer.set('id', 'features');
+
+    return vectorLayer;
 }
 
 function createFeature(geoJson, projection, style) {
@@ -161,18 +203,8 @@ function createFeature(geoJson, projection, style) {
     return feature;
 }
 
-function createOsmLayer() {
-    const osm = new OSM({ 
-        tileLoadFunction: grayscale()
-    });
-
-    return new TileLayer({
-        source: osm
-    });
-}
-
-async function createWmtsLayer() {
-    const options = await getWmtsOptions();
+async function createWmtsLayer(wmtsLayer) {
+    const options = await getWmtsOptions(wmtsLayer);
 
     if (options === null) {
         return null;
@@ -180,15 +212,19 @@ async function createWmtsLayer() {
 
     return new TileLayer({
         source: new WMTS(options),
-        maxZoom: baseMap.maxZoom
+        maxZoom: basemap.maxZoom
     });
 }
 
-async function getWmtsOptions() {
+async function getWmtsOptions(wmtsLayer) {
+    if (_wmtsOptions[wmtsLayer] !== undefined) {
+        return _wmtsOptions[wmtsLayer];
+    }
+
     let xml;
 
     try {
-        const response = await fetch(baseMap.wmtsUrl, { timeout: 10000 });
+        const response = await fetch(basemap.wmtsUrl, { timeout: 10000 });
         xml = await response.text();
     } catch {
         return null;
@@ -197,7 +233,7 @@ async function getWmtsOptions() {
     const capabilities = new WMTSCapabilities().read(xml);
 
     const options = optionsFromCapabilities(capabilities, {
-        layer: baseMap.layer,
+        layer: wmtsLayer,
         matrixSet: 'EPSG:3857'
     });
 
@@ -205,6 +241,8 @@ async function getWmtsOptions() {
         ...options,
         crossOrigin: 'anonymous'
     };
+
+    _wmtsOptions[wmtsLayer] = wmtsOptions;
 
     return wmtsOptions;
 }
@@ -216,17 +254,6 @@ function createWmsLayer(url) {
             crossOrigin: 'anonymous'
         })
     });
-}
-
-function getProjection(geometry) {
-    const crsName = geometry?.crs?.properties?.name;
-    let epsgCode = 4326;
-
-    if (crsName !== undefined) {
-        epsgCode = getEpsgCode(crsName) || 4326;
-    }
-
-    return `EPSG:${epsgCode}`;
 }
 
 function exportToPngImage(map) {

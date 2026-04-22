@@ -1,0 +1,41 @@
+.geoJsonContainer {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.geoJsonWrapper {
+    border: 1px solid #E5E7EB;
+    border-radius: var(--ds-border-radius-lg);
+    display: flex;
+    flex-grow: 1;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+}
+
+.geoJson {
+    flex-grow: 1;
+    height: 1px;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 12px;
+
+    output {
+        white-space: pre;
+        font-weight: normal;
+        font-size: 14px;
+        line-height: 1;
+        font-family: menlo, consolas, monospace;
+    }
+}
+
+.copyButton {
+    position: absolute !important;
+    right: 29px;
+    top: 12px;
+}
+
+.crs {
+    margin-top: var(--ds-size-3);
+}

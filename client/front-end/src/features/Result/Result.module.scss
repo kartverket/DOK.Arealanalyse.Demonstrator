@@ -1,0 +1,138 @@
+.result {
+    padding: 16px 32px;
+
+    &.mustHandle {
+        .status {
+            color: #B42318;
+            border-color: #f0443866;
+            background-color: #FEF3F2;
+
+            svg {
+                stroke: #F04438;
+            }
+        }
+
+        .guidanceText {
+            border-color: #f0443866;
+            background-color: #FEF2F2;
+            color: #B42318;
+        }
+    }
+
+    &.mustCheck {
+        .status {
+            color: #B54708;
+            border-color: #F7900966;
+            background-color: #FEE9CE;
+
+            svg {
+                stroke: #F79009;
+            }
+        }
+
+        .guidanceText {
+            border-color: #F7900966;
+            background-color: #FEE9CE;
+            color: #B54708;
+        }
+    }
+
+    &.nearby {
+        .status {
+            color: #027A48;
+            border-color: #12B76A66;
+            background-color: #ECFDF3;
+
+            svg {
+                stroke: #12B76A;
+            }
+        }
+    }
+
+    &.notAnalyzed {
+        .status {
+            color: #344054;
+            border-color: #66708566;
+            background-color: #F2F4F7;
+
+            svg {
+                stroke: #344054;
+            }
+        }
+    }
+}
+
+.description {
+    font-size: 16px;
+    color: #4A5565;
+    margin-bottom: 18px;
+
+    p {
+        margin-bottom: 8px;
+
+        &:empty,
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+}
+
+.guidanceText {
+    border: 1px solid;
+    border-radius: 10px;
+    font-weight: 500;
+    padding: 18px;
+    margin-bottom: 18px;
+}
+
+.internalLinks {
+    margin-left: -32px;
+    margin-right: -32px;
+    padding-left: 32px;
+    padding-right: 32px;
+    margin-bottom: 32px;
+}
+
+.sections {
+    section {
+        margin-bottom: 64px;
+
+        &:last-child {
+            margin-bottom: 32px;
+        }
+    }
+
+    h3 {
+        font-size: 18px;
+        font-weight: 700;
+        color: #101828;
+        line-height: 28px;
+        margin-bottom: 16px;
+    }
+
+    h4 {
+        font-size: 16px;
+        font-weight: 600;
+        color: #101828;
+        line-height: 24px;
+        margin-bottom: 12px;
+    }
+
+    h5 {
+        font-size: 14px;
+        font-weight: 600;
+        color: #101828;
+        text-transform: uppercase;
+        line-height: 20px;
+        margin-bottom: 16px;
+    }
+
+    h6 {
+        font-size: 12px;
+        font-weight: 600;
+        color: #62748E;
+        text-transform: uppercase;
+        line-height: 16px;
+        margin-bottom: 3px;
+    }
+}

@@ -2,8 +2,26 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
     correlationId: null,
-    selectedResult: null,
-    errorMessage: null
+    formData: {
+        inputGeometry: null,
+        requestedBuffer: 0,
+        context: '',
+        theme: '',
+        includeGuidance: true,
+        includeQualityMeasurement: true,
+        includeFilterChosenDOK: false,
+        includeFacts: true,
+        createBinaries: false
+    },
+    currentLocation: {
+        coordinates: null,
+        kommunenummer: null
+    },
+    toast: null,
+    errorMessage: null,
+    analyzisId: 0,
+    busy: false,
+    factInfoOpen: false
 };
 
 export const appSlice = createSlice({
@@ -16,21 +34,66 @@ export const appSlice = createSlice({
                 correlationId: action.payload
             };
         },
-        setSelectedResult: (state, action) => {
+        setFormData: (state, action) => {
             return {
                 ...state,
-                selectedResult: action.payload
+                formData: {
+                    ...state.formData,
+                    [action.payload.name]: action.payload.value
+                }
             };
         },
-        setErrorMessage: (state, action) => {
+        setCurrentLocation: (state, action) => {
             return {
                 ...state,
-                errorMessage: action.payload
+                currentLocation: action.payload
+            };
+        },        
+        setToast: (state, action) => {
+            let toast = null;
+
+            if (action.payload !== null) {
+                toast = { ...action.payload };
+                toast.type = toast.type || 'danger';
+            }
+
+            return {
+                ...state,
+                toast
+            };
+        },
+        analyzeStart: (state) => {
+            return {
+                ...state,
+                analyzisId: state.analyzisId + 1,
+                busy: true
+            };
+        },
+        analyzeFinish:  (state) => {
+            return {
+                ...state,
+                busy: false
+            };
+        },
+        toggleFactInfo: (state, action) => {
+            return {
+                ...state,
+                factInfoOpen: action.payload
             };
         }
     }
 });
 
-export const { setCorrelationId, setSelectedResult, setErrorMessage } = appSlice.actions;
+export const {
+    setCorrelationId,
+    setFormData,
+    setCurrentLocation,
+    setErrorMessage,
+    setToast,
+    analyzeStart,
+    analyzeFinish,
+    toggleFactInfo
+} = appSlice.actions;
 
 export default appSlice.reducer;
+

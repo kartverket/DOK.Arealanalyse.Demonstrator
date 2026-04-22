@@ -1,0 +1,55 @@
+.container {
+    display: flex;
+    flex-direction: column;
+
+    h3 {
+        font-size: 16px;
+        font-weight: 600;
+    }
+
+    >div {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        margin-top: -26px;
+    }
+}
+
+.tableContainer {
+    display: flex;
+    flex-direction: column;
+    width: 33%;
+
+    .right {
+        text-align: right;
+    }
+}
+
+.chartContainer {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    width: 67%;
+
+    .chart {
+        height: 360px;
+        width: 360px;
+    }
+}
+
+.labels {
+    margin: 0;
+    padding: 0;
+
+    li {
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+
+        .color {
+            width: 12px;
+            height: 12px;
+            flex-shrink: 0;
+        }
+    }
+}

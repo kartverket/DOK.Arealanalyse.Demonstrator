@@ -1,0 +1,28 @@
+.button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #E5E7EB;
+    border-radius: 10px;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    background-size: 26px;
+    background-color: #ffffff;
+    cursor: pointer;
+    transition: 0.2s;    
+
+    span {
+        color: #4A5565;
+        font-weight: 600;
+    }
+
+    &:not(:disabled):hover {
+        background-color: #eeeeee !important;
+    }
+
+    &:not(:disabled):active {
+        background-color: #eeeeee !important;
+        border-color: var(--ds-color-border-strong);
+    }
+}

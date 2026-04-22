@@ -1,0 +1,38 @@
+.label {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    user-select: none;
+    padding: var(--ds-size-2) var(--ds-size-3);
+    border-inline-start: 5px solid transparent;
+
+    .subTitle {
+        font-size: 12px;
+    }
+
+    .type {
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        gap: var(--ds-size-1);
+        color: #101828;
+    }
+}
+
+.list {
+    overflow: hidden;
+}
+
+.innerList {
+    max-height: 300px !important;
+    overflow-y: auto;
+
+    &>* {
+        cursor: pointer;
+
+        &:hover>div {
+            background: var(--ds-color-surface-tinted);
+            border-inline-start-color: var(--ds-color-base-default);
+        }
+    }
+}
