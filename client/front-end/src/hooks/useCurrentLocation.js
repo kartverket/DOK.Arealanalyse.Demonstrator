@@ -1,6 +1,6 @@
 
 import useGeolocation from './useGeolocation';
-import { useGetKommuneByPointQuery } from 'store/api';
+import { useGetKommuneByPointQuery } from '@/lib/api/api';
 import { skipToken } from '@reduxjs/toolkit/query';
 
 export default function useCurrentLocation() {
