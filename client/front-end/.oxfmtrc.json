@@ -1,0 +1,76 @@
+{
+    "$schema": "./node_modules/oxfmt/configuration_schema.json",
+    "tabWidth": 4,
+    "useTabs": false,
+    "singleQuote": true,
+    "singleAttributePerLine": true,
+    "printWidth": 80,
+    "sortImports": {
+        "newlinesBetween": false,
+        "sortSideEffects": true,
+        "customGroups": [
+            {
+                "groupName": "types",
+                "modifiers": ["type"]
+            },
+            {
+                "groupName": "react-libs",
+                "elementNamePattern": ["react", "react/**", "react-**"]
+            },
+            {
+                "groupName": "hooks",
+                "elementNamePattern": ["@/hooks/**", "**/hooks/**"]
+            },
+            {
+                "groupName": "lib",
+                "elementNamePattern": ["@/lib", "@/lib/**", "**/lib/**"]
+            },
+            {
+                "groupName": "helpers",
+                "elementNamePattern": ["**/*.helpers"]
+            },
+            {
+                "groupName": "features",
+                "elementNamePattern": ["@/features/**", "**/features/**"]
+            },
+            {
+                "groupName": "components",
+                "elementNamePattern": ["@/components/**", "**/components**"]
+            },
+            {
+                "groupName": "designsystem",
+                "elementNamePattern": ["@digdir/designsystemet-react"]
+            },
+            {
+                "groupName": "icons",
+                "elementNamePattern": [
+                    "**/*.svg*",
+                    "@navikt/aksel-icons",
+                    "@navikt/aksel-icons/**"
+                ]
+            },
+            {
+                "groupName": "styles",
+                "elementNamePattern": ["**/*.css", "**/*.scss"]
+            }
+        ],
+        "groups": [
+            "react-libs",
+            ["builtin", "external"],
+            "hooks",
+            "lib",
+            ["internal", "subpath", "parent", "sibling", "index"],
+            "helpers",
+            "features",
+            "components",
+            "designsystem",
+            "icons",
+            "styles",
+            "unknown",
+            {
+                "newlinesBetween": true
+            },
+            "types"
+        ]
+    }
+}

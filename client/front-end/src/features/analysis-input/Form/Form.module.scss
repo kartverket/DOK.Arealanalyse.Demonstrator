@@ -1,0 +1,50 @@
+.form {
+    border: 1px solid #e5e7eb;
+    border-radius: var(--ds-border-radius-lg);
+    margin-bottom: 80px;
+}
+
+.input {
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+
+    .row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 24px;
+        border-bottom: 1px solid #e5e7eb;
+        padding-bottom: 24px;
+        gap: 30px;
+
+        &:last-child {
+            border-bottom: 0 none;
+            padding-bottom: 0;
+            margin-bottom: 0;
+        }
+
+        .addGeometry {
+            display: flex;
+            align-items: center;
+            gap: var(--ds-size-2);
+            margin-top: 27px;
+            margin-right: var(--ds-size-8);
+        }
+    }
+}
+
+.buffer {
+    width: 150px;
+}
+
+.checkboxes {
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 12px 24px;
+}
+
+.submit {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}

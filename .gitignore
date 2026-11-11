@@ -1,5 +1,14 @@
+# VS Code
+.vscode/
+
 # virtualenv
 .venv
 venv/
 ENV/
+
+# env files
 .env
+.env.local
+
+# Claude
+.claude/
