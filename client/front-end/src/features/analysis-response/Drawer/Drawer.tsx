@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'motion/react';
 import { setSelectedResultId } from '../responseSlice';
 import Result from '../Result/Result';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';

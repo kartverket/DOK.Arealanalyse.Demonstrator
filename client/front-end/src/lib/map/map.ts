@@ -195,7 +195,7 @@ function createFeature(
         dataProjection: projection,
         featureProjection: 'EPSG:25833',
     });
-    const feature = new Feature(geometry);
+    const feature = new Feature(geometry ?? undefined);
     feature.setStyle(style);
 
     return feature;
@@ -271,7 +271,7 @@ function exportToPngImage(map: OlMap): string {
 
     const mapContext = mapCanvas.getContext('2d')!;
     const canvases = map
-        .getViewport()
+        .getViewport()!
         .querySelectorAll<HTMLCanvasElement>(
             '.ol-layer canvas, canvas.ol-layer',
         );
