@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from 'react';
 import { prettyPrintJson } from 'pretty-print-json';
 import { getCrsName, getEpsgCode } from '@/lib/geo/crs';
-import { Button } from '@digdir/designsystemet-react';
+import { Button } from 'dibk-designsystemet';
 import { CheckmarkIcon, FilesIcon } from '@navikt/aksel-icons';
 import styles from './GeoJson.module.scss';
 

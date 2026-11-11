@@ -1,4 +1,4 @@
-import { Heading as DsHeading, Link } from '@digdir/designsystemet-react';
+import { Heading as DsHeading, Link } from 'dibk-designsystemet';
 import logo from '@/assets/gfx/logo-kartverket.svg';
 import styles from './Heading.module.scss';
 
@@ -11,6 +11,7 @@ export default function Heading() {
                 src={logo}
                 alt="Kartverket logo"
             />
+
             <DsHeading level={1}>
                 Arealanalyse av DOK-datasett - Demonstrator
             </DsHeading>

@@ -8,7 +8,7 @@ import Search from './Search/Search';
 import { apiFetch } from '@/app/apiFetch';
 import Dialog from '@/components/Dialog/Dialog';
 import FilePicker from '@/components/FilePicker/FilePicker';
-import { Button, Heading, Popover, Tabs } from '@digdir/designsystemet-react';
+import { Button, Heading, Popover, Tabs } from 'dibk-designsystemet';
 import AreaIcon from '@/assets/gfx/icon-area.svg?react';
 import { QuestionmarkCircleFillIcon } from '@navikt/aksel-icons';
 import styles from './AreaDialog.module.scss';
@@ -112,20 +112,21 @@ export default function AreaDialog({ onOk }: AreaDialogProps) {
                                     onFileSelected={handleFileSelected}
                                 />
 
-                                <Popover.TriggerContext>
-                                    <Popover.Trigger
-                                        icon
-                                        variant="tertiary"
-                                    >
-                                        <QuestionmarkCircleFillIcon
-                                            width={24}
-                                            height={24}
-                                        />
-                                    </Popover.Trigger>
-                                    <Popover placement="top">
-                                        GeoJSON, GML, SOSI, GeoPackage
-                                    </Popover>
-                                </Popover.TriggerContext>
+                                <Button
+                                    icon
+                                    variant="tertiary"
+                                    popovertarget="fileTypes"
+                                    className={styles.popover}
+                                >
+                                    <QuestionmarkCircleFillIcon
+                                        fontSize="24px"
+                                        aria-hidden
+                                    />
+                                </Button>
+
+                                <Popover id="fileTypes" placement="top">
+                                    GeoJSON, GML, SOSI, GeoPackage
+                                </Popover>
                             </div>
 
                             <div className={styles.sampleSelector}>

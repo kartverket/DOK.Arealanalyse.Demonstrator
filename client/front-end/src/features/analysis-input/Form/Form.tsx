@@ -21,7 +21,7 @@ import {
     Input,
     Label,
     Select,
-} from '@digdir/designsystemet-react';
+} from 'dibk-designsystemet';
 import { CheckmarkCircleFillIcon } from '@navikt/aksel-icons';
 import styles from './Form.module.scss';
 

@@ -39,7 +39,7 @@
             },
             {
                 "groupName": "designsystem",
-                "elementNamePattern": ["@digdir/designsystemet-react"]
+                "elementNamePattern": ["dibk-designsystemet"]
             },
             {
                 "groupName": "icons",

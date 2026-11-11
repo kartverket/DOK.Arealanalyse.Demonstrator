@@ -1,6 +1,6 @@
 import bbox from '@turf/bbox';
 import { getCrsName, getEpsgCode } from '@/lib/geo/crs';
-import { Button, Tooltip } from '@digdir/designsystemet-react';
+import { Button, Tooltip } from 'dibk-designsystemet';
 import DatafunnIcon from '@/assets/gfx/icon-datafunn.svg?react';
 import styles from './DatafunnButton.module.scss';
 

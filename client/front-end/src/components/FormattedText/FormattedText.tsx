@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, Paragraph } from '@digdir/designsystemet-react';
+import { Link, Paragraph } from 'dibk-designsystemet';
 import styles from './FormattedText.module.scss';
 
 const urlRegex = /(https?:\/\/[^\s]+)/g;

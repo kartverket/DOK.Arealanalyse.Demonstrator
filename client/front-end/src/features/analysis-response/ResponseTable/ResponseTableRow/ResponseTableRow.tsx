@@ -2,7 +2,7 @@ import { memo } from 'react';
 import { ResultStatus } from '../../constants';
 import { setSelectedResultId } from '../../responseSlice';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { Table } from '@digdir/designsystemet-react';
+import { Table } from 'dibk-designsystemet';
 import MustCheckIcon from '@/assets/gfx/icon-must-check.svg?react';
 import MustHandleIcon from '@/assets/gfx/icon-must-handle.svg?react';
 import NearbyIcon from '@/assets/gfx/icon-nearby.svg?react';

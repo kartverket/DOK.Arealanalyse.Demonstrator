@@ -1,4 +1,4 @@
-import { Heading } from '@digdir/designsystemet-react';
+import { Heading } from 'dibk-designsystemet';
 import styles from './Analysis.module.scss';
 
 import type { ResultItem } from '@/types/analysis.types';

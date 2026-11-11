@@ -10,7 +10,6 @@
     gap: 3px;
     padding: 2px;
     border: 1px solid #f3f4f6;
-    border-radius: 16px;
     width: fit-content;
 
     .filter {
@@ -56,7 +55,6 @@
             gap: 4px;
             padding: 4px 10px;
             border: 1px solid #f3f4f6;
-            border-radius: 16px;
             cursor: pointer;
         }
 
@@ -69,7 +67,7 @@
 
 .themeAndSearch {
     display: flex;
-    gap: 9px;
+    gap: 12px;
 
     .themes {
         min-width: 240px;
@@ -80,7 +78,11 @@
         }
     }
 
-    div:has(.search[disabled])::before {
+    .search {
+        width: 252px;
+    }
+
+    div:has(.search input[disabled])::before {
         opacity: var(--ds-opacity-disabled);
     }
 }
@@ -101,7 +103,7 @@
 
 .buttons {
     display: flex;
-    gap: 9px;
+    gap: 12px;
 
     .disabled {
         cursor: not-allowed;

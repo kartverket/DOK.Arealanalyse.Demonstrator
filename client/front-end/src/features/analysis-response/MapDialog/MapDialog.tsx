@@ -8,7 +8,7 @@ import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import Dialog from '@/components/Dialog/Dialog';
 import Legend from '@/components/Map/Legend/Legend';
 import { MapControl } from '@/components/Map/Map.constants';
-import { Button } from '@digdir/designsystemet-react';
+import { Button } from 'dibk-designsystemet';
 import { ArrowDownIcon, ArrowUpIcon, XMarkIcon } from '@navikt/aksel-icons';
 import styles from './MapDialog.module.scss';
 

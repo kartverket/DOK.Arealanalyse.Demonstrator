@@ -2,7 +2,7 @@ import { StatusFilter } from '../constants';
 import ThemeSelector from './ThemeSelector/ThemeSelector';
 import { toggleFactInfo } from '@/app/appSlice';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { Button, Search } from '@digdir/designsystemet-react';
+import { Button, EXPERIMENTAL_Suggestion as Suggestion } from 'dibk-designsystemet';
 import DownloadIcon from '@/assets/gfx/icon-download.svg?react';
 import FactInfoIcon from '@/assets/gfx/icon-fact-info.svg?react';
 import MustCheckIcon from '@/assets/gfx/icon-must-check.svg?react';
@@ -165,19 +165,18 @@ export default function ResponseTableHeader({
                     disabled={disabled}
                 />
 
-                <Search>
-                    <Search.Input
+                <Suggestion className={styles.search}>
+                    <Suggestion.Input
+                        type="search"
                         name="search"
                         value={searchTerm}
                         onChange={(event) => onSearchChange(event.target.value)}
                         aria-label="Søk i tabell"
                         placeholder="Søk i tabell"
-                        width={320}
-                        className={styles.search}
                         disabled={disabled}
                     />
-                    <Search.Clear />
-                </Search>
+                    <Suggestion.Clear />
+                </Suggestion>
             </div>
 
             <div className={styles.buttons}>

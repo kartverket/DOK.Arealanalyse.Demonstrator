@@ -214,26 +214,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@digdir/designsystemet-theme@npm:^1.11.0":
-  version: 1.11.0
-  resolution: "@digdir/designsystemet-theme@npm:1.11.0"
-  dependencies:
-    "@digdir/designsystemet-types": "npm:^1.11.0"
-  checksum: 10c0/c94aa7eb135981a15780e3aaa2f636eb299ad1477c2a5d0e505a6b9fbe8d595afb20257f00d976d5c8000880b406f5bde29d4a20e76329f8c540580e0e16750c
-  languageName: node
-  linkType: hard
-
 "@digdir/designsystemet-types@npm:1.24.0":
   version: 1.24.0
   resolution: "@digdir/designsystemet-types@npm:1.24.0"
   checksum: 10c0/ad972a98d3bf1e4bd4ce8d530f484920a80dcca65486356751e30b592768c7e473b9bc99b8dd2885309eba6d72a73d6193675809ef01a7ff0b04a4d4b0fcf48b
-  languageName: node
-  linkType: hard
-
-"@digdir/designsystemet-types@npm:^1.11.0":
-  version: 1.13.2
-  resolution: "@digdir/designsystemet-types@npm:1.13.2"
-  checksum: 10c0/32d8a79af96537acdc56302edbe7e96b4b4f5d067ed9ceecda6592ef699dd982a0dc5c570f1ea39a5f56e2e30e4ae03b6227a96dbe0934c2c0c9057b153b887e
   languageName: node
   linkType: hard
 
@@ -353,6 +337,13 @@ __metadata:
   version: 0.2.12
   resolution: "@floating-ui/utils@npm:0.2.12"
   checksum: 10c0/bb910b90d56991a62011afaf5f8e0c4b7fb6dab69403f4dd17fbd6eb25560b28d533dff9791f270b4f459852e9006a1077b5d73cbedb5e34d9424afc6a828314
+  languageName: node
+  linkType: hard
+
+"@fontsource/poppins@npm:^5.3.0":
+  version: 5.3.0
+  resolution: "@fontsource/poppins@npm:5.3.0"
+  checksum: 10c0/869fe85c618645a84f4ff331fd61b3fd856a6df15a42fff21c311b599a81104541f7402feccb3446ad50ddd73cfea20bd9191e9cfa533a382ec68d9ba1093038
   languageName: node
   linkType: hard
 
@@ -1810,13 +1801,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"dibk-designsystemet@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "dibk-designsystemet@npm:1.0.0"
+  peerDependencies:
+    "@digdir/designsystemet-css": ^1.15.0
+    "@digdir/designsystemet-react": ^1.15.0
+    "@fontsource/poppins": ^5.2.7
+    react: ">=18.3.1 || ^19.0.0"
+    react-dom: ">=18.3.1 || ^19.0.0"
+  checksum: 10c0/33508f89489356e1c2437b09c7f87c5af65fa7ea17994326b16f4d84820e79a914ad7aa0b323e72f6d9800b65273fab652984ce685bb8ec8bffba129fbbcbc71
+  languageName: node
+  linkType: hard
+
 "dokanalyse-front-end@workspace:.":
   version: 0.0.0-use.local
   resolution: "dokanalyse-front-end@workspace:."
   dependencies:
     "@digdir/designsystemet-css": "npm:^1.24.0"
     "@digdir/designsystemet-react": "npm:^1.24.0"
-    "@digdir/designsystemet-theme": "npm:^1.11.0"
+    "@fontsource/poppins": "npm:^5.3.0"
     "@navikt/aksel-icons": "npm:^8.22.1"
     "@reduxjs/toolkit": "npm:^2.14.0"
     "@turf/bbox": "npm:^7.4.0"
@@ -1830,6 +1834,7 @@ __metadata:
     "@vitejs/plugin-react": "npm:^6.3.0"
     chart.js: "npm:^4.6.1"
     dayjs: "npm:^1.11.23"
+    dibk-designsystemet: "npm:^1.0.0"
     fast-sort: "npm:^3.4.1"
     lodash.groupby: "npm:^4.6.0"
     marked: "npm:^18.2.0"

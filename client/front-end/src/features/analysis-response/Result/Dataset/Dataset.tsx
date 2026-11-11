@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import FormattedText from '@/components/FormattedText/FormattedText';
-import { Heading, Link } from '@digdir/designsystemet-react';
+import { Heading, Link } from 'dibk-designsystemet';
 import styles from './Dataset.module.scss';
 
 import type { Dataset as DatasetType } from '@/types/api.types';

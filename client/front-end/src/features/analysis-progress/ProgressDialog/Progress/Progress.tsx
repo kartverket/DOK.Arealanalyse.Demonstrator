@@ -5,7 +5,7 @@ import ProgressBar, {
     PROGRESS_VARIANT,
     type ProgressVariant,
 } from '@/components/ProgressBar/ProgressBar';
-import { Heading, Spinner } from '@digdir/designsystemet-react';
+import { Heading, Spinner } from 'dibk-designsystemet';
 import styles from './Progress.module.scss';
 
 import type { StateStatus, TaskStatus } from '@/types/socket.types';

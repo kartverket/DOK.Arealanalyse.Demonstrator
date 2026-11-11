@@ -1,5 +1,5 @@
 import ResponseTableRow from './ResponseTableRow/ResponseTableRow';
-import { Table } from '@digdir/designsystemet-react';
+import { Table } from 'dibk-designsystemet';
 import styles from './ResponseTable.module.scss';
 
 import type { ResultItem } from '@/types/analysis.types';

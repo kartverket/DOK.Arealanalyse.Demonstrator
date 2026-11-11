@@ -2,7 +2,7 @@ import { useCallback, useEffect } from 'react';
 import { setToast } from '@/app/appSlice';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import Dialog from '@/components/Dialog/Dialog';
-import { Alert } from '@digdir/designsystemet-react';
+import { Alert } from 'dibk-designsystemet';
 import styles from './Toaster.module.scss';
 
 export default function Toaster() {

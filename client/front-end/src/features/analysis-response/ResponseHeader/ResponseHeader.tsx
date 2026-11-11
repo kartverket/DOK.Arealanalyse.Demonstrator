@@ -2,7 +2,7 @@ import { isEmptyObject } from '@/lib/helpers';
 import { ResultStatus, StatusFilter } from '../constants';
 import { selectResults } from '../responseSlice';
 import { useAppSelector } from '@/app/hooks';
-import { Heading } from '@digdir/designsystemet-react';
+import { Heading } from 'dibk-designsystemet';
 import AreaIcon from '@/assets/gfx/icon-area.svg?react';
 import MustCheckIcon from '@/assets/gfx/icon-must-check.svg?react';
 import MustHandleIcon from '@/assets/gfx/icon-must-handle.svg?react';

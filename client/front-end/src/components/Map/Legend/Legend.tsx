@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, Heading } from '@digdir/designsystemet-react';
+import { Button, Heading } from 'dibk-designsystemet';
 import { ChevronUpIcon, BulletListIcon } from '@navikt/aksel-icons';
 import styles from './Legend.module.scss';
 

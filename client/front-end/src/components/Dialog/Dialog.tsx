@@ -1,5 +1,5 @@
 import { useEffect, type ComponentPropsWithRef } from 'react';
-import { Dialog as DsDialog } from '@digdir/designsystemet-react';
+import { Dialog as DsDialog } from 'dibk-designsystemet';
 import styles from './Dialog.module.scss';
 
 type DialogProps = ComponentPropsWithRef<typeof DsDialog>;

@@ -44,6 +44,11 @@
     display: flex;
     justify-content: space-between;
     width: 252px;
+
+    &:hover {
+        background-color: unset;
+        color: unset;
+    }
 }
 
 .dropdownItemWrapper {

@@ -6,7 +6,7 @@ import { fetchArea } from './Suggestion.helpers';
 import {
     EXPERIMENTAL_Suggestion as DsSuggestion,
     type SuggestionItem,
-} from '@digdir/designsystemet-react';
+} from 'dibk-designsystemet';
 import styles from './Suggestion.module.scss';
 
 import type { AreaFeature, SearchFeature } from '@/types/api.types';

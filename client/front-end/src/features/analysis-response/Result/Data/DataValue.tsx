@@ -1,4 +1,4 @@
-import { Link } from '@digdir/designsystemet-react';
+import { Link } from 'dibk-designsystemet';
 
 interface DataValueProps {
     value: unknown;

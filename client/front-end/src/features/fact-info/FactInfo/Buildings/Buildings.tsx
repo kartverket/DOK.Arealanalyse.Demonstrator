@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { Pie } from 'react-chartjs-2';
 import { inPlaceSort } from 'fast-sort';
 import { COLOR_MAP, getChartData, chartOptions } from './Buildings.helpers';
-import { Heading, Paragraph, Table } from '@digdir/designsystemet-react';
+import { Heading, Paragraph, Table } from 'dibk-designsystemet';
 import styles from './Buildings.module.scss';
 
 import type { BuildingCount, FactPart } from '@/types/api.types';

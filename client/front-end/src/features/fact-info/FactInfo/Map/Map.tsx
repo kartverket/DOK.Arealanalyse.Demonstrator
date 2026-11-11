@@ -5,7 +5,7 @@ import basemap from '@/config/basemap.config';
 import DatafunnButton from '@/components/DatafunnButton/DatafunnButton';
 import { MapControl } from '@/components/Map/Map.constants';
 import MapView from '@/components/Map/MapView/MapView';
-import { Skeleton } from '@digdir/designsystemet-react';
+import { Skeleton } from 'dibk-designsystemet';
 import styles from './Map.module.scss';
 
 import type { CrsGeometry } from '@/types/geo.types';

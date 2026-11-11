@@ -12,6 +12,7 @@ import FactInfo from '@/features/fact-info/FactInfo/FactInfo';
 import ErrorBoundary from '@/components/ErrorBoundary/ErrorBoundary';
 import Heading from '@/components/Heading/Heading';
 import Toaster from '@/components/Toaster/Toaster';
+import { DibkAppShell } from 'dibk-designsystemet';
 import styles from './App.module.scss';
 
 export default function App() {
@@ -20,20 +21,19 @@ export default function App() {
     const analysisId = useAppSelector((state) => state.app.analysisId);
 
     return (
-        <div className={styles.app}>
-            <Heading />
-
-            <div className={styles.content}>
-                <ErrorBoundary>
-                    <Form />
-                    <Response key={analysisId} />
-                    <Drawer />
-                    <MapDialog />
-                    <ProgressDialog />
-                    <FactInfo />
-                    <Toaster />
-                </ErrorBoundary>
-            </div>
-        </div>
+        <DibkAppShell
+            search={false}
+            title="Arealanalyse av DOK-datasett - Demonstrator"
+        >
+            <ErrorBoundary>
+                <Form />
+                <Response key={analysisId} />
+                <Drawer />
+                <MapDialog />
+                <ProgressDialog />
+                <FactInfo />
+                <Toaster />
+            </ErrorBoundary>
+        </DibkAppShell>
     );
 }

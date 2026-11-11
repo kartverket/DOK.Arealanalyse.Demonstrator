@@ -1,4 +1,4 @@
-import { Heading, List } from '@digdir/designsystemet-react';
+import { Heading, List } from 'dibk-designsystemet';
 import styles from './Quality.module.scss';
 
 import type { QualityMeasurement } from '@/types/api.types';

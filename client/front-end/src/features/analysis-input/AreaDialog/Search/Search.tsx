@@ -1,7 +1,7 @@
 import { useMemo, useState, type ChangeEvent } from 'react';
 import { useGetKommunerQuery } from '@/lib/api/api';
 import Suggestion from './Suggestion/Suggestion';
-import { Field, Label, Select } from '@digdir/designsystemet-react';
+import { Field, Label, Select } from 'dibk-designsystemet';
 import styles from './Search.module.scss';
 
 import type { AreaFeature } from '@/types/api.types';

@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { Bar } from 'react-chartjs-2';
 import { inPlaceSort } from 'fast-sort';
 import { getChartData, chartOptions } from './Roads.helpers';
-import { Heading, Paragraph, Table } from '@digdir/designsystemet-react';
+import { Heading, Paragraph, Table } from 'dibk-designsystemet';
 import styles from './Roads.module.scss';
 
 import type { FactPart, RoadLength } from '@/types/api.types';

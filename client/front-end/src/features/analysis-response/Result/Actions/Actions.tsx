@@ -1,5 +1,5 @@
 import { marked } from 'marked';
-import { Heading, Link, List } from '@digdir/designsystemet-react';
+import { Heading, Link, List } from 'dibk-designsystemet';
 import { ExternalLinkIcon } from '@navikt/aksel-icons';
 import styles from './Actions.module.scss';
 

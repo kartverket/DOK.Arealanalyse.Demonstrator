@@ -1,6 +1,5 @@
 .form {
-    border: 1px solid #e5e7eb;
-    border-radius: var(--ds-border-radius-lg);
+    border: 1px solid var(--dibk-color-hairline);
     margin-bottom: 80px;
 }
 
@@ -13,9 +12,9 @@
         display: flex;
         align-items: center;
         margin-bottom: 24px;
-        border-bottom: 1px solid #e5e7eb;
+        border-bottom: 1px solid var(--dibk-color-hairline);
         padding-bottom: 24px;
-        gap: 30px;
+        gap: 24px;
 
         &:last-child {
             border-bottom: 0 none;

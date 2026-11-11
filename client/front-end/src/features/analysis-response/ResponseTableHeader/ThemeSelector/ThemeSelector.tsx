@@ -1,5 +1,5 @@
 import { useState, type ChangeEvent } from 'react';
-import { Checkbox, Dropdown } from '@digdir/designsystemet-react';
+import { Checkbox, Dropdown } from 'dibk-designsystemet';
 import { ChevronDownIcon, ChevronUpIcon } from '@navikt/aksel-icons';
 import styles from './ThemeSelector.module.scss';
 

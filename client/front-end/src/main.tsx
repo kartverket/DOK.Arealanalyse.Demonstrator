@@ -6,6 +6,8 @@ import store from '@/app/store';
 import '@/config/chartjs.config';
 import '@/config/projections.config';
 import '@/config/extents.config';
+import 'dibk-designsystemet/fonts.css';
+import 'dibk-designsystemet/styles.css';
 import '@/styles/styles.scss';
 
 const root = document.getElementById('root')!;

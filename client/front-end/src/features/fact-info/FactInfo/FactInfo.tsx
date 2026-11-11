@@ -8,7 +8,7 @@ import { toggleFactInfo } from '@/app/appSlice';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { getBufferedGeometry } from './FactInfo.helpers';
 import Dialog from '@/components/Dialog/Dialog';
-import { Button, Heading } from '@digdir/designsystemet-react';
+import { Button, Heading } from 'dibk-designsystemet';
 import styles from './FactInfo.module.scss';
 
 import type { AnalysisData } from '@/types/analysis.types';

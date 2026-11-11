@@ -6,7 +6,7 @@ import ResultMapView from '../MapView/MapView';
 import basemap from '@/config/basemap.config';
 import DatafunnButton from '@/components/DatafunnButton/DatafunnButton';
 import { MapControl } from '@/components/Map/Map.constants';
-import { Heading, Skeleton } from '@digdir/designsystemet-react';
+import { Heading, Skeleton } from 'dibk-designsystemet';
 import styles from './Map.module.scss';
 
 import type { ResultItem } from '@/types/analysis.types';

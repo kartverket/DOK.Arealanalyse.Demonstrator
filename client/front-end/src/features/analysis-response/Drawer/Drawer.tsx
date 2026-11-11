@@ -4,7 +4,7 @@ import { setSelectedResultId } from '../responseSlice';
 import Result from '../Result/Result';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import Dialog from '@/components/Dialog/Dialog';
-import { Button } from '@digdir/designsystemet-react';
+import { Button } from 'dibk-designsystemet';
 import {
     ArrowDownIcon,
     ArrowUpIcon,

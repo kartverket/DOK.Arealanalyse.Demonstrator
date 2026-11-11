@@ -1,5 +1,5 @@
 import React, { type ErrorInfo, type ReactNode } from 'react';
-import { Button, Heading, Paragraph } from '@digdir/designsystemet-react';
+import { Button, Heading, Paragraph } from 'dibk-designsystemet';
 import { ArrowCirclepathIcon } from '@navikt/aksel-icons';
 import styles from './ErrorBoundary.module.scss';
 

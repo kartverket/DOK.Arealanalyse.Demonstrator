@@ -1,5 +1,5 @@
 import DataNode from './DataNode';
-import { Heading } from '@digdir/designsystemet-react';
+import { Heading } from 'dibk-designsystemet';
 import styles from './Data.module.scss';
 
 interface DataProps {

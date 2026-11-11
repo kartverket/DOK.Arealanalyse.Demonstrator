@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { Pie } from 'react-chartjs-2';
 import { inPlaceSort } from 'fast-sort';
 import { COLOR_MAP, getChartData, chartOptions } from './Area.helpers';
-import { Heading, Paragraph, Table } from '@digdir/designsystemet-react';
+import { Heading, Paragraph, Table } from 'dibk-designsystemet';
 import styles from './Area.module.scss';
 
 import type { AreaTypesData, FactPart } from '@/types/api.types';

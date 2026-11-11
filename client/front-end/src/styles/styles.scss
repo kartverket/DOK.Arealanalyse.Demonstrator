@@ -1,18 +1,16 @@
-@use '@digdir/designsystemet-css';
-@use './_theme.css';
-@use './reset';
-@use '../../node_modules/ol/ol.css';
+@use 'ol/ol';
 @use '../../node_modules/pretty-print-json/dist/css/pretty-print-json.css';
-@use './fonts';
-@use './overrides';
+@use 'fonts';
+@use 'overrides';
 
 :root {
-    --page-width: 1520px;
+    --dibk-container-max: 1520px;
+    --dibk-container-pad: 40px;
 }
 
 html {
-    font-family: 'Inter';
-    font-size: 12px;
+    font-family: 'Poppins';
+    font-size: 14px;
     scrollbar-gutter: stable;
 
     &.no-scroll {
@@ -22,7 +20,7 @@ html {
 
 body {
     background-color: #ffffff;
-    color: #101828;
+    // color: #101828;
 }
 
 *[role='button'] {
