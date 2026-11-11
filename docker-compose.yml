@@ -6,7 +6,7 @@ services:
     build:
       context: ./client/front-end
     environment:
-      - SOCKET_IO_SRV_URL=http://host.docker.internal:5002/
+      - SOCKET_IO_SRV_URL=http://172.17.0.1:5002/
     ports:
       - "80:80"
       - "443:443"
@@ -22,7 +22,7 @@ services:
     build:
       context: ./client/api
     environment:
-      - PYGEOAPI_API_URL=http://host.docker.internal:5000/processes/dokanalyse/execution
+      - PYGEOAPI_API_URL=http://172.17.0.1:5000/processes/dokanalyse/execution
       - EXCLUDED_KOMMUNER_PLAN=0301,2100,2211
       - NAP_USERNAME=${NAP_USERNAME}
       - NAP_PASSWORD=${NAP_PASSWORD}

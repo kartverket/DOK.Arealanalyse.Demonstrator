@@ -1838,7 +1838,7 @@ __metadata:
     oxfmt: "npm:^0.78.0"
     oxlint: "npm:^1.93.0"
     oxlint-rules: "npm:^0.4.3"
-    pretty-print-json: "npm:^3.0.6"
+    pretty-print-json: "npm:^3.0.8"
     progressbar.js: "npm:^1.1.1"
     proj4: "npm:^2.22.0"
     react: "npm:^19.3.1"
@@ -2817,10 +2817,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pretty-print-json@npm:^3.0.6":
-  version: 3.0.7
-  resolution: "pretty-print-json@npm:3.0.7"
-  checksum: 10c0/8e5f322a2ff08d1e138fd0981d4628764f89b40f93b65a707a51cf086a2376eb88bf6d881bdb4bed2c4513e1462687a03adb240b1ad064abbd022ffa84a3c668
+"pretty-print-json@npm:^3.0.8":
+  version: 3.0.8
+  resolution: "pretty-print-json@npm:3.0.8"
+  checksum: 10c0/6dd715f71a19832576c90752ebbb36803e5d51baaa1144cc285a9defa664298dd6eb0ec33942e696852f95e60aff3b0da603c56ab5b3eb0ee8507dbc113b97e0
   languageName: node
   linkType: hard
 
