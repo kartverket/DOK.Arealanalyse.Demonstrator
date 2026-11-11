@@ -114,7 +114,10 @@ export const selectResults = createSelector(
         });
 
         sortResults(groupings, [ResultStatus.NOT_RELEVANT, ResultStatus.NOT_IMPLEMENTED, ResultStatus.TIMEOUT, ResultStatus.ERROR], results => {
-            inPlaceSort(results).asc(result => result.themes[0]);
+            inPlaceSort(results).asc([
+                result => result.themes[0],
+                result => result.data.description
+            ]);
         });
 
         return groupings;

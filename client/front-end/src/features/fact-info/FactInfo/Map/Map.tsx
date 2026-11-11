@@ -1,7 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { createMapImage } from '@/lib/map/map';
 import caching from '@/lib/map/mapImageCache';
-import { getGeometries } from './Map.helpers';
 import { Skeleton } from '@digdir/designsystemet-react';
 import styles from './Map.module.scss';
 import basemap from '@/config/basemap.config';
@@ -13,20 +12,15 @@ const MAP_WIDTH = 1280;
 const MAP_HEIGHT = 720;
 
 interface MapProps {
-    inputGeometry: CrsGeometry;
-    buffer: string;
+    geometry: CrsGeometry;
+    bufferedGeometry: CrsGeometry | null;
     mapImageUri: string | null;
     cacheKey: string;
 }
 
-export default function Map({ inputGeometry, buffer, mapImageUri, cacheKey }: MapProps) {
+export default function Map({ geometry, bufferedGeometry, mapImageUri, cacheKey }: MapProps) {
     const [_mapImageUri, setMapImageUri] = useState<string | null>(null);
     const [showInteractiveMap, setShowInteractiveMap] = useState(false);
-
-    const { geometry, bufferedGeometry } = useMemo(
-        () => getGeometries(inputGeometry, buffer),
-        [inputGeometry, buffer]
-    );
 
     useEffect(
         () => {

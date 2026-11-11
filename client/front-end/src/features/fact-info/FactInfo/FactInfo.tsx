@@ -3,6 +3,7 @@ import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { toggleFactInfo } from '@/app/appSlice';
 import { Button, Heading } from '@digdir/designsystemet-react';
 import Dialog from '@/components/Dialog/Dialog';
+import { getBufferedGeometry } from './FactInfo.helpers';
 import Map from './Map/Map';
 import styles from './FactInfo.module.scss';
 import Area from './Area/Area';
@@ -20,7 +21,6 @@ const DATASET_ID = {
 
 export default function FactInfo() {
     const data = useAppSelector(state => state.response.data);
-    const { inputGeometry, requestedBuffer } = useAppSelector(state => state.app.formData);
     const factInfoOpen = useAppSelector(state => state.app.factInfoOpen);
     const dispatch = useAppDispatch();
     const contentRef = useRef<HTMLDivElement>(null);
@@ -72,16 +72,12 @@ export default function FactInfo() {
                 </section>
 
                 <section className={styles.map}>
-                    {
-                        inputGeometry !== null && (
-                            <Map
-                                inputGeometry={inputGeometry}
-                                buffer={requestedBuffer}
-                                mapImageUri={data.factSheetRasterResult.imageUri}
-                                cacheKey={data.id}
-                            />
-                        )
-                    }
+                    <Map
+                        geometry={data.inputGeometry}
+                        bufferedGeometry={getBufferedGeometry(data)}
+                        mapImageUri={data.factSheetRasterResult.imageUri}
+                        cacheKey={data.id}
+                    />
                 </section>
 
                 <section>
