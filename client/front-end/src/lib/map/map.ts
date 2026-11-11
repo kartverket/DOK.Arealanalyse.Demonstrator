@@ -11,14 +11,14 @@ import Style from 'ol/style/Style';
 import Stroke from 'ol/style/Stroke';
 import type BaseLayer from 'ol/layer/Base';
 import type { Options as WmtsOptions } from 'ol/source/WMTS';
-import type { CrsGeometry, LonLat } from '@/types/geo.types';
+import type { CrsGeometry } from '@/types/geo.types';
 import { getProjection } from '@/lib/geo/crs';
 import basemap from '@/config/basemap.config';
 
 const MAP_WIDTH = 720;
 const MAP_HEIGHT = 480;
 
-type WmtsLayerName = (typeof basemap.layers)[keyof typeof basemap.layers];
+export type WmtsLayerName = (typeof basemap.layers)[keyof typeof basemap.layers];
 
 interface MapImageOptions {
     width?: number;
@@ -28,73 +28,20 @@ interface MapImageOptions {
 
 const _wmtsOptions: Partial<Record<WmtsLayerName, WmtsOptions>> = {};
 
-export async function createMap({ geometry, bufferedGeometry, wmsUrl }: {
-    geometry: CrsGeometry;
-    bufferedGeometry: CrsGeometry | null;
-    wmsUrl: string | null;
+export async function createMap({ geometry, bufferedGeometry = null, wmtsLayer, wmsUrl = null }: {
+    geometry: CrsGeometry | null;
+    bufferedGeometry?: CrsGeometry | null;
+    wmtsLayer: WmtsLayerName;
+    wmsUrl?: string | null;
 }): Promise<OlMap> {
-    const layers = withoutNull([
-        await createWmtsLayer(basemap.layers.topograatone),
-        createWmsLayer(wmsUrl),
-        createFeaturesLayer(geometry, bufferedGeometry)
-    ]);
+    const featuresLayer = geometry !== null ? createFeaturesLayer(geometry, bufferedGeometry) : null;
 
     const map = new OlMap({
         interactions: defaultInteractions().extend([new DragRotateAndZoom()]),
-        layers
+        layers: await createLayers(wmtsLayer, wmsUrl, featuresLayer)
     });
 
-    map.setView(new View({
-        padding: [50, 50, 50, 50],
-        projection: 'EPSG:25833',
-        maxZoom: basemap.maxZoom
-    }));
-
-    return map;
-}
-
-export async function createAreaMap(geometry: CrsGeometry | null): Promise<OlMap> {
-    const layers = withoutNull<BaseLayer>([
-        await createWmtsLayer(basemap.layers.topograatone)
-    ]);
-
-    if (geometry !== null) {
-        layers.push(createAreaFeaturesLayer(geometry));
-    }
-
-    const map = new OlMap({
-        interactions: defaultInteractions().extend([new DragRotateAndZoom()]),
-        layers
-    });
-
-    map.setView(new View({
-        padding: [50, 50, 50, 50],
-        projection: 'EPSG:25833',
-        maxZoom: basemap.maxZoom
-    }));
-
-    return map;
-}
-
-export async function createFactInfoMap({ geometry, bufferedGeometry }: {
-    geometry: CrsGeometry;
-    bufferedGeometry: CrsGeometry | null;
-}): Promise<OlMap> {
-    const layers = withoutNull([
-        await createWmtsLayer(basemap.layers.topo),
-        createFeaturesLayer(geometry, bufferedGeometry)
-    ]);
-
-    const map = new OlMap({
-        interactions: defaultInteractions().extend([new DragRotateAndZoom()]),
-        layers
-    });
-
-    map.setView(new View({
-        padding: [50, 50, 50, 50],
-        projection: 'EPSG:25833',
-        maxZoom: basemap.maxZoom
-    }));
+    map.setView(createView());
 
     return map;
 }
@@ -124,32 +71,6 @@ export function getLayer<TLayer extends BaseLayer = BaseLayer>(map: OlMap, id: s
         .find(layer => layer.get('id') === id) as TLayer | undefined;
 }
 
-export async function getCurrentPosition(): Promise<LonLat | null> {
-    return new Promise(resolve => {
-        if ('geolocation' in navigator) {
-            const options = {
-                enableHighAccuracy: true,
-                timeout: 5000,
-                maximumAge: 0
-            };
-
-            navigator.geolocation.getCurrentPosition(
-                position => {
-                    resolve([position.coords.longitude, position.coords.latitude]);
-                },
-                error => {
-                    console.log(`Error (${error.code}): ${error.message}`);
-                    resolve(null);
-                },
-                options
-            );
-        } else {
-            console.log('Geolocation er ikke støttet');
-            resolve(null);
-        }
-    });
-}
-
 async function createTempMap(
     geometry: CrsGeometry,
     bufferedGeometry: CrsGeometry | null,
@@ -158,29 +79,9 @@ async function createTempMap(
     options: MapImageOptions
 ): Promise<[OlMap, HTMLDivElement]> {
     const featuresLayer = createFeaturesLayer(geometry, bufferedGeometry);
-    const wmts = await createWmtsLayer(wmtsLayer);
-    const layers: BaseLayer[] = [];
+    const map = new OlMap({ layers: await createLayers(wmtsLayer, wmsUrl, featuresLayer) });
 
-    if (wmts !== null) {
-        layers.push(wmts);
-    }
-
-    if (wmsUrl) {
-        layers.push(createWmsLayer(wmsUrl));
-    }
-
-    layers.push(featuresLayer);
-
-    const map = new OlMap({ layers });
-
-    map.setView(new View({
-        padding: [50, 50, 50, 50],
-        projection: 'EPSG:25833',
-        maxZoom: basemap.maxZoom,
-        constrainResolution: options.constrainResolution !== undefined ?
-            options.constrainResolution :
-            true
-    }));
+    map.setView(createView(options.constrainResolution ?? true));
 
     const mapWidth = options.width || MAP_WIDTH;
     const mapHeight = options.height || MAP_HEIGHT;
@@ -197,6 +98,38 @@ async function createTempMap(
     return [map, mapElement];
 }
 
+async function createLayers(
+    wmtsLayer: WmtsLayerName,
+    wmsUrl: string | null,
+    featuresLayer: VectorLayer<VectorSource> | null
+): Promise<BaseLayer[]> {
+    const layers: BaseLayer[] = [];
+    const wmts = await createWmtsLayer(wmtsLayer);
+
+    if (wmts !== null) {
+        layers.push(wmts);
+    }
+
+    if (wmsUrl) {
+        layers.push(createWmsLayer(wmsUrl));
+    }
+
+    if (featuresLayer !== null) {
+        layers.push(featuresLayer);
+    }
+
+    return layers;
+}
+
+function createView(constrainResolution?: boolean): View {
+    return new View({
+        padding: [50, 50, 50, 50],
+        projection: 'EPSG:25833',
+        maxZoom: basemap.maxZoom,
+        constrainResolution
+    });
+}
+
 function createFeaturesLayer(geometry: CrsGeometry, bufferedGeometry: CrsGeometry | null = null): VectorLayer<VectorSource> {
     const projection = getProjection(geometry);
     const source = new VectorSource();
@@ -204,18 +137,6 @@ function createFeaturesLayer(geometry: CrsGeometry, bufferedGeometry: CrsGeometr
     if (bufferedGeometry !== null) {
         source.addFeature(createFeature(bufferedGeometry, projection, getBufferStyle()));
     }
-
-    source.addFeature(createFeature(geometry, projection, getOutlineStyle()));
-
-    const vectorLayer = new VectorLayer({ source });
-    vectorLayer.set('id', 'features');
-
-    return vectorLayer;
-}
-
-function createAreaFeaturesLayer(geometry: CrsGeometry): VectorLayer<VectorSource> {
-    const projection = getProjection(geometry);
-    const source = new VectorSource();
 
     source.addFeature(createFeature(geometry, projection, getOutlineStyle()));
 
@@ -285,10 +206,10 @@ async function getWmtsOptions(wmtsLayer: WmtsLayerName): Promise<WmtsOptions | n
     return wmtsOptions;
 }
 
-function createWmsLayer(url: string | null): TileLayer {
+function createWmsLayer(url: string): TileLayer {
     return new TileLayer({
         source: new TileWMS({
-            url: url ?? undefined,
+            url,
             params: {},
             crossOrigin: 'anonymous'
         })
@@ -358,8 +279,4 @@ function getBufferStyle(): Style {
             width: 2
         })
     });
-}
-
-function withoutNull<T>(items: (T | null)[]): T[] {
-    return items.filter((item): item is T => item !== null);
 }

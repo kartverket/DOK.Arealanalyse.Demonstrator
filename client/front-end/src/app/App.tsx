@@ -1,6 +1,6 @@
 import { useAppSelector } from './hooks';
 import useSocketIO from '@/lib/socket/useSocketIO';
-import messageHandlers from '@/features/analysis-progress/messageHandlers';
+import messageHandlers, { handleDisconnect } from '@/features/analysis-progress/messageHandlers';
 import Form from '@/features/analysis-input/Form/Form';
 import Response from '@/features/analysis-response/Response/Response';
 import Drawer from '@/features/analysis-response/Drawer/Drawer';
@@ -13,7 +13,7 @@ import Toaster from '@/components/Toaster/Toaster';
 import styles from './App.module.scss';
 
 export default function App() {
-    useSocketIO(messageHandlers);
+    useSocketIO(messageHandlers, handleDisconnect);
     const analysisId = useAppSelector(state => state.app.analysisId);
 
     return (

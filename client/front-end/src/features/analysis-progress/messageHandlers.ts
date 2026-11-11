@@ -12,4 +12,8 @@ const messageHandlers: ServerToClientEvents = {
     }
 };
 
+export function handleDisconnect(): void {
+    store.dispatch(setCorrelationId(null));
+}
+
 export default messageHandlers;

@@ -19,5 +19,3 @@ export const ResultStatus = {
     TIMEOUT: 'TIMEOUT',
     ERROR: 'ERROR'
 } as const satisfies Record<string, ResultStatusValue>;
-
-export const DEFAULT_EPSG = 25833;

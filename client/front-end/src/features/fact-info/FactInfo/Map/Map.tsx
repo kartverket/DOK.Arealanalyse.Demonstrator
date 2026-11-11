@@ -4,7 +4,8 @@ import caching from '@/lib/map/mapImageCache';
 import { Skeleton } from '@digdir/designsystemet-react';
 import styles from './Map.module.scss';
 import basemap from '@/config/basemap.config';
-import MapView from '../MapView/MapView';
+import MapView from '@/components/Map/MapView/MapView';
+import { MapControl } from '@/components/Map/Map.constants';
 import DatafunnButton from '@/components/DatafunnButton/DatafunnButton';
 import type { CrsGeometry } from '@/types/geo.types';
 
@@ -79,6 +80,11 @@ export default function Map({ geometry, bufferedGeometry, mapImageUri, cacheKey 
                 <MapView
                     geometry={geometry}
                     bufferedGeometry={bufferedGeometry}
+                    wmtsLayer={basemap.layers.topo}
+                    controls={[
+                        MapControl.ZOOM,
+                        MapControl.ZOOM_TO_EXTENT
+                    ]}
                 />
 
                 <DatafunnButton

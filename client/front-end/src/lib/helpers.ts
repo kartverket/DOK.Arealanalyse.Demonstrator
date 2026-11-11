@@ -1,11 +1,3 @@
-export function parseJson(json: string): unknown {
-    try {
-        return JSON.parse(json);
-    } catch {
-        return null;
-    }
-}
-
 export function debounce<TArgs extends unknown[]>(func: (...args: TArgs) => void, delay: number) {
     let timeoutId: ReturnType<typeof setTimeout> | undefined;
 

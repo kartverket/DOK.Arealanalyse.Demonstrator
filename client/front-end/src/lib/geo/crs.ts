@@ -26,12 +26,3 @@ export function getEpsgCode(crsName: string | undefined): string | null {
 export function getCrsName(geoJson: CrsGeometry): string | undefined {
     return geoJson?.crs?.properties?.name;
 }
-
-export function addCrsName(geoJson: CrsGeometry, epsg: number): void {
-    geoJson.crs = {
-        type: 'name',
-        properties: {
-            name: `urn:ogc:def:crs:EPSG::${epsg}`
-        }
-    }
-}

@@ -62,7 +62,7 @@ export function filterResults(resultList: ResultGroupings, statusFilters: Status
 
     filtered = filtered
         .filter(resultItem => resultItem.themes
-            .some(theme => selectedThemes.includes(theme)));
+            .some(theme => selectedThemes.includes(capitalizeFirstLetter(theme))));
 
     const normalized = searchTerm.trim().toLowerCase();
 

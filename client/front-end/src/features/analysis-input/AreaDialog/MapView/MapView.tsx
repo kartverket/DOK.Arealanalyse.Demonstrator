@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import { createAreaMap } from '@/lib/map/map';
+import { createMap } from '@/lib/map/map';
 import { setupMap } from './MapView.helpers';
 import Zoom from '@/components/Map/Zoom/Zoom';
 import ZoomToExtent from '@/components/Map/ZoomToExtent/ZoomToExtent';
+import basemap from '@/config/basemap.config';
 import type OlMap from 'ol/Map';
 import type { CrsGeometry, LonLat } from '@/types/geo.types';
 import styles from './MapView.module.scss';
@@ -23,7 +24,11 @@ export default function MapView({ geometry, currentLocation }: MapViewProps) {
             }
 
             (async () => {
-                const olMap = await createAreaMap(geometry);
+                const olMap = await createMap({
+                    geometry,
+                    wmtsLayer: basemap.layers.topograatone
+                });
+
                 setMap(olMap);
             })();
         },

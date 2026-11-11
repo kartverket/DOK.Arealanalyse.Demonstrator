@@ -1,13 +1,10 @@
 import { useEffect, useRef } from 'react';
-import { useDispatch } from 'react-redux';
 import { io, type Socket } from 'socket.io-client';
-import { setCorrelationId } from '@/app/appSlice';
 import type { ServerToClientEvents } from '@/types/socket.types';
 
 const WS_BASE_URL = import.meta.env.VITE_WS_BASE_URL;
 
-export default function useSocketIO(messageHandlers: ServerToClientEvents) {
-    const dispatch = useDispatch();
+export default function useSocketIO(messageHandlers: ServerToClientEvents, onDisconnect: () => void) {
     const initRef = useRef(true);
 
     useEffect(
@@ -22,14 +19,12 @@ export default function useSocketIO(messageHandlers: ServerToClientEvents) {
 
             initRef.current = false;
 
-            socket.on('disconnect', () => {
-                dispatch(setCorrelationId(null));
-            });
+            socket.on('disconnect', onDisconnect);
 
             (Object.keys(messageHandlers) as (keyof ServerToClientEvents)[]).forEach(key => {
                 socket.on(key, messageHandlers[key]);
             });
         },
-        [dispatch, messageHandlers]
+        [messageHandlers, onDisconnect]
     );
 }

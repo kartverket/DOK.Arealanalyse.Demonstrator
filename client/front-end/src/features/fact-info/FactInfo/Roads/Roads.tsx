@@ -41,7 +41,7 @@ export default function Roads({ factPart }: RoadsProps) {
         return (
             <div>
                 <div className={styles.tableContainer}>
-                    <Table aria-label="Oversikt vegtyper">
+                    <Table data-size="sm" aria-label="Oversikt vegtyper">
                         <Table.Head>
                             <Table.Row>
                                 <Table.Cell>Vegtype</Table.Cell>
