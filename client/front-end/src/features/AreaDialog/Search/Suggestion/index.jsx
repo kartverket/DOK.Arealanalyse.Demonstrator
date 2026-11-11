@@ -1,10 +1,9 @@
-import { Button, EXPERIMENTAL_Suggestion as DsSuggestion } from '@digdir/designsystemet-react';
+import { EXPERIMENTAL_Suggestion as DsSuggestion } from '@digdir/designsystemet-react';
 import { useRef, useState } from 'react';
 import { api, apiFetch } from 'store/api';
 import { debounce } from 'utils/helpers';
 import { getApiParams } from './helpers';
 import styles from './Suggestion.module.scss';
-import { ZoomPlusIcon } from '@navikt/aksel-icons';
 
 export default function Suggestion({ kommunenummer, onSelected }) {
     const [suggestions, setSuggestions] = useState([]);

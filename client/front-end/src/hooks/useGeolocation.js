@@ -2,12 +2,11 @@ import { useEffect, useState } from 'react';
 
 export default function useGeolocation() {
     const [coordinates, setCoordinates] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(() => 'geolocation' in navigator);
 
     useEffect(
         () => {
             if (!('geolocation' in navigator)) {
-                setLoading(false);
                 return;
             }
 

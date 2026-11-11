@@ -9,7 +9,7 @@
     background: rgb(0 0 0 / 15%);
     overflow: hidden;
     overscroll-behavior: contain;    
-    animation: dialog-fade-in var(0.3s) ease-in-out;
+    animation: dialog-fade-in 0.3s ease-in-out;
 }
 
 .dialog {
