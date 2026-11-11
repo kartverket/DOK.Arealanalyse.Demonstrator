@@ -1,3 +1,6 @@
+# VS Code
+.vscode/
+
 # virtualenv
 .venv
 venv/
