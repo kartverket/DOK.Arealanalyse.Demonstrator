@@ -1,8 +1,9 @@
 import dayjs from 'dayjs';
-import { Heading, Link } from '@digdir/designsystemet-react';
 import FormattedText from '@/components/FormattedText/FormattedText';
-import type { Dataset as DatasetType } from '@/types/api.types';
+import { Heading, Link } from '@digdir/designsystemet-react';
 import styles from './Dataset.module.scss';
+
+import type { Dataset as DatasetType } from '@/types/api.types';
 
 interface DatasetProps {
     dataset: DatasetType;

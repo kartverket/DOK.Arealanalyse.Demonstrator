@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { createMapImage } from '@/lib/map/map';
 import caching from '@/lib/map/mapImageCache';
+import basemap from '@/config/basemap.config';
+import DatafunnButton from '@/components/DatafunnButton/DatafunnButton';
+import { MapControl } from '@/components/Map/Map.constants';
+import MapView from '@/components/Map/MapView/MapView';
 import { Skeleton } from '@digdir/designsystemet-react';
 import styles from './Map.module.scss';
-import basemap from '@/config/basemap.config';
-import MapView from '@/components/Map/MapView/MapView';
-import { MapControl } from '@/components/Map/Map.constants';
-import DatafunnButton from '@/components/DatafunnButton/DatafunnButton';
+
 import type { CrsGeometry } from '@/types/geo.types';
 
 const MAP_WIDTH = 1280;
@@ -19,39 +20,39 @@ interface MapProps {
     cacheKey: string;
 }
 
-export default function Map({ geometry, bufferedGeometry, mapImageUri, cacheKey }: MapProps) {
+export default function Map({
+    geometry,
+    bufferedGeometry,
+    mapImageUri,
+    cacheKey,
+}: MapProps) {
     const [_mapImageUri, setMapImageUri] = useState<string | null>(null);
     const [showInteractiveMap, setShowInteractiveMap] = useState(false);
 
-    useEffect(
-        () => {
-            (async () => {
-                let imageUri = mapImageUri;
-
+    useEffect(() => {
+        (async () => {
+            let imageUri = mapImageUri;
+            if (imageUri === null) {
+                imageUri = caching.getMapImage(cacheKey);
                 if (imageUri === null) {
-                    imageUri = caching.getMapImage(cacheKey);
+                    imageUri = await createMapImage({
+                        geometry,
+                        bufferedGeometry,
+                        wmtsLayer: basemap.layers.topo,
+                        options: {
+                            width: MAP_WIDTH,
+                            height: MAP_HEIGHT,
+                            constrainResolution: false,
+                        },
+                    });
 
-                    if (imageUri === null) {
-                        imageUri = await createMapImage({
-                            geometry,
-                            bufferedGeometry,
-                            wmtsLayer: basemap.layers.topo,
-                            options: {
-                                width: MAP_WIDTH,
-                                height: MAP_HEIGHT,
-                                constrainResolution: false
-                            }
-                        });
-
-                        caching.setMapImage(cacheKey, imageUri);
-                    }
+                    caching.setMapImage(cacheKey, imageUri);
                 }
+            }
 
-                setMapImageUri(imageUri);
-            })();
-        },
-        [geometry, bufferedGeometry, mapImageUri, cacheKey]
-    );
+            setMapImageUri(imageUri);
+        })();
+    }, [geometry, bufferedGeometry, mapImageUri, cacheKey]);
 
     function renderMap() {
         if (!showInteractiveMap) {
@@ -81,10 +82,7 @@ export default function Map({ geometry, bufferedGeometry, mapImageUri, cacheKey 
                     geometry={geometry}
                     bufferedGeometry={bufferedGeometry}
                     wmtsLayer={basemap.layers.topo}
-                    controls={[
-                        MapControl.ZOOM,
-                        MapControl.ZOOM_TO_EXTENT
-                    ]}
+                    controls={[MapControl.ZOOM, MapControl.ZOOM_TO_EXTENT]}
                 />
 
                 <DatafunnButton
@@ -95,7 +93,9 @@ export default function Map({ geometry, bufferedGeometry, mapImageUri, cacheKey 
         );
     }
 
-    return _mapImageUri === null ?
-        <Skeleton className={styles.skeleton} /> :
+    return _mapImageUri === null ? (
+        <Skeleton className={styles.skeleton} />
+    ) : (
         renderMap()
+    );
 }

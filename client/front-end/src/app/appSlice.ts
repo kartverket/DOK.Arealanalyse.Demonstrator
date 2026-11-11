@@ -1,4 +1,5 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+
 import type { CrsGeometry, LonLat } from '@/types/geo.types';
 
 export interface AnalysisFormData {
@@ -51,17 +52,17 @@ const initialState: AppState = {
         includeQualityMeasurement: true,
         includeFilterChosenDOK: false,
         includeFacts: true,
-        createBinaries: false
+        createBinaries: false,
     },
     currentLocation: {
         coordinates: null,
-        kommunenummer: null
+        kommunenummer: null,
     },
     toast: null,
     errorMessage: null,
     analysisId: 0,
     busy: false,
-    factInfoOpen: false
+    factInfoOpen: false,
 };
 
 export const appSlice = createSlice({
@@ -71,7 +72,7 @@ export const appSlice = createSlice({
         setCorrelationId: (state, action: PayloadAction<string | null>) => {
             return {
                 ...state,
-                correlationId: action.payload
+                correlationId: action.payload,
             };
         },
         setFormData: (state, action: PayloadAction<FormDataField>) => {
@@ -79,51 +80,53 @@ export const appSlice = createSlice({
                 ...state,
                 formData: {
                     ...state.formData,
-                    [action.payload.name]: action.payload.value
-                }
+                    [action.payload.name]: action.payload.value,
+                },
             };
         },
         setCurrentLocation: (state, action: PayloadAction<CurrentLocation>) => {
             return {
                 ...state,
-                currentLocation: action.payload
+                currentLocation: action.payload,
             };
         },
-        setToast: (state, action: PayloadAction<{ message: string; type?: ToastType } | null>) => {
+        setToast: (
+            state,
+            action: PayloadAction<{ message: string; type?: ToastType } | null>,
+        ) => {
             let toast: Toast | null = null;
-
             if (action.payload !== null) {
                 toast = {
                     ...action.payload,
-                    type: action.payload.type || 'danger'
+                    type: action.payload.type || 'danger',
                 };
             }
 
             return {
                 ...state,
-                toast
+                toast,
             };
         },
         analyzeStart: (state) => {
             return {
                 ...state,
                 analysisId: state.analysisId + 1,
-                busy: true
+                busy: true,
             };
         },
-        analyzeFinish:  (state) => {
+        analyzeFinish: (state) => {
             return {
                 ...state,
-                busy: false
+                busy: false,
             };
         },
         toggleFactInfo: (state, action: PayloadAction<boolean>) => {
             return {
                 ...state,
-                factInfoOpen: action.payload
+                factInfoOpen: action.payload,
             };
-        }
-    }
+        },
+    },
 });
 
 export const {
@@ -133,7 +136,7 @@ export const {
     setToast,
     analyzeStart,
     analyzeFinish,
-    toggleFactInfo
+    toggleFactInfo,
 } = appSlice.actions;
 
 export default appSlice.reducer;

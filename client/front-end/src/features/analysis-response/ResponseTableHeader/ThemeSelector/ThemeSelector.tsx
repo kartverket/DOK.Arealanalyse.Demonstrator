@@ -10,7 +10,12 @@ interface ThemeSelectorProps {
     disabled: boolean;
 }
 
-export default function ThemeSelector({ themes, selectedThemes, onThemeSelected, disabled }: ThemeSelectorProps) {
+export default function ThemeSelector({
+    themes,
+    selectedThemes,
+    onThemeSelected,
+    disabled,
+}: ThemeSelectorProps) {
     const [buttonText, setButtonText] = useState('Alle valgt');
     const [dropdownOpen, setDropdownOpen] = useState(false);
 
@@ -24,7 +29,6 @@ export default function ThemeSelector({ themes, selectedThemes, onThemeSelected,
                 buttonText = 'Alle valgt';
             } else {
                 updatedThemes = [...selectedThemes, value];
-
                 if (updatedThemes.length === themes.length) {
                     updatedThemes = [...updatedThemes, 'Alle'];
                     buttonText = 'Alle valgt';
@@ -37,8 +41,10 @@ export default function ThemeSelector({ themes, selectedThemes, onThemeSelected,
                 updatedThemes = [];
                 buttonText = 'Ingen valgt';
             } else {
-                updatedThemes = selectedThemes.filter(theme => theme !== value && theme !== 'Alle');
-                buttonText = `${updatedThemes.length > 0 ? updatedThemes.length : 'Ingen'} valgt`;                
+                updatedThemes = selectedThemes.filter(
+                    (theme) => theme !== value && theme !== 'Alle',
+                );
+                buttonText = `${updatedThemes.length > 0 ? updatedThemes.length : 'Ingen'} valgt`;
             }
         }
 
@@ -48,22 +54,24 @@ export default function ThemeSelector({ themes, selectedThemes, onThemeSelected,
 
     return (
         <Dropdown.TriggerContext>
-            <Dropdown.Trigger 
+            <Dropdown.Trigger
                 variant="secondary"
                 className={styles.dropdownTrigger}
                 disabled={disabled}
             >
-                <span>
-                    Tema: {buttonText}
-                </span>                    
-                {dropdownOpen ? <ChevronUpIcon aria-hidden /> : <ChevronDownIcon aria-hidden />}                
+                <span>Tema: {buttonText}</span>
+                {dropdownOpen ? (
+                    <ChevronUpIcon aria-hidden />
+                ) : (
+                    <ChevronDownIcon aria-hidden />
+                )}
             </Dropdown.Trigger>
 
-            <Dropdown 
+            <Dropdown
                 open={dropdownOpen}
                 onOpen={() => setDropdownOpen(true)}
                 onClose={() => setDropdownOpen(false)}
-                placement="bottom-end" 
+                placement="bottom-end"
                 className={styles.dropdown}
             >
                 <Dropdown.List>
@@ -77,20 +85,21 @@ export default function ThemeSelector({ themes, selectedThemes, onThemeSelected,
                             />
                         </Dropdown.Item>
                     </div>
-                    {
-                        themes.map(theme => (
-                            <div key={theme} className={styles.dropdownItemWrapper}>
-                                <Dropdown.Item>
-                                    <Checkbox
-                                        label={theme}
-                                        value={theme}
-                                        checked={selectedThemes.includes(theme)}
-                                        onChange={handleThemeSelected}
-                                    />
-                                </Dropdown.Item>
-                            </div>
-                        ))
-                    }
+                    {themes.map((theme) => (
+                        <div
+                            key={theme}
+                            className={styles.dropdownItemWrapper}
+                        >
+                            <Dropdown.Item>
+                                <Checkbox
+                                    label={theme}
+                                    value={theme}
+                                    checked={selectedThemes.includes(theme)}
+                                    onChange={handleThemeSelected}
+                                />
+                            </Dropdown.Item>
+                        </div>
+                    ))}
                 </Dropdown.List>
             </Dropdown>
         </Dropdown.TriggerContext>

@@ -1,36 +1,48 @@
-import { EXPERIMENTAL_Suggestion as DsSuggestion, type SuggestionItem } from '@digdir/designsystemet-react';
 import { useRef, useState, type FormEvent } from 'react';
 import { api } from '@/lib/api/api';
-import { apiFetch } from '@/app/apiFetch';
 import { debounce } from '@/lib/helpers';
+import { apiFetch } from '@/app/apiFetch';
 import { fetchArea } from './Suggestion.helpers';
-import type { AreaFeature, SearchFeature } from '@/types/api.types';
+import {
+    EXPERIMENTAL_Suggestion as DsSuggestion,
+    type SuggestionItem,
+} from '@digdir/designsystemet-react';
 import styles from './Suggestion.module.scss';
+
+import type { AreaFeature, SearchFeature } from '@/types/api.types';
 
 interface SuggestionProps {
     kommunenummer: string;
     onSelected: (feature: AreaFeature) => void;
 }
 
-export default function Suggestion({ kommunenummer, onSelected }: SuggestionProps) {
+export default function Suggestion({
+    kommunenummer,
+    onSelected,
+}: SuggestionProps) {
     const [suggestions, setSuggestions] = useState<SearchFeature[]>([]);
     const [selected, setSelected] = useState('');
     const suggestionInputRef = useRef<HTMLInputElement>(null);
 
-    const handleSuggestionInput = debounce(async (event: FormEvent<HTMLInputElement>) => {
-        const query = (event.target as HTMLInputElement).value.trim();
+    const handleSuggestionInput = debounce(
+        async (event: FormEvent<HTMLInputElement>) => {
+            const query = (event.target as HTMLInputElement).value.trim();
+            if (query.length < 3) {
+                return;
+            }
 
-        if (query.length < 3) {
-            return;
-        }
-
-        try {
-            const response = await apiFetch(api.endpoints.search, { kommunenummer, query });
-            setSuggestions(response.features);
-        } catch (error) {
-            console.log(error)
-        }
-    }, 500);
+            try {
+                const response = await apiFetch(api.endpoints.search, {
+                    kommunenummer,
+                    query,
+                });
+                setSuggestions(response.features);
+            } catch (error) {
+                console.log(error);
+            }
+        },
+        500,
+    );
 
     async function handleSuggestionChange(item: SuggestionItem | null) {
         if (item === null) {
@@ -44,17 +56,15 @@ export default function Suggestion({ kommunenummer, onSelected }: SuggestionProp
         }
 
         const id = parseInt(item.value);
-        const feature = suggestions.find(suggestion => suggestion.id === id);
-
+        const feature = suggestions.find((suggestion) => suggestion.id === id);
         if (feature === undefined) {
             return;
         }
 
-        setSuggestions([])
+        setSuggestions([]);
 
         try {
             const response = await fetchArea(kommunenummer, feature);
-
             if (response !== null) {
                 onSelected(response);
             }
@@ -79,7 +89,9 @@ export default function Suggestion({ kommunenummer, onSelected }: SuggestionProp
                 return (
                     <>
                         <span>{props.data.adressetekst}</span>
-                        <span className={styles.subTitle}>{props.data.matrikkelnummer}</span>
+                        <span className={styles.subTitle}>
+                            {props.data.matrikkelnummer}
+                        </span>
                         <span className={styles.type}>{type}</span>
                     </>
                 );
@@ -108,23 +120,19 @@ export default function Suggestion({ kommunenummer, onSelected }: SuggestionProp
                 disabled={kommunenummer === ''}
             />
             <DsSuggestion.List className={styles.list}>
-                <DsSuggestion.Empty>
-                    Ingen treff
-                </DsSuggestion.Empty>
+                <DsSuggestion.Empty>Ingen treff</DsSuggestion.Empty>
                 <div className={styles.innerList}>
-                    {
-                        suggestions.map(feature => (
-                            <DsSuggestion.Option
-                                key={feature.id}
-                                value={feature.id}
-                                label={feature.properties.value}
-                            >
-                                <div className={styles.label}>
-                                    {renderLabel(feature)}
-                                </div>
-                            </DsSuggestion.Option>
-                        ))
-                    }
+                    {suggestions.map((feature) => (
+                        <DsSuggestion.Option
+                            key={feature.id}
+                            value={feature.id}
+                            label={feature.properties.value}
+                        >
+                            <div className={styles.label}>
+                                {renderLabel(feature)}
+                            </div>
+                        </DsSuggestion.Option>
+                    ))}
                 </div>
             </DsSuggestion.List>
         </DsSuggestion>

@@ -5,10 +5,7 @@ export type StateStatus =
     | 'CREATING_MAP_IMAGES'
     | 'CREATING_REPORT';
 
-export type TaskStatus =
-    | 'NOT_STARTED'
-    | 'IN_PROGRESS'
-    | 'DONE';
+export type TaskStatus = 'NOT_STARTED' | 'IN_PROGRESS' | 'DONE';
 
 export interface ProgressMessage {
     status: StateStatus | null;

@@ -4,7 +4,7 @@ export const StatusFilter = {
     MUST_HANDLE: 'mustHandle',
     MUST_CHECK: 'mustCheck',
     NEARBY: 'nearby',
-    NOT_ANALYZED: 'notAnalyzed'
+    NOT_ANALYZED: 'notAnalyzed',
 } as const;
 
 export type StatusFilter = (typeof StatusFilter)[keyof typeof StatusFilter];
@@ -17,5 +17,5 @@ export const ResultStatus = {
     NOT_RELEVANT: 'NOT-RELEVANT',
     NOT_IMPLEMENTED: 'NOT-IMPLEMENTED',
     TIMEOUT: 'TIMEOUT',
-    ERROR: 'ERROR'
+    ERROR: 'ERROR',
 } as const satisfies Record<string, ResultStatusValue>;

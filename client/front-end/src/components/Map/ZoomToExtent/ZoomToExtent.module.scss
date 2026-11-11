@@ -2,7 +2,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid #E5E7EB;
+    border: 1px solid #e5e7eb;
     border-radius: 10px;
     width: 34px;
     height: 34px;
@@ -13,7 +13,7 @@
     user-select: none;
 
     span {
-        color: #4A5565;
+        color: #4a5565;
         font-weight: 600;
     }
 
@@ -23,6 +23,6 @@
 
     &:not(:disabled):active {
         background-color: #eeeeee !important;
-        border-color: var(--ds-color-border-strong);        
+        border-color: var(--ds-color-border-strong);
     }
 }

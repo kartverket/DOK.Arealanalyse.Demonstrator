@@ -4,7 +4,7 @@
     bottom: 0;
     left: 0;
     background-color: #ffffff;
-    border: 1px solid #E5E7EB;
+    border: 1px solid #e5e7eb;
     border-left: 0 none;
     border-bottom: 0 none;
     border-radius: 0 var(--ds-border-radius-lg) 0 0;
@@ -15,7 +15,7 @@
         justify-content: space-between;
         gap: 18px;
 
-        &>div {
+        & > div {
             display: flex;
             align-items: center;
             gap: 12px;

@@ -1,7 +1,5 @@
 import { marked } from 'marked';
 import { ResultStatus } from '../constants';
-import { getSectionOptions } from './Result.helpers';
-import InternalLinks from '@/components/InternalLinks/InternalLinks';
 import Actions from './Actions/Actions';
 import Analysis from './Analysis/Analysis';
 import Data from './Data/Data';
@@ -10,9 +8,12 @@ import Heading from './Heading/Heading';
 import Map from './Map/Map';
 import Quality from './Quality/Quality';
 import StatusAndThemes from './StatusAndThemes/StatusAndThemes';
+import { getSectionOptions } from './Result.helpers';
+import InternalLinks from '@/components/InternalLinks/InternalLinks';
+import styles from './Result.module.scss';
+
 import type { ResultItem } from '@/types/analysis.types';
 import type { CrsGeometry } from '@/types/geo.types';
-import styles from './Result.module.scss';
 
 interface ResultProps {
     result: ResultItem;
@@ -48,13 +49,11 @@ export default function Result({ result, inputGeometry }: ResultProps) {
         }
 
         const html = marked.parse(data.description, { async: false });
-
         return (
             <div
                 dangerouslySetInnerHTML={{ __html: html }}
                 className={styles.description}
-            >
-            </div>
+            ></div>
         );
     }
 
@@ -62,20 +61,16 @@ export default function Result({ result, inputGeometry }: ResultProps) {
         <div className={`${styles.result} ${getStatusClassName()}`}>
             <Heading result={result} />
 
-            <StatusAndThemes 
-                result={result} 
+            <StatusAndThemes
+                result={result}
                 statusClassName={styles.status}
             />
 
             {renderDescription()}
 
-            {
-                data.guidanceText !== null && (
-                    <div className={styles.guidanceText}>
-                        {data.guidanceText}
-                    </div>
-                )
-            }
+            {data.guidanceText !== null && (
+                <div className={styles.guidanceText}>{data.guidanceText}</div>
+            )}
 
             <InternalLinks
                 links={internalLinks}
@@ -83,66 +78,44 @@ export default function Result({ result, inputGeometry }: ResultProps) {
             />
 
             <div className={styles.sections}>
-                {
-                    show.map && (
-                        <section id="section-map">
-                            <Map
-                                result={result}
-                                inputGeometry={inputGeometry}
-                            />
-                        </section>
-                    )
-                }
+                {show.map && (
+                    <section id="section-map">
+                        <Map
+                            result={result}
+                            inputGeometry={inputGeometry}
+                        />
+                    </section>
+                )}
 
-                {
-                    show.actions && (
-                        <section id="section-actions">
-                            <Actions
-                                result={result}
-                            />
-                        </section>
-                    )
-                }
+                {show.actions && (
+                    <section id="section-actions">
+                        <Actions result={result} />
+                    </section>
+                )}
 
-                {
-                    show.data && (
-                        <section id="section-data">
-                            <Data 
-                                dataList={data.data}
-                            />
-                        </section>
-                    )
-                }
+                {show.data && (
+                    <section id="section-data">
+                        <Data dataList={data.data} />
+                    </section>
+                )}
 
-                {
-                    show.dataset && data.runOnDataset !== null && (
-                        <section id="section-dataset">
-                            <Dataset 
-                                dataset={data.runOnDataset}
-                            />
-                        </section>
-                    )
-                }
+                {show.dataset && data.runOnDataset !== null && (
+                    <section id="section-dataset">
+                        <Dataset dataset={data.runOnDataset} />
+                    </section>
+                )}
 
-                {
-                    show.quality && (
-                        <section id="section-quality">
-                            <Quality
-                                qualityMeasurement={data.qualityMeasurement}
-                            />
-                        </section>
-                    )
-                }
+                {show.quality && (
+                    <section id="section-quality">
+                        <Quality qualityMeasurement={data.qualityMeasurement} />
+                    </section>
+                )}
 
-                {
-                    show.analysis && (
-                        <section id="section-analysis">
-                            <Analysis 
-                                result={result} 
-                            />
-                        </section>
-                    )
-                }
+                {show.analysis && (
+                    <section id="section-analysis">
+                        <Analysis result={result} />
+                    </section>
+                )}
             </div>
         </div>
     );

@@ -12,36 +12,36 @@
 
     &.mustHandle {
         .status {
-            color: #B42318;
+            color: #b42318;
             border-color: #f0443866;
-            background-color: #FEF3F2;
+            background-color: #fef3f2;
 
             svg {
-                stroke: #F04438;
+                stroke: #f04438;
             }
         }
     }
 
     &.mustCheck {
         .status {
-            color: #B54708;
-            border-color: #F7900966;
-            background-color: #FEE9CE;
+            color: #b54708;
+            border-color: #f7900966;
+            background-color: #fee9ce;
 
             svg {
-                stroke: #F79009;
+                stroke: #f79009;
             }
         }
     }
 
     &.nearby {
         .status {
-            color: #027A48;
-            border-color: #12B76A66;
-            background-color: #ECFDF3;
+            color: #027a48;
+            border-color: #12b76a66;
+            background-color: #ecfdf3;
 
             svg {
-                stroke: #12B76A;
+                stroke: #12b76a;
             }
         }
     }
@@ -50,20 +50,20 @@
         .status {
             color: #344054;
             border-color: #66708566;
-            background-color: #F2F4F7;
+            background-color: #f2f4f7;
 
             svg {
                 stroke: #344054;
             }
         }
-    }    
+    }
 }
 
 .top {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-bottom: 1px solid #F3F4F6;
+    border-bottom: 1px solid #f3f4f6;
     padding-bottom: var(--ds-size-6);
     margin-bottom: var(--ds-size-4);
 
@@ -88,7 +88,7 @@
     position: relative;
     width: 100%;
     flex: 1 1 auto;
-    border: 1px solid #E5E7EB;
+    border: 1px solid #e5e7eb;
     border-radius: var(--ds-border-radius-lg);
     overflow: hidden;
 }

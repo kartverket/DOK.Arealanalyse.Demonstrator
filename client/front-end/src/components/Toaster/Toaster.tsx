@@ -1,31 +1,25 @@
 import { useCallback, useEffect } from 'react';
-import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { setToast } from '@/app/appSlice';
-import { Alert } from '@digdir/designsystemet-react';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import Dialog from '@/components/Dialog/Dialog';
+import { Alert } from '@digdir/designsystemet-react';
 import styles from './Toaster.module.scss';
 
 export default function Toaster() {
-    const toast = useAppSelector(state => state.app.toast);
+    const toast = useAppSelector((state) => state.app.toast);
     const dispatch = useAppDispatch();
 
-    const handleClose = useCallback(
-        () => {
-            dispatch(setToast(null));
-        },
-        [dispatch]
-    );
+    const handleClose = useCallback(() => {
+        dispatch(setToast(null));
+    }, [dispatch]);
 
-    useEffect(
-        () => {
-            if (toast !== null) {
-                setTimeout(() => {
-                    handleClose();
-                }, 5000);
-            }
-        },
-        [toast, handleClose]
-    );
+    useEffect(() => {
+        if (toast !== null) {
+            setTimeout(() => {
+                handleClose();
+            }, 5000);
+        }
+    }, [toast, handleClose]);
 
     return (
         <Dialog
@@ -35,16 +29,14 @@ export default function Toaster() {
             modal={false}
             className={styles.toaster}
         >
-            {
-                toast !== null && (
-                    <Alert
-                        data-color={toast.type}
-                        className={styles.alert}
-                    >
-                        {toast.message}
-                    </Alert>
-                )
-            }
+            {toast !== null && (
+                <Alert
+                    data-color={toast.type}
+                    className={styles.alert}
+                >
+                    {toast.message}
+                </Alert>
+            )}
         </Dialog>
     );
 }

@@ -1,31 +1,49 @@
-import type { ChangeEvent } from 'react';
-import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { api, useGetDokTemaQuery } from '@/lib/api/api';
-import { apiFetch } from '@/app/apiFetch';
-import { resetProgress } from '@/features/analysis-progress/progressSlice';
-import { analyzeStart, analyzeFinish, setFormData, type FormDataField } from '@/app/appSlice';
-import { setResponse, resetResponseState } from '@/features/analysis-response/responseSlice';
-import { createPayload, mapResponse } from './Form.helpers';
-import { Button, Checkbox, Field, Input, Label, Select } from '@digdir/designsystemet-react';
 import AreaDialog from '../AreaDialog/AreaDialog';
+import { apiFetch } from '@/app/apiFetch';
+import {
+    analyzeStart,
+    analyzeFinish,
+    setFormData,
+    type FormDataField,
+} from '@/app/appSlice';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import { createPayload, mapResponse } from './Form.helpers';
+import { resetProgress } from '@/features/analysis-progress/progressSlice';
+import {
+    setResponse,
+    resetResponseState,
+} from '@/features/analysis-response/responseSlice';
+import {
+    Button,
+    Checkbox,
+    Field,
+    Input,
+    Label,
+    Select,
+} from '@digdir/designsystemet-react';
 import { CheckmarkCircleFillIcon } from '@navikt/aksel-icons';
-import type { CrsGeometry } from '@/types/geo.types';
 import styles from './Form.module.scss';
 
+import type { CrsGeometry } from '@/types/geo.types';
+import type { ChangeEvent } from 'react';
+
 export default function Form() {
-    const correlationId = useAppSelector(state => state.app.correlationId);
-    const formData = useAppSelector(state => state.app.formData);
-    const busy = useAppSelector(state => state.app.busy);
+    const correlationId = useAppSelector((state) => state.app.correlationId);
+    const formData = useAppSelector((state) => state.app.formData);
+    const busy = useAppSelector((state) => state.app.busy);
     const { data: themes = [] } = useGetDokTemaQuery();
     const dispatch = useAppDispatch();
 
-    function handleChange(event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
+    function handleChange(
+        event: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    ) {
         const name = event.target.name;
 
-        const value = event.target.type === 'checkbox' ?
-            (event.target as HTMLInputElement).checked :
-            event.target.value;
-
+        const value =
+            event.target.type === 'checkbox'
+                ? (event.target as HTMLInputElement).checked
+                : event.target.value;
         dispatch(setFormData({ name, value } as FormDataField));
     }
 
@@ -44,10 +62,12 @@ export default function Form() {
 
     async function runAnalyses() {
         resetState();
+
         const payload = createPayload(formData, correlationId);
 
         try {
             dispatch(analyzeStart());
+
             const response = await apiFetch(api.endpoints.analyze, { payload });
             const mapped = mapResponse(response);
             dispatch(setResponse(mapped));
@@ -71,7 +91,10 @@ export default function Form() {
                             color="#056d13"
                             fontSize="24px"
                             style={{
-                                visibility: formData.inputGeometry !== null ? 'visible' : 'hidden'
+                                visibility:
+                                    formData.inputGeometry !== null
+                                        ? 'visible'
+                                        : 'hidden',
                             }}
                         />
                     </div>
@@ -99,9 +122,15 @@ export default function Form() {
                             <Select.Option value="">
                                 Velg bruksområde
                             </Select.Option>
-                            <Select.Option value="Reguleringsplan">Reguleringsplan</Select.Option>
-                            <Select.Option value="Kommuneplan">Kommuneplan</Select.Option>
-                            <Select.Option value="Byggesak">Byggesak</Select.Option>
+                            <Select.Option value="Reguleringsplan">
+                                Reguleringsplan
+                            </Select.Option>
+                            <Select.Option value="Kommuneplan">
+                                Kommuneplan
+                            </Select.Option>
+                            <Select.Option value="Byggesak">
+                                Byggesak
+                            </Select.Option>
                         </Select>
                     </Field>
 
@@ -112,19 +141,15 @@ export default function Form() {
                             value={formData.theme}
                             onChange={handleChange}
                         >
-                            <Select.Option value="">
-                                Velg tema
-                            </Select.Option>
-                            {
-                                themes.map(theme => (
-                                    <Select.Option
-                                        key={theme}
-                                        value={theme}
-                                    >
-                                        {theme}
-                                    </Select.Option>
-                                ))
-                            }
+                            <Select.Option value="">Velg tema</Select.Option>
+                            {themes.map((theme) => (
+                                <Select.Option
+                                    key={theme}
+                                    value={theme}
+                                >
+                                    {theme}
+                                </Select.Option>
+                            ))}
                         </Select>
                     </Field>
 

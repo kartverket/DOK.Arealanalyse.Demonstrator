@@ -10,7 +10,7 @@ function setMapImage(key: string, value: string): void {
 
 const caching = {
     getMapImage,
-    setMapImage
-}
+    setMapImage,
+};
 
 export default caching;

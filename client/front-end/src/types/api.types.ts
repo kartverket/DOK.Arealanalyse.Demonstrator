@@ -1,5 +1,5 @@
-import type { Feature, FeatureCollection, Geometry, MultiPoint } from 'geojson';
 import type { CrsGeometry, LonLat } from './geo.types';
+import type { Feature, FeatureCollection, Geometry, MultiPoint } from 'geojson';
 
 // Analyse (pygeoapi-prosessen «dokanalyse»)
 
@@ -62,6 +62,7 @@ export interface AnalysisResult {
     possibleActions: string[];
     qualityMeasurement: QualityMeasurement[];
     qualityWarning: string[];
+
     meta: {
         statusCode: number;
         duration: number;
@@ -139,8 +140,10 @@ export interface KommuneProperties {
 }
 
 export type KommuneFeature = Feature<MultiPoint, KommuneProperties>;
-
-export type KommuneFeatureCollection = FeatureCollection<MultiPoint, KommuneProperties>;
+export type KommuneFeatureCollection = FeatureCollection<
+    MultiPoint,
+    KommuneProperties
+>;
 
 export interface KommuneByPointArgs {
     coordinates: LonLat;
@@ -174,31 +177,34 @@ export interface SearchArgs {
 
 export type SearchProperties =
     | {
-        type: 'Eiendom';
-        value: string;
-        data: {
-            matrikkelnummer: string;
-            kommunenummer: string;
-            kommunenavn: string | null;
-        };
-    }
+          type: 'Eiendom';
+          value: string;
+
+          data: {
+              matrikkelnummer: string;
+              kommunenummer: string;
+              kommunenavn: string | null;
+          };
+      }
     | {
-        type: 'Vegadresse';
-        value: string;
-        data: {
-            matrikkelnummer: string;
-            adressetekst: string;
-            kommunenummer: string;
-            kommunenavn: string | null;
-        };
-    }
+          type: 'Vegadresse';
+          value: string;
+
+          data: {
+              matrikkelnummer: string;
+              adressetekst: string;
+              kommunenummer: string;
+              kommunenavn: string | null;
+          };
+      }
     | {
-        type: 'Reguleringsplan' | 'Reguleringsplanforslag';
-        value: string;
-        data: {
-            planId: string;
-        };
-    };
+          type: 'Reguleringsplan' | 'Reguleringsplanforslag';
+          value: string;
+
+          data: {
+              planId: string;
+          };
+      };
 
 export type SearchFeature = Feature<Geometry | null, SearchProperties> & {
     id: number;

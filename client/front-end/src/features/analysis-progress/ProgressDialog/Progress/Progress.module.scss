@@ -18,8 +18,8 @@
 .statuses {
     display: flex;
     flex-direction: column;
-    border-top: 1px solid #F1F5F9;
-    border-bottom: 1px solid #F1F5F9;
+    border-top: 1px solid #f1f5f9;
+    border-bottom: 1px solid #f1f5f9;
     padding: 16px 0;
     gap: 16px;
     font-family: 'Manrope';
@@ -39,18 +39,18 @@
             height: 24px;
             border: 1px solid;
             border-radius: var(--ds-border-radius-sm);
-            color: #0F172B;
+            color: #0f172b;
             font-size: 12px;
             margin-right: 12px;
         }
 
         &.notStarted {
-            color: #5B5B5B;
+            color: #5b5b5b;
 
             .icon {
-                border-color: #E2E8F0;
-                background-color: #F8FAFC;
-                color: #CAD5E2;
+                border-color: #e2e8f0;
+                background-color: #f8fafc;
+                color: #cad5e2;
             }
         }
 
@@ -61,11 +61,12 @@
 
         &.done .icon {
             border-color: var(--ds-color-base-default);
-            background: url('../../../../assets/gfx/icon-checkmark.svg') no-repeat center;
+            background: url('../../../../assets/gfx/icon-checkmark.svg')
+                no-repeat center;
             background-color: var(--ds-color-base-default);
         }
 
-        >div {
+        > div {
             display: flex;
             flex-direction: column;
             position: relative;

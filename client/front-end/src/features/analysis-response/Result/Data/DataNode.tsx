@@ -9,13 +9,22 @@ interface DataNodeProps {
     label?: string | null;
 }
 
-export default function DataNode({ data, level = 0, label = null }: DataNodeProps) {
-    const indent = ((level - 1) * INDENT_PX);
+export default function DataNode({
+    data,
+    level = 0,
+    label = null,
+}: DataNodeProps) {
+    const indent = (level - 1) * INDENT_PX;
 
     if (data === null || typeof data !== 'object') {
         return (
             <div className={styles.row}>
-                <div className={styles.label} style={{ marginLeft: indent }}>{label}</div>
+                <div
+                    className={styles.label}
+                    style={{ marginLeft: indent }}
+                >
+                    {label}
+                </div>
                 <div className={styles.value}>
                     <DataValue value={data} />
                 </div>

@@ -4,21 +4,22 @@ import styles from './Dialog.module.scss';
 
 type DialogProps = ComponentPropsWithRef<typeof DsDialog>;
 
-export default function Dialog({ children, modal = true, ...props }: DialogProps) {
-    useEffect(
-        () => {
-            if (!modal) {
-                return;
-            }
+export default function Dialog({
+    children,
+    modal = true,
+    ...props
+}: DialogProps) {
+    useEffect(() => {
+        if (!modal) {
+            return;
+        }
 
-            if (props.open) {
-                document.documentElement.classList.add('no-scroll');
-            } else {
-                document.documentElement.classList.remove('no-scroll')
-            }
-        },
-        [modal, props.open]
-    );
+        if (props.open) {
+            document.documentElement.classList.add('no-scroll');
+        } else {
+            document.documentElement.classList.remove('no-scroll');
+        }
+    }, [modal, props.open]);
 
     function renderModal() {
         return (

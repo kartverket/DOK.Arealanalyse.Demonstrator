@@ -7,7 +7,7 @@
         font-weight: 600;
     }
 
-    >div {
+    > div {
         display: flex;
         align-items: center;
         gap: 24px;
@@ -22,7 +22,7 @@
 
     .right {
         text-align: right;
-    }     
+    }
 }
 
 .chartContainer {
@@ -30,7 +30,7 @@
     align-items: center;
     gap: 24px;
     width: 67%;
-    
+
     canvas {
         width: 100% !important;
     }

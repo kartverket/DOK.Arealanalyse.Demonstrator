@@ -1,17 +1,21 @@
 import { ResultStatus } from '../../constants';
-import MustHandleIcon from '@/assets/gfx/icon-must-handle.svg?react';
 import MustCheckIcon from '@/assets/gfx/icon-must-check.svg?react';
+import MustHandleIcon from '@/assets/gfx/icon-must-handle.svg?react';
 import NearbyIcon from '@/assets/gfx/icon-nearby.svg?react';
 import NotAnalyzedIcon from '@/assets/gfx/icon-not-analyzed.svg?react';
-import type { ResultItem } from '@/types/analysis.types';
 import styles from './StatusAndThemes.module.scss';
+
+import type { ResultItem } from '@/types/analysis.types';
 
 interface StatusAndThemesProps {
     result: ResultItem;
     statusClassName?: string;
 }
 
-export default function StatusAndThemes({ result, statusClassName = '' }: StatusAndThemesProps) {
+export default function StatusAndThemes({
+    result,
+    statusClassName = '',
+}: StatusAndThemesProps) {
     function renderStatus() {
         switch (result.status) {
             case ResultStatus.HIT_RED:
@@ -58,11 +62,14 @@ export default function StatusAndThemes({ result, statusClassName = '' }: Status
             </span>
 
             <span className={styles.themes}>
-                {
-                    result.themes.map(theme => (
-                        <span key={theme} className={styles.theme}>{theme}</span>
-                    ))
-                }
+                {result.themes.map((theme) => (
+                    <span
+                        key={theme}
+                        className={styles.theme}
+                    >
+                        {theme}
+                    </span>
+                ))}
             </span>
         </div>
     );

@@ -2,15 +2,19 @@ import { useRef, useState } from 'react';
 import { useGetEksemplerQuery } from '@/lib/api/api';
 import { Dropdown } from '@digdir/designsystemet-react';
 import { ChevronDownIcon, ChevronUpIcon } from '@navikt/aksel-icons';
-import type { Sample } from '@/types/api.types';
 import styles from './SampleSelector.module.scss';
+
+import type { Sample } from '@/types/api.types';
 
 interface SampleSelectorProps {
     selectedSample: Sample | null;
     onSampleSelect: (sample: Sample) => void;
 }
 
-export default function SampleSelector({ selectedSample, onSampleSelect }: SampleSelectorProps) {
+export default function SampleSelector({
+    selectedSample,
+    onSampleSelect,
+}: SampleSelectorProps) {
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const { data: samples = [] } = useGetEksemplerQuery();
     const dropdownTriggerRef = useRef<HTMLButtonElement>(null);
@@ -40,7 +44,11 @@ export default function SampleSelector({ selectedSample, onSampleSelect }: Sampl
                     className={styles.dropdownTrigger}
                 >
                     {selectedSample?.name || 'Velg eksempel'}
-                    {dropdownOpen ? <ChevronUpIcon aria-hidden /> : <ChevronDownIcon aria-hidden />}
+                    {dropdownOpen ? (
+                        <ChevronUpIcon aria-hidden />
+                    ) : (
+                        <ChevronDownIcon aria-hidden />
+                    )}
                 </Dropdown.Trigger>
 
                 <Dropdown
@@ -51,23 +59,27 @@ export default function SampleSelector({ selectedSample, onSampleSelect }: Sampl
                     className={styles.dropdown}
                 >
                     <Dropdown.List>
-                        {
-                            samples.map(sample => (
-                                <Dropdown.Item key={sample.name}>
-                                    <Dropdown.Button
-                                        onClick={() => handleSampleSelect(sample)}
-                                        className={selectedSample?.name === sample.name ? styles.selected : ''}
-                                    >
-                                        <span className={styles.name}>{sample.name}</span>
-                                        {
-                                            sample.description !== null && (
-                                                <span className={styles.description}>{sample.description}</span>
-                                            )
-                                        }
-                                    </Dropdown.Button>
-                                </Dropdown.Item>
-                            ))
-                        }
+                        {samples.map((sample) => (
+                            <Dropdown.Item key={sample.name}>
+                                <Dropdown.Button
+                                    onClick={() => handleSampleSelect(sample)}
+                                    className={
+                                        selectedSample?.name === sample.name
+                                            ? styles.selected
+                                            : ''
+                                    }
+                                >
+                                    <span className={styles.name}>
+                                        {sample.name}
+                                    </span>
+                                    {sample.description !== null && (
+                                        <span className={styles.description}>
+                                            {sample.description}
+                                        </span>
+                                    )}
+                                </Dropdown.Button>
+                            </Dropdown.Item>
+                        ))}
                     </Dropdown.List>
                 </Dropdown>
             </Dropdown.TriggerContext>

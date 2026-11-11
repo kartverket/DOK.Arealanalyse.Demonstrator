@@ -1,10 +1,10 @@
 .tableContainer {
-    border: 1px solid #E5E7EB;
+    border: 1px solid #e5e7eb;
     border-radius: var(--ds-border-radius-lg);
     overflow: hidden;
     margin-bottom: 120px;
 
-    &>div {
+    & > div {
         overflow-y: auto;
         height: 640px;
     }
@@ -37,8 +37,8 @@
         font-weight: 600;
         text-transform: uppercase;
         background-color: rgb(252 252 253);
-        border-bottom: 1px solid #E5E7EB;
-        color: #6A7282;
+        border-bottom: 1px solid #e5e7eb;
+        color: #6a7282;
         padding: 16px;
         line-height: 1.25;
 
@@ -62,7 +62,7 @@
 
     td {
         color: #101828;
-        border-bottom: 1px solid #E5E7EB;
+        border-bottom: 1px solid #e5e7eb;
         padding: 24px 16px;
         line-height: 1.25;
         min-height: 77px;
@@ -82,57 +82,57 @@
 
     &.mustHandle {
         &.selected td {
-            background-color: #FEF3F2;
-            border-bottom-color: #FB2C36;
+            background-color: #fef3f2;
+            border-bottom-color: #fb2c36;
 
             &:first-child {
-                border-left-color: #FB2C36;
+                border-left-color: #fb2c36;
             }
         }
 
         .status {
-            background-color: #FEF3F2;
+            background-color: #fef3f2;
 
             svg {
-                stroke: #F04438;
+                stroke: #f04438;
             }
         }
     }
 
     &.mustCheck {
         &.selected td {
-            background-color: #FFFBEB80;
-            border-bottom-color: #FE9A00;
+            background-color: #fffbeb80;
+            border-bottom-color: #fe9a00;
 
             &:first-child {
-                border-left-color: #FE9A00;
+                border-left-color: #fe9a00;
             }
         }
 
         .status {
-            background-color: #FFFAEB;
+            background-color: #fffaeb;
 
             svg {
-                stroke: #F79009;
+                stroke: #f79009;
             }
         }
     }
 
     &.nearby {
         &.selected td {
-            background-color: #F0FDF480;
-            border-bottom-color: #00C950;
+            background-color: #f0fdf480;
+            border-bottom-color: #00c950;
 
             &:first-child {
-                border-left-color: #00C950;
+                border-left-color: #00c950;
             }
         }
 
         .status {
-            background-color: #ECFDF3;
+            background-color: #ecfdf3;
 
             svg {
-                stroke: #12B76A;
+                stroke: #12b76a;
             }
         }
     }
@@ -148,7 +148,7 @@
         }
 
         .status {
-            background-color: #F2F4F7;
+            background-color: #f2f4f7;
 
             svg {
                 stroke: #344054;
@@ -177,10 +177,10 @@
 }
 
 .theme {
-    border: 1px solid #E5E7EB;
+    border: 1px solid #e5e7eb;
     border-radius: 16px;
-    background-color: #F3F4F6;
-    color: #4A5565;
+    background-color: #f3f4f6;
+    color: #4a5565;
     font-size: 12px;
     font-weight: 500;
     padding: 6px 9px;
@@ -204,13 +204,13 @@
             }
 
             &.notImplemented {
-                color: #8E8E8E;
+                color: #8e8e8e;
             }
         }
 
         .datasetTitle {
             font-size: 12px;
-            color: #6A7282;
+            color: #6a7282;
         }
 
         .title {
@@ -226,7 +226,7 @@
         padding: 6px 12px;
         height: max-content;
         border-radius: var(--ds-border-radius-default);
-        background-color: #FEE9CE;
+        background-color: #fee9ce;
 
         ul {
             margin: 0;

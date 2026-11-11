@@ -1,6 +1,7 @@
 import { MinusIcon, PlusIcon } from '@navikt/aksel-icons';
-import type OlMap from 'ol/Map';
 import styles from './Zoom.module.scss';
+
+import type OlMap from 'ol/Map';
 
 interface ZoomProps {
     map: OlMap;
@@ -12,14 +13,13 @@ export default function Zoom({ map, className = '' }: ZoomProps) {
         const view = map.getView();
         const maxZoom = view.getMaxZoom();
         let zoom = view.getZoom()! + 1;
-
         if (zoom > maxZoom) {
             zoom = maxZoom;
         }
 
         view.animate({
             zoom,
-            duration: 250
+            duration: 250,
         });
     }
 
@@ -27,14 +27,13 @@ export default function Zoom({ map, className = '' }: ZoomProps) {
         const view = map.getView();
         const minZoom = view.getMinZoom();
         let zoom = view.getZoom()! - 1;
-
         if (zoom < minZoom) {
             zoom = minZoom;
         }
 
         view.animate({
             zoom,
-            duration: 250
+            duration: 250,
         });
     }
 
@@ -53,7 +52,7 @@ export default function Zoom({ map, className = '' }: ZoomProps) {
                 className={styles.zoomOut}
                 onClick={zoomOut}
                 title="Zoom ut"
-                aria-label="Zoom ut"                
+                aria-label="Zoom ut"
             >
                 <MinusIcon aria-hidden />
             </button>

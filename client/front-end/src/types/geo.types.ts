@@ -2,6 +2,7 @@ import type { Geometry } from 'geojson';
 
 export interface NamedCrs {
     type: 'name';
+
     properties: {
         name: string;
     };

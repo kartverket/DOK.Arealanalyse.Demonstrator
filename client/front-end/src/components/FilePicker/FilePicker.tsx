@@ -12,9 +12,9 @@ type FilePickerProps = {
 
 export default function FilePicker(props: FilePickerProps) {
     const { label, fileTypes } = props;
-    const id = useId()
+    const id = useId();
     const [value, setValue] = useState<string[]>([]);
-    const accept = fileTypes.map(type => `.${type}`).join(', ');
+    const accept = fileTypes.map((type) => `.${type}`).join(', ');
 
     function handleFileSelected(event: ChangeEvent<HTMLInputElement>) {
         const files = [...(event.target.files ?? [])];
@@ -22,7 +22,7 @@ export default function FilePicker(props: FilePickerProps) {
         if (!props.multiple) {
             props.onFileSelected(files[0] || null);
         } else {
-            props.onFileSelected(files)
+            props.onFileSelected(files);
         }
 
         setValue([]);
@@ -30,7 +30,7 @@ export default function FilePicker(props: FilePickerProps) {
 
     return (
         <div className={styles.filePicker}>
-            <label 
+            <label
                 htmlFor={id}
                 role="button"
                 aria-label="Legg til fil"
@@ -42,10 +42,10 @@ export default function FilePicker(props: FilePickerProps) {
 
             <input
                 id={id}
-                type="file" 
+                type="file"
                 value={value}
                 onChange={handleFileSelected}
-                accept={accept} 
+                accept={accept}
                 multiple
             />
         </div>

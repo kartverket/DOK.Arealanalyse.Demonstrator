@@ -1,35 +1,48 @@
 import { createRandomId } from '@/lib/helpers';
 import { ResultStatus } from '@/features/analysis-response/constants';
+
 import type { AnalysisFormData } from '@/app/appSlice';
-import type { AnalysisInputs, AnalysisPayload, AnalysisResponse, AnalysisResult } from '@/types/api.types';
-import type { MappedAnalysisResponse, ResultItem } from '@/types/analysis.types';
+import type {
+    MappedAnalysisResponse,
+    ResultItem,
+} from '@/types/analysis.types';
+import type {
+    AnalysisInputs,
+    AnalysisPayload,
+    AnalysisResponse,
+    AnalysisResult,
+} from '@/types/api.types';
 
-export function mapResponse(response: AnalysisResponse): MappedAnalysisResponse {
+export function mapResponse(
+    response: AnalysisResponse,
+): MappedAnalysisResponse {
     const { resultList } = response;
-
     return {
         id: createRandomId(),
         ...response,
-        resultList: mapResultList(resultList)
+        resultList: mapResultList(resultList),
     };
 }
 
-export function createPayload(formData: AnalysisFormData, correlationId: string | null): AnalysisPayload {
+export function createPayload(
+    formData: AnalysisFormData,
+    correlationId: string | null,
+): AnalysisPayload {
     const inputs: AnalysisInputs = {
         ...formData,
         requestedBuffer: parseInt(formData.requestedBuffer),
         context: formData.context !== '' ? formData.context : null,
         theme: formData.theme !== '' ? formData.theme : null,
-        correlationId
+        correlationId,
     };
 
     return {
-        inputs
+        inputs,
     };
 }
 
 function mapResultList(resultList: AnalysisResult[]): ResultItem[] {
-    return resultList.map(result => {
+    return resultList.map((result) => {
         return {
             id: createRandomId(),
             status: result.resultStatus,
@@ -39,18 +52,16 @@ function mapResultList(resultList: AnalysisResult[]): ResultItem[] {
             preTitle: getPreTitle(result),
             distance: {
                 value: result.distanceToObject,
-                formatted: getDistanceFormatted(result)
+                formatted: getDistanceFormatted(result),
             },
             hitArea: {
                 value: result.hitArea,
-                formatted: getHitAreaPercentFormatted(result)
+                formatted: getHitAreaPercentFormatted(result),
             },
-            data: result
+            data: result,
         };
     });
 }
-
-
 
 function getPreTitle(result: AnalysisResult): string | null {
     switch (result.resultStatus) {
@@ -69,13 +80,12 @@ function getDistanceFormatted(result: AnalysisResult): string | null {
     }
 
     let distance = result.distanceToObject;
-
     if (distance >= 20_000) {
         distance = 20_000;
-        return `> ${distance.toLocaleString('nb-NO')} m`
+        return `> ${distance.toLocaleString('nb-NO')} m`;
     }
 
-    return `${distance.toLocaleString('nb-NO')} m`
+    return `${distance.toLocaleString('nb-NO')} m`;
 }
 
 function getHitAreaPercentFormatted(result: AnalysisResult): string | null {
@@ -85,6 +95,5 @@ function getHitAreaPercentFormatted(result: AnalysisResult): string | null {
 
     const percent = (result.hitArea / result.inputGeometryArea) * 100;
     const rounded = Math.round((percent + Number.EPSILON) * 100) / 100;
-
-    return `${rounded.toLocaleString('nb-NO')} %`
+    return `${rounded.toLocaleString('nb-NO')} %`;
 }

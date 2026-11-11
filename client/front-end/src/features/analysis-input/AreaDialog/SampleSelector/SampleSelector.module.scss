@@ -16,7 +16,7 @@
         overflow-y: auto;
     }
 
-    li>button {
+    li > button {
         display: flex;
         flex-direction: column;
         align-items: flex-start;
@@ -34,7 +34,7 @@
         }
 
         .description {
-            color: #6A7282;
+            color: #6a7282;
             line-height: 1.25;
         }
     }

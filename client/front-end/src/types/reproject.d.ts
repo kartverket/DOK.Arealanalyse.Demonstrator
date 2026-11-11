@@ -5,6 +5,6 @@ declare module 'reproject' {
         geojson: T,
         from: string,
         to: string,
-        crss?: Record<string, unknown>
+        crss?: Record<string, unknown>,
     ): T;
 }

@@ -1,11 +1,11 @@
 import React from 'react';
-import ReactDOM from 'react-dom/client';
 import { Provider } from 'react-redux';
-import store from '@/app/store';
+import ReactDOM from 'react-dom/client';
 import App from '@/app/App';
+import store from '@/app/store';
+import '@/config/chartjs.config';
 import '@/config/projections.config';
 import '@/config/extents.config';
-import '@/config/chartjs.config';
 import '@/styles/styles.scss';
 
 const root = document.getElementById('root')!;
@@ -15,6 +15,5 @@ ReactDOM.createRoot(root).render(
         <Provider store={store}>
             <App />
         </Provider>
-    </React.StrictMode>
+    </React.StrictMode>,
 );
-

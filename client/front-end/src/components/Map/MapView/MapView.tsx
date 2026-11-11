@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { createMap, type WmtsLayerName } from '@/lib/map/map';
-import { setupMap } from './MapView.helpers';
 import { MapControl } from '../Map.constants';
 import Zoom from '../Zoom/Zoom';
 import ZoomToExtent from '../ZoomToExtent/ZoomToExtent';
-import type OlMap from 'ol/Map';
-import type { CrsGeometry } from '@/types/geo.types';
+import { setupMap } from './MapView.helpers';
 import styles from './MapView.module.scss';
+
+import type { CrsGeometry } from '@/types/geo.types';
+import type OlMap from 'ol/Map';
 
 interface MapViewProps {
     geometry: CrsGeometry;
@@ -18,62 +19,58 @@ interface MapViewProps {
     children?: ReactNode;
 }
 
-export default function MapView({ geometry, bufferedGeometry, wmtsLayer, wmsUrl = null, controls = [], className = '', children }: MapViewProps) {
+export default function MapView({
+    geometry,
+    bufferedGeometry,
+    wmtsLayer,
+    wmsUrl = null,
+    controls = [],
+    className = '',
+    children,
+}: MapViewProps) {
     const [map, setMap] = useState<OlMap | null>(null);
     const mapElementRef = useRef<HTMLDivElement>(null);
 
-    useEffect(
-        () => {
-            (async () => {
-                const olMap = await createMap({
-                    geometry,
-                    bufferedGeometry,
-                    wmtsLayer,
-                    wmsUrl
-                });
+    useEffect(() => {
+        (async () => {
+            const olMap = await createMap({
+                geometry,
+                bufferedGeometry,
+                wmtsLayer,
+                wmsUrl,
+            });
+            setMap(olMap);
+        })();
+    }, [geometry, bufferedGeometry, wmtsLayer, wmsUrl]);
 
-                setMap(olMap);
-            })();
-        },
-        [geometry, bufferedGeometry, wmtsLayer, wmsUrl]
-    );
+    useEffect(() => {
+        if (map === null) {
+            return;
+        }
 
-    useEffect(
-        () => {
-            if (map === null) {
-                return;
-            }
+        map.setTarget(mapElementRef.current ?? undefined);
+        setupMap(map);
 
-            map.setTarget(mapElementRef.current ?? undefined);
-            setupMap(map);
-
-            return () => {
-                map.dispose();
-            }
-        },
-        [map]
-    );
+        return () => {
+            map.dispose();
+        };
+    }, [map]);
 
     return (
         <div className={`${styles.mapContainer} ${className}`}>
-            <div ref={mapElementRef} className={styles.map}></div>
-            {
-                map !== null && (
-                    <div className={styles.buttons}>
-                        {
-                            controls.includes(MapControl.ZOOM) && (
-                                <Zoom map={map} />
-                            )
-                        }
-                        {
-                            controls.includes(MapControl.ZOOM_TO_EXTENT) && (
-                                <ZoomToExtent map={map} />
-                            )
-                        }
-                        {children}
-                    </div>
-                )
-            }
+            <div
+                ref={mapElementRef}
+                className={styles.map}
+            ></div>
+            {map !== null && (
+                <div className={styles.buttons}>
+                    {controls.includes(MapControl.ZOOM) && <Zoom map={map} />}
+                    {controls.includes(MapControl.ZOOM_TO_EXTENT) && (
+                        <ZoomToExtent map={map} />
+                    )}
+                    {children}
+                </div>
+            )}
         </div>
     );
 }

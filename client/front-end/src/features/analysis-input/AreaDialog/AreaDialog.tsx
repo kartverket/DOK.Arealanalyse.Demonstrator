@@ -1,19 +1,20 @@
 import { useState } from 'react';
-import { api } from '@/lib/api/api';
-import { apiFetch } from '@/app/apiFetch';
 import useCurrentLocation from '@/hooks/useCurrentLocation';
-import { Button, Heading, Popover, Tabs } from '@digdir/designsystemet-react';
-import Dialog from '@/components/Dialog/Dialog';
-import FilePicker from '@/components/FilePicker/FilePicker';
+import { api } from '@/lib/api/api';
 import GeoJson from './GeoJson/GeoJson';
 import MapView from './MapView/MapView';
 import SampleSelector from './SampleSelector/SampleSelector';
 import Search from './Search/Search';
+import { apiFetch } from '@/app/apiFetch';
+import Dialog from '@/components/Dialog/Dialog';
+import FilePicker from '@/components/FilePicker/FilePicker';
+import { Button, Heading, Popover, Tabs } from '@digdir/designsystemet-react';
 import AreaIcon from '@/assets/gfx/icon-area.svg?react';
 import { QuestionmarkCircleFillIcon } from '@navikt/aksel-icons';
+import styles from './AreaDialog.module.scss';
+
 import type { AreaFeature, Sample } from '@/types/api.types';
 import type { CrsGeometry } from '@/types/geo.types';
-import styles from './AreaDialog.module.scss';
 
 const DEFAULT_EPSG = 25833;
 
@@ -28,15 +29,15 @@ export default function AreaDialog({ onOk }: AreaDialogProps) {
     const [title, setTitle] = useState<string | null>(null);
     const [geometry, setGeometry] = useState<CrsGeometry | null>(null);
     const currentLocation = useCurrentLocation();
-    
+
     function ok() {
-        setOpen(false)
+        setOpen(false);
         onOk(geometry);
     }
 
     function cancel() {
         setOpen(false);
-        setSelectedTab('map')
+        setSelectedTab('map');
     }
 
     async function handleFileSelected(file: File | null) {
@@ -45,8 +46,10 @@ export default function AreaDialog({ onOk }: AreaDialogProps) {
         }
 
         try {
-            const geoJson = await apiFetch(api.endpoints.getOmråde, { file, epsg: DEFAULT_EPSG });
-
+            const geoJson = await apiFetch(api.endpoints.getOmråde, {
+                file,
+                epsg: DEFAULT_EPSG,
+            });
             if (geoJson !== null) {
                 setSelectedSample(null);
                 setTitle(file.name);
@@ -58,14 +61,14 @@ export default function AreaDialog({ onOk }: AreaDialogProps) {
     }
 
     function handleSampleSelected(sample: Sample) {
-        setSelectedSample(sample)
+        setSelectedSample(sample);
         setTitle(sample.fileName);
         setGeometry(sample.geoJson);
     }
 
     function handleSearchResponse(feature: AreaFeature) {
         setSelectedSample(null);
-        setTitle(feature.properties.tittel)
+        setTitle(feature.properties.tittel);
         setGeometry(feature.geometry);
     }
 
@@ -81,14 +84,16 @@ export default function AreaDialog({ onOk }: AreaDialogProps) {
                 closeButton={false}
                 className={styles.areaDialog}
             >
-                <Heading>Analyseområde{title !== null ? `: ${title}` : ''}</Heading>
+                <Heading>
+                    Analyseområde{title !== null ? `: ${title}` : ''}
+                </Heading>
 
                 <div className={styles.content}>
                     <div className={styles.top}>
                         <div>
-                            <Search 
+                            <Search
                                 onResponse={handleSearchResponse}
-                                kommunenummer={currentLocation.kommunenummer}    
+                                kommunenummer={currentLocation.kommunenummer}
                             />
                         </div>
 
@@ -96,7 +101,14 @@ export default function AreaDialog({ onOk }: AreaDialogProps) {
                             <div className={styles.filePicker}>
                                 <FilePicker
                                     label="Legg til fil"
-                                    fileTypes={['json', 'geojson', 'sos', 'sosi', 'gml', 'gpkg']}
+                                    fileTypes={[
+                                        'json',
+                                        'geojson',
+                                        'sos',
+                                        'sosi',
+                                        'gml',
+                                        'gpkg',
+                                    ]}
                                     onFileSelected={handleFileSelected}
                                 />
 
@@ -105,7 +117,10 @@ export default function AreaDialog({ onOk }: AreaDialogProps) {
                                         icon
                                         variant="tertiary"
                                     >
-                                        <QuestionmarkCircleFillIcon width={24} height={24} />
+                                        <QuestionmarkCircleFillIcon
+                                            width={24}
+                                            height={24}
+                                        />
                                     </Popover.Trigger>
                                     <Popover placement="top">
                                         GeoJSON, GML, SOSI, GeoPackage
@@ -128,23 +143,27 @@ export default function AreaDialog({ onOk }: AreaDialogProps) {
                         className={styles.tabs}
                     >
                         <Tabs.List>
-                            <Tabs.Tab value="map">
-                                Kart
-                            </Tabs.Tab>
-                            <Tabs.Tab value="geojson">
-                                GeoJSON
-                            </Tabs.Tab>
+                            <Tabs.Tab value="map">Kart</Tabs.Tab>
+                            <Tabs.Tab value="geojson">GeoJSON</Tabs.Tab>
                         </Tabs.List>
 
-                        <Tabs.Panel value="map" className={styles.tabPanel}>
+                        <Tabs.Panel
+                            value="map"
+                            className={styles.tabPanel}
+                        >
                             <div className={styles.map}>
-                                <MapView 
-                                    geometry={geometry} 
-                                    currentLocation={currentLocation.coordinates}    
+                                <MapView
+                                    geometry={geometry}
+                                    currentLocation={
+                                        currentLocation.coordinates
+                                    }
                                 />
                             </div>
                         </Tabs.Panel>
-                        <Tabs.Panel value="geojson" className={styles.tabPanel}>
+                        <Tabs.Panel
+                            value="geojson"
+                            className={styles.tabPanel}
+                        >
                             <div className={styles.geojson}>
                                 <GeoJson data={geometry} />
                             </div>

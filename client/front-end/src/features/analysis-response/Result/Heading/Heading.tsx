@@ -1,6 +1,7 @@
 import { Heading as DsHeading } from '@digdir/designsystemet-react';
-import type { ResultItem } from '@/types/analysis.types';
 import styles from './Heading.module.scss';
+
+import type { ResultItem } from '@/types/analysis.types';
 
 interface HeadingProps {
     result: ResultItem;
@@ -23,14 +24,24 @@ export default function Heading({ result, className = '' }: HeadingProps) {
     function renderTitle() {
         return (
             <div className={styles.title}>
-                {
-                    result.title !== null ?
-                        <>
-                            <DsHeading level={5}>{result.datasetTitle}</DsHeading>
-                            <DsHeading level={2} className={styles.title}>{result.title}</DsHeading>
-                        </> :
-                        <DsHeading level={2} className={styles.title}>{result.datasetTitle}</DsHeading>
-                }
+                {result.title !== null ? (
+                    <>
+                        <DsHeading level={5}>{result.datasetTitle}</DsHeading>
+                        <DsHeading
+                            level={2}
+                            className={styles.title}
+                        >
+                            {result.title}
+                        </DsHeading>
+                    </>
+                ) : (
+                    <DsHeading
+                        level={2}
+                        className={styles.title}
+                    >
+                        {result.datasetTitle}
+                    </DsHeading>
+                )}
             </div>
         );
     }
@@ -38,13 +49,11 @@ export default function Heading({ result, className = '' }: HeadingProps) {
     return (
         <div className={`${styles.heading} ${className}`}>
             {renderTitle()}
-            {
-                hitAreaOrDistance !== null && (
-                    <div className={styles.hitAreaOrDistance}>
-                        {hitAreaOrDistance}
-                    </div>
-                )
-            }
+            {hitAreaOrDistance !== null && (
+                <div className={styles.hitAreaOrDistance}>
+                    {hitAreaOrDistance}
+                </div>
+            )}
         </div>
     );
 }

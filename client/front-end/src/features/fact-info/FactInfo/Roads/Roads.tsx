@@ -3,33 +3,31 @@ import { Bar } from 'react-chartjs-2';
 import { inPlaceSort } from 'fast-sort';
 import { getChartData, chartOptions } from './Roads.helpers';
 import { Heading, Paragraph, Table } from '@digdir/designsystemet-react';
-import type { FactPart, RoadLength } from '@/types/api.types';
 import styles from './Roads.module.scss';
+
+import type { FactPart, RoadLength } from '@/types/api.types';
 
 interface RoadsProps {
     factPart: FactPart<RoadLength[]> | undefined;
 }
 
 export default function Roads({ factPart }: RoadsProps) {
-    const roads = useMemo(
-        () => {
-            if (!factPart?.data) {
-                return [];
-            }
+    const roads = useMemo(() => {
+        if (!factPart?.data) {
+            return [];
+        }
 
-            const _roads = factPart.data
-                .filter(type => type.length > 0)
-                .map(type => ({
-                    ...type,
-                    length: Math.round(type.length)
-                }));
+        const _roads = factPart.data
+            .filter((type) => type.length > 0)
+            .map((type) => ({
+                ...type,
+                length: Math.round(type.length),
+            }));
 
-            inPlaceSort(_roads).desc(type => type.length);
+        inPlaceSort(_roads).desc((type) => type.length);
 
-            return _roads;
-        },
-        [factPart]
-    );
+        return _roads;
+    }, [factPart]);
 
     const chartData = getChartData(roads);
 
@@ -41,18 +39,25 @@ export default function Roads({ factPart }: RoadsProps) {
         return (
             <div>
                 <div className={styles.tableContainer}>
-                    <Table data-size="sm" aria-label="Oversikt vegtyper">
+                    <Table
+                        data-size="sm"
+                        aria-label="Oversikt vegtyper"
+                    >
                         <Table.Head>
                             <Table.Row>
                                 <Table.Cell>Vegtype</Table.Cell>
-                                <Table.Cell className={styles.right}>Lengde (m)</Table.Cell>
+                                <Table.Cell className={styles.right}>
+                                    Lengde (m)
+                                </Table.Cell>
                             </Table.Row>
                         </Table.Head>
                         <Table.Body>
-                            {roads.map(road => (
+                            {roads.map((road) => (
                                 <Table.Row key={road.roadType}>
                                     <Table.Cell>{road.roadType}</Table.Cell>
-                                    <Table.Cell  className={styles.right}>{road.length.toLocaleString('nb-NO')}</Table.Cell>
+                                    <Table.Cell className={styles.right}>
+                                        {road.length.toLocaleString('nb-NO')}
+                                    </Table.Cell>
                                 </Table.Row>
                             ))}
                         </Table.Body>
@@ -60,7 +65,10 @@ export default function Roads({ factPart }: RoadsProps) {
                 </div>
 
                 <div className={styles.chartContainer}>
-                    <Bar data={chartData} options={chartOptions} />
+                    <Bar
+                        data={chartData}
+                        options={chartOptions}
+                    />
                 </div>
             </div>
         );

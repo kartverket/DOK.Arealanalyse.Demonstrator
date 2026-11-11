@@ -1,6 +1,7 @@
 import { Heading } from '@digdir/designsystemet-react';
-import type { ResultItem } from '@/types/analysis.types';
 import styles from './Analysis.module.scss';
+
+import type { ResultItem } from '@/types/analysis.types';
 
 interface AnalysisProps {
     result: ResultItem;
@@ -30,14 +31,16 @@ export default function Analysis({ result }: AnalysisProps) {
                     <Heading level={5}>Algoritmer kjørt</Heading>
 
                     <div className={styles.algorithms}>
-                        {
-                            data.runAlgorithm.map((algorithm, index) => (
-                                <div key={index}>
-                                    <span className={styles.number}>{index + 1}</span>
-                                    <span className={styles.description}>{algorithm}</span>
-                                </div>
-                            ))
-                        }
+                        {data.runAlgorithm.map((algorithm, index) => (
+                            <div key={index}>
+                                <span className={styles.number}>
+                                    {index + 1}
+                                </span>
+                                <span className={styles.description}>
+                                    {algorithm}
+                                </span>
+                            </div>
+                        ))}
                     </div>
                 </div>
 
@@ -47,9 +50,7 @@ export default function Analysis({ result }: AnalysisProps) {
                     <div className={styles.results}>
                         <div className={styles.box}>
                             <Heading level={6}>Buffer brukt</Heading>
-                            <span className={styles.value}>
-                                {getBuffer()}
-                            </span>
+                            <span className={styles.value}>{getBuffer()}</span>
                         </div>
 
                         <div className={styles.box}>
@@ -59,27 +60,25 @@ export default function Analysis({ result }: AnalysisProps) {
                             </span>
                         </div>
 
-                        {
-                            result.hitArea.formatted !== null && (
-                                <div className={styles.box}>
-                                    <Heading level={6}>Treffareal</Heading>
-                                    <span className={styles.value}>
-                                        {getHitArea()} ({result.hitArea.formatted})
-                                    </span>
-                                </div>
-                            )
-                        }
+                        {result.hitArea.formatted !== null && (
+                            <div className={styles.box}>
+                                <Heading level={6}>Treffareal</Heading>
+                                <span className={styles.value}>
+                                    {getHitArea()} ({result.hitArea.formatted})
+                                </span>
+                            </div>
+                        )}
 
-                        {
-                            result.distance.formatted !== null && (
-                                <div className={styles.box}>
-                                    <Heading level={6}>Avstand til nærmeste objekt</Heading>
-                                    <span className={styles.value}>
-                                        {result.distance.formatted}
-                                    </span>
-                                </div>
-                            )
-                        }
+                        {result.distance.formatted !== null && (
+                            <div className={styles.box}>
+                                <Heading level={6}>
+                                    Avstand til nærmeste objekt
+                                </Heading>
+                                <span className={styles.value}>
+                                    {result.distance.formatted}
+                                </span>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

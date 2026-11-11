@@ -6,7 +6,11 @@ interface GeneralProps {
     inputGeometryArea: number;
 }
 
-export default function General({ municipalityName, municipalityNumber, inputGeometryArea }: GeneralProps) {
+export default function General({
+    municipalityName,
+    municipalityNumber,
+    inputGeometryArea,
+}: GeneralProps) {
     return (
         <div className={styles.general}>
             <div>
@@ -20,9 +24,12 @@ export default function General({ municipalityName, municipalityNumber, inputGeo
                 </div>
                 <div>
                     <span className={styles.label}>Områdeareal:</span>
-                    <span>{Math.round(inputGeometryArea).toLocaleString('nb-NO')} m²</span>
+                    <span>
+                        {Math.round(inputGeometryArea).toLocaleString('nb-NO')}{' '}
+                        m²
+                    </span>
                 </div>
             </div>
         </div>
-    )
+    );
 }

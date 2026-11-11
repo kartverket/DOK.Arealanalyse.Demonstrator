@@ -27,10 +27,10 @@
     max-height: 300px !important;
     overflow-y: auto;
 
-    &>* {
+    & > * {
         cursor: pointer;
 
-        &:hover>div {
+        &:hover > div {
             background: var(--ds-color-surface-tinted);
             border-inline-start-color: var(--ds-color-base-default);
         }

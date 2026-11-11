@@ -1,9 +1,10 @@
 import { useMemo, useState, type ChangeEvent } from 'react';
 import { useGetKommunerQuery } from '@/lib/api/api';
-import { Field, Label, Select } from '@digdir/designsystemet-react';
 import Suggestion from './Suggestion/Suggestion';
-import type { AreaFeature } from '@/types/api.types';
+import { Field, Label, Select } from '@digdir/designsystemet-react';
 import styles from './Search.module.scss';
+
+import type { AreaFeature } from '@/types/api.types';
 
 interface SearchProps {
     onResponse: (feature: AreaFeature) => void;
@@ -12,21 +13,18 @@ interface SearchProps {
 
 export default function Search({ onResponse, kommunenummer }: SearchProps) {
     const [selectedKommune, setSelectedKommune] = useState(kommunenummer ?? '');
-    const { data = null } = useGetKommunerQuery();    
+    const { data = null } = useGetKommunerQuery();
 
-    const kommuner = useMemo(
-        () => {
-            if (data === null) {
-                return [];
-            }
+    const kommuner = useMemo(() => {
+        if (data === null) {
+            return [];
+        }
 
-            return data.features.map(({ properties }) => ({
-                value: properties.kommunenummer,
-                label: `${properties.kommunenavn} (${properties.kommunenummer})`
-            }))
-        },
-        [data]
-    )
+        return data.features.map(({ properties }) => ({
+            value: properties.kommunenummer,
+            label: `${properties.kommunenavn} (${properties.kommunenummer})`,
+        }));
+    }, [data]);
 
     async function handleKommuneChange(event: ChangeEvent<HTMLSelectElement>) {
         const kommunenummer = event.target.value;
@@ -42,16 +40,14 @@ export default function Search({ onResponse, kommunenummer }: SearchProps) {
                     onChange={handleKommuneChange}
                 >
                     <Select.Option value="">Velg kommune</Select.Option>
-                    {
-                        kommuner.map(kommune => (
-                            <Select.Option
-                                key={kommune.value}
-                                value={kommune.value}
-                            >
-                                {kommune.label}
-                            </Select.Option>
-                        ))
-                    }
+                    {kommuner.map((kommune) => (
+                        <Select.Option
+                            key={kommune.value}
+                            value={kommune.value}
+                        >
+                            {kommune.label}
+                        </Select.Option>
+                    ))}
                 </Select>
             </Field>
 
@@ -64,5 +60,5 @@ export default function Search({ onResponse, kommunenummer }: SearchProps) {
                 />
             </Field>
         </div>
-    )
+    );
 }

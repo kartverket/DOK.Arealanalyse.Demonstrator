@@ -1,8 +1,8 @@
-import type { ChartData, ChartOptions } from 'chart.js';
 import type { BuildingCount } from '@/types/api.types';
+import type { ChartData, ChartOptions } from 'chart.js';
 
 export const COLOR_MAP: Record<string, string> = {
-    'Bolig': '#C48723',
+    Bolig: '#C48723',
     'Fritidsbolig - hytte': '#DCAA27',
     'Industri og lagerbygning': '#74A3D4',
     'Kontor- og forretningsbygning': '#74A3D4',
@@ -10,27 +10,29 @@ export const COLOR_MAP: Record<string, string> = {
     'Hotell og restaurantbygning': '#74A3D4',
     'Skole-, kultur-, idrett-, forskningsbygning': '#74A3D4',
     'Helse- og omsorgsbygning': '#74A3D4',
-    'Fengsel, beredskapsbygning, mv.': '#74A3D4'
+    'Fengsel, beredskapsbygning, mv.': '#74A3D4',
 };
 
 export function getChartData(buildings: BuildingCount[]): ChartData<'pie'> {
     return {
-        labels: buildings.map(item => item.category),
+        labels: buildings.map((item) => item.category),
         datasets: [
             {
                 label: 'Antall',
-                data: buildings.map(item => item.count),
-                backgroundColor: buildings.map(item => COLOR_MAP[item.category] || '#E7E9ED'),
-                hoverOffset: 4
-            }
-        ]
+                data: buildings.map((item) => item.count),
+                backgroundColor: buildings.map(
+                    (item) => COLOR_MAP[item.category] || '#E7E9ED',
+                ),
+                hoverOffset: 4,
+            },
+        ],
     };
 }
 
 export const chartOptions: ChartOptions<'pie'> = {
     plugins: {
         legend: {
-            display: false
-        }
-    }
+            display: false,
+        },
+    },
 };

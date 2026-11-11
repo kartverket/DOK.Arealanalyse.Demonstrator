@@ -10,13 +10,14 @@ interface FormattedTextProps {
     maxLength?: number;
 }
 
-export default function FormattedText({ text, maxLength = 200 }: FormattedTextProps) {
+export default function FormattedText({
+    text,
+    maxLength = 200,
+}: FormattedTextProps) {
     const [expanded, setExpanded] = useState(false);
-
     const shouldTruncate = text.length > maxLength;
-    const displayText = expanded || !shouldTruncate
-        ? text
-        : text.slice(0, maxLength) + '...';
+    const displayText =
+        expanded || !shouldTruncate ? text : text.slice(0, maxLength) + '...';
 
     const renderLine = (line: string, lineIndex: number) => {
         const urlParts = line.split(urlRegex);
@@ -42,7 +43,10 @@ export default function FormattedText({ text, maxLength = 200 }: FormattedTextPr
                     return emailParts.map((emailPart, j) => {
                         if (emailPart.match(emailRegex)) {
                             return (
-                                <Link key={`${i}-${j}`} href={`mailto:${emailPart}`}>
+                                <Link
+                                    key={`${i}-${j}`}
+                                    href={`mailto:${emailPart}`}
+                                >
                                     {emailPart}
                                 </Link>
                             );
@@ -57,19 +61,17 @@ export default function FormattedText({ text, maxLength = 200 }: FormattedTextPr
 
     const paragraphs = displayText
         .split('\n')
-        .map(line => line.trim())
-        .filter(line => line.length > 0)
+        .map((line) => line.trim())
+        .filter((line) => line.length > 0)
         .map(renderLine);
 
     return (
         <>
-            <div className={styles.paragraphs}>
-                {paragraphs}
-            </div>
-            
+            <div className={styles.paragraphs}>{paragraphs}</div>
+
             {shouldTruncate && (
-                <button 
-                    onClick={() => setExpanded(prev => !prev)}
+                <button
+                    onClick={() => setExpanded((prev) => !prev)}
                     className={styles.button}
                 >
                     {expanded ? 'Vis mindre...' : 'Vis mer...'}

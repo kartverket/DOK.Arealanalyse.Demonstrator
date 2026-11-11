@@ -1,23 +1,26 @@
 import { memo } from 'react';
-import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { setSelectedResultId } from '../../responseSlice';
 import { ResultStatus } from '../../constants';
+import { setSelectedResultId } from '../../responseSlice';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { Table } from '@digdir/designsystemet-react';
-import MustHandleIcon from '@/assets/gfx/icon-must-handle.svg?react';
 import MustCheckIcon from '@/assets/gfx/icon-must-check.svg?react';
+import MustHandleIcon from '@/assets/gfx/icon-must-handle.svg?react';
 import NearbyIcon from '@/assets/gfx/icon-nearby.svg?react';
 import NotAnalyzedIcon from '@/assets/gfx/icon-not-analyzed.svg?react';
 import { ChevronRightIcon } from '@navikt/aksel-icons';
-import type { ResultStatus as ResultStatusValue } from '@/types/api.types';
-import type { ResultItem } from '@/types/analysis.types';
 import styles from '../ResponseTable.module.scss';
+
+import type { ResultItem } from '@/types/analysis.types';
+import type { ResultStatus as ResultStatusValue } from '@/types/api.types';
 
 interface ResponseTableRowProps {
     result: ResultItem;
 }
 
 function ResponseTableRow({ result }: ResponseTableRowProps) {
-    const selectedResultId = useAppSelector(state => state.response.selectedResultId);
+    const selectedResultId = useAppSelector(
+        (state) => state.response.selectedResultId,
+    );
     const dispatch = useAppDispatch();
 
     function getRowClassName(result: ResultItem) {
@@ -83,16 +86,21 @@ function ResponseTableRow({ result }: ResponseTableRowProps) {
             className = styles.notImplemented;
         }
 
-        return <span className={`${styles.preTitle} ${className}`}>{result.preTitle}</span>;
+        return (
+            <span className={`${styles.preTitle} ${className}`}>
+                {result.preTitle}
+            </span>
+        );
     }
-
 
     function renderDescription(result: ResultItem) {
         if (result.title !== null) {
             return (
                 <div className={styles.description}>
                     {renderPreTitle(result)}
-                    <span className={styles.datasetTitle}>{result.datasetTitle}</span>
+                    <span className={styles.datasetTitle}>
+                        {result.datasetTitle}
+                    </span>
                     <span className={styles.title}>{result.title}</span>
                 </div>
             );
@@ -114,7 +122,9 @@ function ResponseTableRow({ result }: ResponseTableRowProps) {
         return (
             <div className={styles.warnings}>
                 <ul>
-                    {result.data.qualityWarning.map(warning => <li key={warning}>{warning}</li>)}
+                    {result.data.qualityWarning.map((warning) => (
+                        <li key={warning}>{warning}</li>
+                    ))}
                 </ul>
             </div>
         );
@@ -146,20 +156,28 @@ function ResponseTableRow({ result }: ResponseTableRowProps) {
             </Table.Cell>
             <Table.Cell>
                 <span className={styles.themes}>
-                    {
-                        result.themes.map(theme => (
-                            <span key={theme} className={styles.theme}>{theme}</span>
-                        ))
-                    }
+                    {result.themes.map((theme) => (
+                        <span
+                            key={theme}
+                            className={styles.theme}
+                        >
+                            {theme}
+                        </span>
+                    ))}
                 </span>
             </Table.Cell>
             <Table.Cell className={styles.descriptionAndWarnings}>
                 {renderDescription(result)}
                 {renderWarnings(result)}
             </Table.Cell>
-            <Table.Cell className={styles.hitAreaOrDistance}>{getHitAreaOrDistance(result)}</Table.Cell>
+            <Table.Cell className={styles.hitAreaOrDistance}>
+                {getHitAreaOrDistance(result)}
+            </Table.Cell>
             <Table.Cell>
-                <ChevronRightIcon fontSize="24px" color="#d1d5dc" />
+                <ChevronRightIcon
+                    fontSize="24px"
+                    color="#d1d5dc"
+                />
             </Table.Cell>
         </Table.Row>
     );
