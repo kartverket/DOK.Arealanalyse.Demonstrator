@@ -1,0 +1,36 @@
+.legend {
+    margin: 0;
+    padding: 0;
+    color: var(--dibk-color-meta);
+    font-size: 0.875rem;
+    list-style: none;
+
+    li {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+    }
+}
+
+.swatch {
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 2px;
+    background-color: var(--dibk-color-hairline);
+
+    &[data-status='ok'] {
+        background-color: var(--ds-color-success-base-default);
+    }
+
+    &[data-status='slow'] {
+        background-color: var(--ds-color-info-base-default);
+    }
+
+    &[data-status='degraded'] {
+        background-color: var(--ds-color-warning-base-default);
+    }
+
+    &[data-status='down'] {
+        background-color: var(--ds-color-danger-base-default);
+    }
+}

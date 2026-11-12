@@ -15,6 +15,15 @@ import type {
     SearchFeatureCollection,
 } from '@/types/api.types';
 import type { CrsGeometry } from '@/types/geo.types';
+import type {
+    DaysArgs,
+    IncidentArgs,
+    IncidentList,
+    StatusOverview,
+    TargetStatistics,
+    Timeline,
+    TimelineArgs,
+} from '@/types/health.types';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -80,6 +89,18 @@ export const api = createApi({
             query: ({ kommunenummer, query }) =>
                 `sok/${kommunenummer}?q=${query}`,
         }),
+        getStatus: builder.query<StatusOverview, void>({
+            query: () => 'status',
+        }),
+        getStatusStatistics: builder.query<TargetStatistics[], DaysArgs>({
+            query: (params) => ({ url: 'status/statistikk', params }),
+        }),
+        getStatusTimeline: builder.query<Timeline, TimelineArgs>({
+            query: (params) => ({ url: 'status/tidslinje', params }),
+        }),
+        getStatusIncidents: builder.query<IncidentList, IncidentArgs>({
+            query: (params) => ({ url: 'status/hendelser', params }),
+        }),
     }),
 });
 
@@ -91,6 +112,10 @@ export const {
     useGetReguleringsplanQuery,
     useGetReguleringsplanforslagQuery,
     useSearchQuery,
+    useGetStatusQuery,
+    useGetStatusStatisticsQuery,
+    useGetStatusTimelineQuery,
+    useGetStatusIncidentsQuery,
     useAnalyzeMutation,
     useGetEiendomMutation,
     useGetOmrådeMutation,

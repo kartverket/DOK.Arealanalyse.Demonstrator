@@ -1,4 +1,6 @@
 import locale
+import asyncio
+import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -6,12 +8,14 @@ from fastapi.middleware.gzip import GZipMiddleware
 import uvicorn
 import aiohttp
 from .routers import (dok_tema, eiendom, eksempler,
-                      kommuner, omrade, pygeoapi, plan, sok)
+                      kommuner, omrade, pygeoapi, plan, sok, status)
 from .services.kommuner import get_and_cache_kommuner
+from .services.healthcheck.scheduler import start_scheduler
 from .utils import session_registry
 from .utils.helpers import is_development
 
 locale.setlocale(locale.LC_COLLATE, 'nb_NO.UTF-8')
+logging.basicConfig(level=logging.INFO)
 
 
 @asynccontextmanager
@@ -21,10 +25,19 @@ async def lifespan(app: FastAPI):
 
     session_registry.set_session(session)
     _ = await get_and_cache_kommuner()
+    healthcheck_task = start_scheduler()
 
     try:
         yield
     finally:
+        if healthcheck_task:
+            healthcheck_task.cancel()
+
+            try:
+                await healthcheck_task
+            except asyncio.CancelledError:
+                pass
+
         await session.close()
         session_registry.set_session(None)
 
@@ -58,6 +71,7 @@ app.include_router(omrade.router)
 app.include_router(plan.router)
 app.include_router(pygeoapi.router)
 app.include_router(sok.router)
+app.include_router(status.router)
 
 
 if __name__ == '__main__':

@@ -55,7 +55,28 @@ DOKANALYSE_SOCKET_IO_SRV_URL=http://host.docker.internal:5002/
 docker-compose up --build
 ```
 
+## Tjenestestatus (helsesjekk)
+Web-api-et sjekker jevnlig tjenestene som DOK-analysen er avhengig av, og front-end viser resultatet på `/status`. Datasettene leses fra konfigurasjonsfilene i [DOK.Arealanalyse.Config](https://github.com/kartverket/DOK.Arealanalyse.Config) på GitHub, så nye eller endrede konfigurasjonsfiler blir med i neste kjøring.
 
+For hvert datasett sjekkes det at datatjenesten (WFS, ArcGIS REST eller OGC API) og WMS-en svarer, at lagene finnes, at egenskapene i `properties`, `geom_field` og feltene i `filter` finnes i skjemaet, og at en intersect-spørring mot et testområde fungerer. I tillegg sjekkes Geolett-id-ene, metadata i Kartkatalogen og de andre registrene og API-ene som Process og web-api-et bruker. Resultatene lagres i en SQLite-database.
+
+```ini
+HEALTHCHECK_ENABLED=true                     # kjør helsesjekken som bakgrunnsjobb i web-api-et
+HEALTHCHECK_INTERVAL_MINUTES=15
+HEALTHCHECK_CONFIG_REF=main                  # branch i konfigurasjonsrepoet (main = produksjon, staging = staging)
+HEALTHCHECK_DB_PATH=/data/healthcheck/healthcheck.db
+HEALTHCHECK_RETENTION_DAYS=90                # hvor lenge resultatene beholdes
+HEALTHCHECK_DETAILS_RETENTION_DAYS=7         # hvor lenge detaljene (manglende egenskaper o.l.) beholdes
+HEALTHCHECK_SLOW_THRESHOLD_MS=5000
+HEALTHCHECK_REQUEST_TIMEOUT=30
+```
+
+Helsesjekken kan også kjøres manuelt, for eksempel for å teste en endring i konfigurasjonen:
+
+```bash
+cd client/api/src
+uv run --project .. python -m dokanalyse-web-api.services.healthcheck --no-store --only-problems --ref staging
+```
 
 ## Markedsplass
 Beskrivelse av tjenesten som er ihht GaiaX for evt publisering av tjenesten i dataspace/markedsplass

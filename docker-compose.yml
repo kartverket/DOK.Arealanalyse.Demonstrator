@@ -26,6 +26,11 @@ services:
       - EXCLUDED_KOMMUNER_PLAN=0301,2100,2211
       - NAP_USERNAME=${NAP_USERNAME}
       - NAP_PASSWORD=${NAP_PASSWORD}
+      - HEALTHCHECK_ENABLED=true
+      - HEALTHCHECK_CONFIG_REF=main
+      - HEALTHCHECK_DB_PATH=/data/healthcheck/healthcheck.db
+    volumes:
+      - healthcheck:/data/healthcheck
     ports:
       - "5001:5001"      
     expose:
@@ -33,6 +38,8 @@ services:
     networks:
       - internal      
     restart: always
+    depends_on:
+      - socket-io    
 
   mcp-server:
     container_name: dokanalyse-mcp-server
@@ -82,6 +89,7 @@ services:
 
 volumes:
   dokanalyse:
+  healthcheck:
 
 networks:
   internal:

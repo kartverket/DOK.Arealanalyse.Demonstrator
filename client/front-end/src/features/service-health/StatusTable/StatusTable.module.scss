@@ -1,0 +1,56 @@
+.tableContainer {
+    overflow-x: auto;
+}
+
+.statusTable {
+    width: 100%;
+
+    td {
+        vertical-align: top;
+    }
+}
+
+.number {
+    text-align: right;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.name {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    min-width: 16rem;
+}
+
+.nameButton {
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--ds-color-accent-text-default, var(--dibk-color-ink));
+    font: inherit;
+    font-weight: 500;
+    text-align: left;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+    cursor: pointer;
+
+    &:hover {
+        text-decoration-thickness: 2px;
+    }
+}
+
+.subtitle,
+.message {
+    color: var(--dibk-color-meta);
+    font-size: 0.875rem;
+}
+
+.message {
+    color: var(--dibk-color-ink);
+}
+
+.historyCell {
+    width: 30%;
+    min-width: 14rem;
+}

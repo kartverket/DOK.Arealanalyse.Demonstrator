@@ -1,0 +1,10 @@
+.statusTag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    white-space: nowrap;
+
+    svg {
+        font-size: 1.1em;
+    }
+}

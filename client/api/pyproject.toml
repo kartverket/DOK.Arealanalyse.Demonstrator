@@ -11,6 +11,7 @@ dependencies = [
     "lxml>=6.0.3",
     "python-levenshtein>=0.27.3",
     "python-multipart>=0.0.22",
+    "pyyaml>=6.0.3",
     "shapely>=2.1.2",
     "types-lxml>=2026.2.16",
     "uvicorn>=0.42.0",
