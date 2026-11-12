@@ -158,6 +158,18 @@ def create_dataset_target(config: DatasetConfig, service_type: str | None, url: 
     )
 
 
+def create_failed_dataset_result(config: DatasetConfig, message: str) -> CheckResult:
+    url = get_url_and_auth(config.feature_service)[0] if config.feature_service else None
+
+    return CheckResult(
+        target=create_dataset_target(config, config.service_type, url),
+        status=Status.DOWN,
+        message=message,
+        details={'issues': [message]},
+        checked_at=datetime.now(timezone.utc)
+    )
+
+
 def create_invalid_config_result(config: InvalidConfig) -> CheckResult:
     return CheckResult(
         target=Target(
@@ -286,7 +298,11 @@ async def _get_ogc_api_paths(context: RunContext, url: str, auth: Auth | None, c
     if not parsed['features']:
         return None, 'Samlingen har ingen objekter å kontrollere egenskapene mot'
 
-    properties = parsed['features'][0].get('properties') or {}
+    feature = parsed['features'][0]
+    properties = (feature.get('properties') or {}) if isinstance(feature, dict) else None
+
+    if not isinstance(properties, dict):
+        return None, 'Eksempelobjektet er ikke et gyldig GeoJSON-objekt'
 
     return get_json_paths(properties), None
 
@@ -478,4 +494,5 @@ def _to_wkt() -> str:
     return f'POLYGON (({coords}))'
 
 
-__all__ = ['check_dataset', 'create_dataset_target', 'create_invalid_config_result']
+__all__ = ['check_dataset', 'create_dataset_target', 'create_failed_dataset_result',
+           'create_invalid_config_result']

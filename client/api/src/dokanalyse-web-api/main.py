@@ -9,13 +9,15 @@ import uvicorn
 import aiohttp
 from .routers import (dok_tema, eiendom, eksempler,
                       kommuner, omrade, pygeoapi, plan, sok, status)
-from .services.kommuner import get_and_cache_kommuner
+from .services.kommuner import get_kommuner
 from .services.healthcheck.scheduler import start_scheduler
 from .utils import session_registry
 from .utils.helpers import is_development
 
 locale.setlocale(locale.LC_COLLATE, 'nb_NO.UTF-8')
 logging.basicConfig(level=logging.INFO)
+
+_logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager
@@ -24,7 +26,13 @@ async def lifespan(app: FastAPI):
     session = aiohttp.ClientSession(timeout=timeout)
 
     session_registry.set_session(session)
-    _ = await get_and_cache_kommuner()
+
+    try:
+        await get_kommuner()
+    except Exception as err:
+        # Appen skal starte selv om Kommuneinfo er nede; listen hentes ved første forespørsel
+        _logger.warning('Could not preload kommuner: %s', err)
+
     healthcheck_task = start_scheduler()
 
     try:

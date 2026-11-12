@@ -1,6 +1,7 @@
 import math
 import locale
 from os import getenv
+import aiohttp
 
 locale.setlocale(locale.LC_ALL, 'nb_NO.UTF-8')
 
@@ -9,6 +10,14 @@ def is_development() -> bool:
     environment = getenv('ENVIRONMENT', '').strip().lower()
 
     return environment == 'dev' or environment == 'development'
+
+
+def describe_error(err: BaseException) -> str:
+    # Bare type, status og vert: meldingen kan inneholde URL-er med brukerens søk eller koordinater
+    if isinstance(err, aiohttp.ClientResponseError):
+        return f'{type(err).__name__} (HTTP {err.status} fra {err.request_info.real_url.host})'
+
+    return type(err).__name__
 
 
 def format_bytes(size_bytes: int | float) -> str:
@@ -30,4 +39,4 @@ def _format_no(value: float) -> str:
         return locale.format_string('%.15g', value, grouping=True)
 
 
-__all__ = ['is_development', 'format_bytes']
+__all__ = ['is_development', 'describe_error', 'format_bytes']

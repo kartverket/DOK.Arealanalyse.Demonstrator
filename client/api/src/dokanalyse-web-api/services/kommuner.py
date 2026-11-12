@@ -1,5 +1,6 @@
 import os
 import json
+import logging
 from pathlib import Path
 from typing import Any, Dict, List
 from async_lru import alru_cache
@@ -22,11 +23,16 @@ _punkt_query_params = {
 
 _cache_path = Path('/tmp/kommuner.geojson')
 
+_logger = logging.getLogger(__name__)
+
 
 @alru_cache(maxsize=None, ttl=_TTL)
 async def get_kommuner() -> Dict[str, Any]:
     if is_cache_valid(_cache_path, 180):
-        return read_file_from_disk(_cache_path)
+        try:
+            return read_file_from_disk(_cache_path)
+        except (OSError, ValueError) as err:
+            _logger.warning('Could not read cached kommuner: %s', err)
 
     return await get_and_cache_kommuner()
 
@@ -38,24 +44,11 @@ async def get_kommune_by_point(lon: float, lat: float) -> Dict[str, Any] | None:
 
 
 @alru_cache(maxsize=None, ttl=_TTL)
-async def get_kommuner_for_plan() -> Dict[str, Any]:
-    kommuner = await get_kommuner()
-    excluded = _get_excluded_kommuner_for_plan()
-    features = [feature for feature in kommuner['features']
-                if feature['properties']['kommunenummer'] not in excluded]
-
-    return {
-        **kommuner,
-        'features': features
-    }
-
-
-@alru_cache(maxsize=None, ttl=_TTL)
 async def get_kommune_by_kommunenummer(kommunenummer: str) -> Dict[str, Any] | None:
     kommuner = await get_kommuner()
     features = kommuner['features']
 
-    return next(feature for feature in features if feature['properties']['kommunenummer'] == kommunenummer)
+    return next((feature for feature in features if feature['properties']['kommunenummer'] == kommunenummer), None)
 
 
 async def get_and_cache_kommuner() -> Dict[str, Any]:
@@ -63,11 +56,15 @@ async def get_and_cache_kommuner() -> Dict[str, Any]:
         response.raise_for_status()
         data = await response.json()
 
-        kommuner = _map_response(data)
+    kommuner = _map_response(data)
+
+    try:
         write_file_to_disk(_cache_path, json.dumps(
             kommuner, ensure_ascii=False))
+    except OSError as err:
+        _logger.warning('Could not cache kommuner: %s', err)
 
-        return kommuner
+    return kommuner
 
 
 async def _fetch_kommunenummer_by_point(lon: float, lat: float) -> str:
@@ -118,14 +115,5 @@ def _map_response(response: List[Dict[str, Any]]) -> Dict[str, Any]:
     }
 
 
-def _get_excluded_kommuner_for_plan() -> List[str]:
-    to_exclude = os.getenv('EXCLUDED_KOMMUNER_PLAN')
-
-    if not to_exclude:
-        return []
-
-    return [kommunenummer.strip() for kommunenummer in to_exclude.split(',')]
-
-
-__all__ = ['get_kommuner', 'get_kommuner_for_plan',
-           'get_kommune_by_kommunenummer', 'get_and_cache_kommuner']
+__all__ = ['get_kommuner', 'get_kommune_by_kommunenummer',
+           'get_and_cache_kommuner']

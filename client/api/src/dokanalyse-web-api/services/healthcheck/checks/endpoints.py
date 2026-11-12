@@ -27,7 +27,10 @@ class Endpoint:
 
 def _non_empty_list(key: str | None = None) -> Validator:
     def validate(data: Any) -> str | None:
-        items = data.get(key) if key and isinstance(data, dict) else data
+        if key is None:
+            items = data
+        else:
+            items = data.get(key) if isinstance(data, dict) else None
 
         if not isinstance(items, list) or not items:
             return f'Responsen mangler {f"«{key}»" if key else "elementer"}'

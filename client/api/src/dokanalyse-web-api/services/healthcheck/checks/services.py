@@ -127,12 +127,12 @@ async def _check_arcgis(context: RunContext, url: str, auth: Auth | None) -> Ser
     if parsed is None:
         return info
 
-    if not isinstance(parsed, dict) or 'layers' not in parsed:
+    if not isinstance(parsed, dict) or not isinstance(parsed.get('layers'), list):
         return _unexpected(info, 'Responsen mangler "layers"')
 
-    info.layers = {
-        str(layer.get('id')) for layer in parsed.get('layers', []) + parsed.get('tables', [])
-    }
+    tables = parsed.get('tables')
+    items = parsed['layers'] + (tables if isinstance(tables, list) else [])
+    info.layers = {str(item.get('id')) for item in items if isinstance(item, dict)}
 
     return info
 

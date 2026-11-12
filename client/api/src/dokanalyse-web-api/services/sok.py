@@ -19,7 +19,7 @@ _matrikkel_pattern = re.compile(
 _adresse_pattern = re.compile(r'^[a-zæøå]{3}', flags=re.IGNORECASE)
 
 
-@alru_cache(maxsize=None, ttl=86400)
+@alru_cache(maxsize=1024, ttl=86400)
 async def search(kommunenummer: str, search_str: str) -> Dict[str, Any]:
     search_str = search_str.strip()
 

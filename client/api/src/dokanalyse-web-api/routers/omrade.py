@@ -1,17 +1,20 @@
-import aiofiles
+import asyncio
+import logging
 import tempfile
+import aiofiles
 from pathlib import Path
 from typing import Annotated, Any, Dict
 from fastapi import APIRouter, HTTPException, Request, UploadFile, File, Form, status
 from ..services import omrade
 from ..services.exceptions import (
     DatasetTooLargeError, InvalidDatasetError, InvalidGeometryError, GeometryConversionError)
-from ..utils.helpers import format_bytes
+from ..utils.helpers import describe_error, format_bytes
 
 _CHUNK_SIZE = 1024 * 1024
 _MAX_SIZE = 10 * 1024 * 1024
 
 router = APIRouter()
+_logger = logging.getLogger(__name__)
 
 
 @router.post('/omrade')
@@ -29,7 +32,7 @@ async def get_omrade(
             raise DatasetTooLargeError()
 
         with tempfile.TemporaryDirectory() as tmp_dirpath:
-            tmp_filepath = Path(tmp_dirpath).joinpath(str(file.filename))
+            tmp_filepath = Path(tmp_dirpath).joinpath(_get_safe_filename(file.filename))
 
             async with aiofiles.open(tmp_filepath, 'wb') as out:
                 while chunk := await file.read(_CHUNK_SIZE):
@@ -40,7 +43,7 @@ async def get_omrade(
 
                     await out.write(chunk)
 
-            response = await omrade.get_omrade(tmp_filepath, out_epsg)
+            response = await asyncio.to_thread(omrade.get_omrade, tmp_filepath, out_epsg)
     except DatasetTooLargeError:
         raise HTTPException(
             status_code=status.HTTP_413_CONTENT_TOO_LARGE,
@@ -62,11 +65,20 @@ async def get_omrade(
             detail=f'Kunne ikke prosessere «{file.filename}»'
         )
     except Exception as err:
+        _logger.error('Kunne ikke prosessere opplastet fil: %s', describe_error(err))
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f'Ukjent feil: {err}'
-        )    
+            detail=f'Ukjent feil ved prosessering av «{file.filename}»'
+        )
     finally:
         await file.close()
 
     return response
+
+
+def _get_safe_filename(filename: str | None) -> str:
+    # Bare selve filnavnet, slik at et navn som «../../x» ikke kan skrive utenfor den midlertidige mappen.
+    # Filendelsen beholdes fordi GDAL bruker den til å velge driver.
+    name = Path(filename or '').name
+
+    return name if name not in ('', '.', '..') else 'upload'

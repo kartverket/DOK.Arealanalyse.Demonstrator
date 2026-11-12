@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import Any, Dict, List
 from osgeo import ogr, osr, gdal
 from shapely.geometry import shape
-import aiofiles
 from .common import add_geojson_crs, get_polygons_from_geometries
 from .exceptions import InvalidDatasetError, InvalidGeometryError, GeometryConversionError
 
@@ -15,13 +14,17 @@ HOLE_AREA_MIN_SIZE = 1
 WGS_84 = 4326
 
 
-async def get_omrade(filepath: Path, out_epsg: int | None) -> Dict[str, Any]:
-    geojson_obj = await _handle_geojson_geometry(filepath)
+# Synkron og CPU-tung (GDAL); kall den fra en tråd for ikke å blokkere event-loopen
+def get_omrade(filepath: Path, out_epsg: int | None) -> Dict[str, Any]:
+    geojson_obj = _handle_geojson_geometry(filepath)
 
     if geojson_obj:
         return geojson_obj
 
-    dataset: gdal.Dataset = ogr.Open(str(filepath), 0)
+    try:
+        dataset: gdal.Dataset | None = ogr.Open(str(filepath), 0)
+    except RuntimeError:
+        dataset = None
 
     if not dataset:
         raise InvalidDatasetError()
@@ -82,11 +85,10 @@ def _get_geometry_from_dataset(dataset: gdal.Dataset, out_epsg: int) -> ogr.Geom
     return out_geometry
 
 
-async def _handle_geojson_geometry(filepath: Path) -> Dict[str, Any] | None:
+def _handle_geojson_geometry(filepath: Path) -> Dict[str, Any] | None:
     try:
-        async with aiofiles.open(filepath) as file:
-            json_str = await file.read()
-    except:
+        json_str = filepath.read_text()
+    except (OSError, ValueError):
         return None
 
     if not _is_geojson_geometry(json_str):

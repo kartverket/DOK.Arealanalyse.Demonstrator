@@ -42,7 +42,7 @@ def is_cache_valid(path: Path, cache_days: int) -> bool:
     modified = datetime.fromtimestamp(timestamp, tz=timezone.utc)
     diff = datetime.now(tz=timezone.utc) - modified
 
-    return diff.days > cache_days
+    return diff.days < cache_days
 
 
 def read_file_from_disk(path: Path) -> Any:

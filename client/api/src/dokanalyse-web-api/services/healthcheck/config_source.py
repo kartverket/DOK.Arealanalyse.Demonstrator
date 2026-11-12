@@ -81,8 +81,16 @@ def _parse_archive(archive: bytes, url: str, ref: str, source: str, result: Http
             if file is None:
                 continue
 
-            _parse_file(match.group('file_name'),
-                        file.read().decode('utf-8'), config_source)
+            file_name = match.group('file_name')
+
+            try:
+                text = file.read().decode('utf-8')
+            except UnicodeDecodeError:
+                config_source.invalid.append(InvalidConfig(
+                    file_name=file_name, error='Filen er ikke gyldig UTF-8'))
+                continue
+
+            _parse_file(file_name, text, config_source)
 
     return config_source
 
@@ -117,7 +125,7 @@ def _parse_dataset(file_name: str, document: Dict[str, Any], config_source: Conf
         return
 
     try:
-        config = DatasetConfig(**{**document, 'file_name': file_name})
+        config = DatasetConfig.model_validate({**document, 'file_name': file_name})
         config_source.datasets.append(config)
     except ValidationError as err:
         errors = '; '.join(
@@ -131,12 +139,13 @@ def _fallback_path() -> Path:
 
 
 def _read_fallback() -> bytes | None:
-    path = _fallback_path()
-
-    if not path.exists():
+    try:
+        return _fallback_path().read_bytes()
+    except FileNotFoundError:
         return None
-
-    return path.read_bytes()
+    except OSError as err:
+        _logger.warning('Could not read stored config archive: %s', err)
+        return None
 
 
 def _write_fallback(archive: bytes) -> None:
