@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { io, type Socket } from 'socket.io-client';
 
 import type { ServerToClientEvents } from '@/types/socket.types';
@@ -9,24 +9,20 @@ export default function useSocketIO(
     messageHandlers: ServerToClientEvents,
     onDisconnect: () => void,
 ) {
-    const initRef = useRef(true);
-
     useEffect(() => {
-        if (!initRef.current) {
-            return;
-        }
-
         const socket: Socket<ServerToClientEvents> = io(SIO_BASE_URL, {
             path: '/ws/socket.io',
         });
-
-        initRef.current = false;
-
         socket.on('disconnect', onDisconnect);
 
-        (Object.keys(messageHandlers) as (keyof ServerToClientEvents)[])
-            .forEach((key) => {
-                socket.on(key, messageHandlers[key]);
-            });
+        (
+            Object.keys(messageHandlers) as (keyof ServerToClientEvents)[]
+        ).forEach((key) => {
+            socket.on(key, messageHandlers[key]);
+        });
+
+        return () => {
+            socket.disconnect();
+        };
     }, [messageHandlers, onDisconnect]);
 }
