@@ -79,7 +79,7 @@ jobs:
                   APP_DIR="file-server"
                   IMAGE_NAME="dokanalyse-file-server"
                   if [[ "${GITHUB_EVENT_NAME}" == "push" ]]; then
-                    SHOULD_BUILD="${{ steps.changes.outputs.socket }}"
+                    SHOULD_BUILD="${{ steps.changes.outputs.fileserver }}"
                   fi
                   ;;                  
                 *)

@@ -1,18 +1,27 @@
 FROM python:3.13-alpine3.23
 
-ENV VIRTUAL_ENV=/app/.venv
-ENV PATH="$VIRTUAL_ENV/bin:/root/.local/bin/:$PATH"
+ENV VIRTUAL_ENV=/app/.venv \
+    PATH="/app/.venv/bin:$PATH" \
+    PYTHONUNBUFFERED=1 \
+    UV_COMPILE_BYTECODE=1 \
+    UV_PYTHON_DOWNLOADS=never
 
 WORKDIR /app
-COPY main.py pyproject.toml uv.lock ./
 
-RUN apk add --update-cache curl \
-    && curl -LsSf https://astral.sh/uv/install.sh | sh \
-    && uv python install 3.13 \
-    && uv venv $VIRTUAL_ENV \
-    && . activate \
-    && uv sync --frozen
+# Avhengighetene installeres før koden kopieres inn, slik at laget gjenbrukes når bare koden endres
+COPY pyproject.toml uv.lock ./
+
+RUN apk add --no-cache --virtual .build-deps curl \
+    && curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR=/tmp/uv UV_NO_MODIFY_PATH=1 sh \
+    && /tmp/uv/uv sync --frozen --no-dev \
+    && rm -rf /tmp/uv /root/.cache \
+    && apk del .build-deps \
+    && adduser -D -H app
+
+COPY main.py ./
+
+USER app
 
 EXPOSE 5002
 
-CMD ["uv", "run", "./main.py"]
+CMD ["python", "main.py"]

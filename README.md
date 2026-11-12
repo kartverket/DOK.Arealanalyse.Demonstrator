@@ -55,6 +55,14 @@ DOKANALYSE_SOCKET_IO_SRV_URL=http://host.docker.internal:5002/
 docker-compose up --build
 ```
 
+## Socket.IO-serveren
+Socket.IO-serveren videreformidler fremdriften i analysen fra pygeoapi til front-end. Opprinnelser (origins) som skal få gjøre CORS-forespørsler mot serveren, settes som en kommaseparert liste. Er variabelen tom, avvises alle CORS-forespørsler.
+
+```ini
+CORS_ALLOWED_ORIGINS=http://localhost:5173,http://localhost
+PORT=5002
+```
+
 ## Tjenestestatus (helsesjekk)
 Web-api-et sjekker jevnlig tjenestene som DOK-analysen er avhengig av, og front-end viser resultatet på `/status`. Datasettene leses fra konfigurasjonsfilene i [DOK.Arealanalyse.Config](https://github.com/kartverket/DOK.Arealanalyse.Config) på GitHub, så nye eller endrede konfigurasjonsfiler blir med i neste kjøring.
 

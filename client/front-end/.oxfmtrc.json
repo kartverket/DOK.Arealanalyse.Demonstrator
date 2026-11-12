@@ -5,41 +5,67 @@
     "singleQuote": true,
     "singleAttributePerLine": true,
     "printWidth": 80,
+    "ignorePatterns": [
+        "src/main.tsx"
+    ],
     "sortImports": {
         "newlinesBetween": false,
         "sortSideEffects": true,
         "customGroups": [
             {
                 "groupName": "types",
-                "modifiers": ["type"]
+                "modifiers": [
+                    "type"
+                ]
             },
             {
                 "groupName": "react-libs",
-                "elementNamePattern": ["react", "react/**", "react-**"]
+                "elementNamePattern": [
+                    "react",
+                    "react/**",
+                    "react-**"
+                ]
             },
             {
                 "groupName": "hooks",
-                "elementNamePattern": ["@/hooks/**", "**/hooks/**"]
+                "elementNamePattern": [
+                    "@/hooks/**",
+                    "**/hooks/**"
+                ]
             },
             {
                 "groupName": "lib",
-                "elementNamePattern": ["@/lib", "@/lib/**", "**/lib/**"]
+                "elementNamePattern": [
+                    "@/lib",
+                    "@/lib/**",
+                    "**/lib/**"
+                ]
             },
             {
                 "groupName": "helpers",
-                "elementNamePattern": ["**/*.helpers"]
+                "elementNamePattern": [
+                    "**/*.helpers"
+                ]
             },
             {
                 "groupName": "features",
-                "elementNamePattern": ["@/features/**", "**/features/**"]
+                "elementNamePattern": [
+                    "@/features/**",
+                    "**/features/**"
+                ]
             },
             {
                 "groupName": "components",
-                "elementNamePattern": ["@/components/**", "**/components**"]
+                "elementNamePattern": [
+                    "@/components/**",
+                    "**/components**"
+                ]
             },
             {
                 "groupName": "designsystem",
-                "elementNamePattern": ["dibk-designsystemet"]
+                "elementNamePattern": [
+                    "dibk-designsystemet"
+                ]
             },
             {
                 "groupName": "icons",
@@ -51,15 +77,27 @@
             },
             {
                 "groupName": "styles",
-                "elementNamePattern": ["**/*.css", "**/*.scss"]
+                "elementNamePattern": [
+                    "**/*.css",
+                    "**/*.scss"
+                ]
             }
         ],
         "groups": [
             "react-libs",
-            ["builtin", "external"],
+            [
+                "builtin",
+                "external"
+            ],
             "hooks",
             "lib",
-            ["internal", "subpath", "parent", "sibling", "index"],
+            [
+                "internal",
+                "subpath",
+                "parent",
+                "sibling",
+                "index"
+            ],
             "helpers",
             "features",
             "components",
