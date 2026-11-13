@@ -1,4 +1,5 @@
-import { useId, useState, type ChangeEvent } from 'react';
+import { useRef, useState, type ChangeEvent } from 'react';
+import { Button } from 'dibk-designsystemet';
 import { FileIcon } from '@navikt/aksel-icons';
 import styles from './FilePicker.module.scss';
 
@@ -12,7 +13,7 @@ type FilePickerProps = {
 
 export default function FilePicker(props: FilePickerProps) {
     const { label, fileTypes } = props;
-    const id = useId();
+    const inputRef = useRef<HTMLInputElement | null>(null);
     const [value, setValue] = useState<string[]>([]);
     const accept = fileTypes.map((type) => `.${type}`).join(', ');
 
@@ -28,21 +29,25 @@ export default function FilePicker(props: FilePickerProps) {
         setValue([]);
     }
 
+    function handleClick() {
+        inputRef.current?.click();
+    }
+
     return (
         <div className={styles.filePicker}>
-            <label
-                htmlFor={id}
-                role="button"
+            <Button
+                onClick={handleClick}
+                variant="secondary"
                 aria-label="Legg til fil"
-                className={`ds-button ${styles.button}`}
             >
                 <FileIcon aria-hidden />
                 {label}
-            </label>
+            </Button>
 
             <input
-                id={id}
+                ref={inputRef}
                 type="file"
+                name="file"
                 value={value}
                 onChange={handleFileSelected}
                 accept={accept}

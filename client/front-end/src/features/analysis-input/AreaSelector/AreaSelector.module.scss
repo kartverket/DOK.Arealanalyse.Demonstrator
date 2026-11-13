@@ -1,28 +1,17 @@
-.areaSelector {
-    border: 1px solid var(--dibk-color-hairline);
-    margin-bottom: 24px;
-    padding: 24px;
-
-    h2 {
-        margin-bottom: var(--ds-size-4);
-    }
-}
-
 .top {
     display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    margin-bottom: 18px;
-    border: 1px solid var(--dibk-color-hairline);
-    padding: 18px;
+    flex-direction: column;
+    gap: 18px;
 
-    & > div {
+    &>div {
         display: flex;
-        align-items: flex-end;
-    }
+        border-bottom: 1px solid var(--dibk-color-hairline);
+        padding: 0 0 var(--ds-size-6) 0;
 
-    .topRight {
-        gap: var(--ds-size-6);
+        &:last-child {
+            padding-bottom: 0;
+            border-bottom: 0;
+        }
     }
 }
 
@@ -32,13 +21,20 @@
     gap: 3px;
 }
 
+.content {
+    display: grid;
+    grid-template-columns: min-content auto 326px;
+    column-gap: 30px;
+}
+
 .tabs {
     display: flex;
     flex-direction: column;
+    margin-right: 18px;
 }
 
 .tabPanel {
-    height: 60vh;
+    height: 50vh;
     min-height: 400px;
     padding: 24px 0 0;
 }
@@ -60,4 +56,23 @@
 .popover svg {
     width: 24px;
     height: 24px;
+}
+
+.heading {
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+
+    span {
+        &::after {
+            content: '';
+            height: 24px;
+            margin: 0 var(--ds-size-3);
+            border-right: 1px solid var(--ds-color-neutral-border-default);
+        }
+
+        &:last-child::after {
+            content: none;
+        }
+    }
 }

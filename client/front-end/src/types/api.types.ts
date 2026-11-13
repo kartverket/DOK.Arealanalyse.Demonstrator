@@ -190,20 +190,16 @@ export interface KommuneByPointArgs {
     coordinates: LonLat;
 }
 
-export interface AreaProperties {
-    tittel: string;
-    [key: string]: unknown;
-}
-
-export type AreaFeature = Feature<CrsGeometry, AreaProperties>;
-
 export interface OmrådeArgs {
     file: File;
     epsg: number;
 }
 
 export interface EiendomArgs {
-    geometry: Geometry;
+    kommunenummer: string;
+    gardsnummer: number;
+    bruksnummer: number;
+    festenummer?: number;
 }
 
 export interface PlanArgs {
@@ -216,35 +212,35 @@ export interface SearchArgs {
     query: string;
 }
 
+export interface EiendomSearchData {
+    kommunenummer: string;
+    kommunenavn: string;
+    gardsnummer: number;
+    bruksnummer: number;
+    festenummer: number;
+    matrikkelnummer: string;
+    adressetekst: string;
+    postnummer: string;
+    poststed: string;
+}
+
+export interface PlanSearchData {
+    planId: string;
+    plannavn: string | null;
+    kommunenummer: string;
+    kommunenavn: string | null;
+}
+
 export type SearchProperties =
     | {
-          type: 'Eiendom';
+          type: 'Eiendom' | 'Vegadresse';
           value: string;
-
-          data: {
-              matrikkelnummer: string;
-              kommunenummer: string;
-              kommunenavn: string | null;
-          };
-      }
-    | {
-          type: 'Vegadresse';
-          value: string;
-
-          data: {
-              matrikkelnummer: string;
-              adressetekst: string;
-              kommunenummer: string;
-              kommunenavn: string | null;
-          };
+          data: EiendomSearchData;
       }
     | {
           type: 'Reguleringsplan' | 'Reguleringsplanforslag';
           value: string;
-
-          data: {
-              planId: string;
-          };
+          data: PlanSearchData;
       };
 
 export type SearchFeature = Feature<Geometry | null, SearchProperties> & {

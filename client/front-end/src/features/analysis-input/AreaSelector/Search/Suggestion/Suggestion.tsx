@@ -1,7 +1,9 @@
-import { useRef, useState, type FormEvent } from 'react';
+import { useRef, useState, type InputEvent, type ReactNode } from 'react';
+import { useDispatch } from 'react-redux';
 import { api } from '@/lib/api/api';
 import { debounce } from '@/lib/helpers';
 import { apiFetch } from '@/app/apiFetch';
+import { setFormData } from '@/app/appSlice';
 import { fetchArea } from './Suggestion.helpers';
 import {
     EXPERIMENTAL_Suggestion as DsSuggestion,
@@ -9,11 +11,12 @@ import {
 } from 'dibk-designsystemet';
 import styles from './Suggestion.module.scss';
 
-import type { AreaFeature, SearchFeature } from '@/types/api.types';
+import type { SearchFeature } from '@/types/api.types';
+import type { CrsGeometry } from '@/types/geo.types';
 
 interface SuggestionProps {
     kommunenummer: string;
-    onSelected: (feature: AreaFeature) => void;
+    onSelected: (geometry: CrsGeometry, title: string) => void;
 }
 
 export default function Suggestion({
@@ -23,9 +26,10 @@ export default function Suggestion({
     const [suggestions, setSuggestions] = useState<SearchFeature[]>([]);
     const [selected, setSelected] = useState('');
     const suggestionInputRef = useRef<HTMLInputElement>(null);
+    const dispatch = useDispatch();
 
     const handleSuggestionInput = debounce(
-        async (event: FormEvent<HTMLInputElement>) => {
+        async (event: InputEvent<HTMLInputElement>) => {
             const query = (event.target as HTMLInputElement).value.trim();
             if (query.length < 3) {
                 return;
@@ -44,12 +48,39 @@ export default function Suggestion({
         500,
     );
 
+    function resetSuggestion() {
+        setSelected('');
+        setSuggestions([]);
+        dispatch(setFormData({ name: 'inputGeometry', value: null }));
+    }
+
+    function getAreaTitle(feature: SearchFeature): ReactNode {
+        const props = feature.properties;
+
+        switch (props.type) {
+            case 'Eiendom':
+                return `${props.data.matrikkelnummer}, ${props.data.postnummer} ${props.data.poststed}`;
+            case 'Vegadresse':
+                return `Eiendom ${props.data.matrikkelnummer} (${props.data.adressetekst}, ${props.data.postnummer} ${props.data.poststed})`;
+            case 'Reguleringsplan':
+            case 'Reguleringsplanforslag': {
+                return (
+                    <>
+                        <span>{props.type}</span>
+                        <span>{props.data.planId} {props.data.plannavn !== null && `: ${props.data.plannavn}`}</span>
+                        <span>{props.data.kommunenavn} ({props.data.kommunenummer})</span>
+                    </>
+                )
+            }
+        }
+    }
+
+
     async function handleSuggestionChange(item: SuggestionItem | null) {
         if (item === null) {
+            resetSuggestion();
             return;
         }
-
-        setSelected('');
 
         if (suggestionInputRef.current !== null) {
             suggestionInputRef.current.value = '';
@@ -61,12 +92,12 @@ export default function Suggestion({
             return;
         }
 
-        setSuggestions([]);
+        setSelected(item.label);
 
         try {
-            const response = await fetchArea(kommunenummer, feature);
-            if (response !== null) {
-                onSelected(response);
+            const geometry = await fetchArea(kommunenummer, feature);
+            if (geometry !== null) {
+                onSelected(geometry, getAreaTitle(feature));
             }
         } catch (error) {
             console.log(error);
@@ -119,8 +150,13 @@ export default function Suggestion({
                 onInput={handleSuggestionInput}
                 disabled={kommunenummer === ''}
             />
+
+            <DsSuggestion.Toggle disabled={kommunenummer === ''} />
+            <DsSuggestion.Clear disabled={kommunenummer === ''} />
+
             <DsSuggestion.List className={styles.list}>
                 <DsSuggestion.Empty>Ingen treff</DsSuggestion.Empty>
+
                 <div className={styles.innerList}>
                     {suggestions.map((feature) => (
                         <DsSuggestion.Option

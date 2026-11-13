@@ -4,10 +4,10 @@ import Suggestion from './Suggestion/Suggestion';
 import { Field, Label, Select } from 'dibk-designsystemet';
 import styles from './Search.module.scss';
 
-import type { AreaFeature } from '@/types/api.types';
+import type { CrsGeometry } from '@/types/geo.types';
 
 interface SearchProps {
-    onResponse: (feature: AreaFeature) => void;
+    onResponse: (geometry: CrsGeometry, title: string) => void;
     kommunenummer: string | null;
 }
 
@@ -51,8 +51,8 @@ export default function Search({ onResponse, kommunenummer }: SearchProps) {
                 </Select>
             </Field>
 
-            <Field>
-                <Label>Plan-ID, matrikkelnummer eller adresse</Label>
+            <Field style={{ width: 250 }}>
+                <Label>Plan-ID, matrikkelnr. eller adresse</Label>
 
                 <Suggestion
                     kommunenummer={selectedKommune}

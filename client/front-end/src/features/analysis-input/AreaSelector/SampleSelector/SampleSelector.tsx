@@ -29,13 +29,15 @@ export default function SampleSelector({
     }
 
     return (
-        <div className={styles.sampleSelector}>
+        <div className={`ds-field ${styles.sampleSelector}`}>
             <div
                 onClick={handleLabelClick}
-                className={styles.label}
+                className="ds-label"
             >
                 Eksempel
             </div>
+
+            <div data-field="description">Velg et forhåndsdefinert eksempel</div>
 
             <Button
                 ref={dropdownTriggerRef}

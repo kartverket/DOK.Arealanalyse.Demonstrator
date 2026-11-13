@@ -6,7 +6,6 @@ import type {
     AnalysisResponse,
     AnalyzeArgs,
     AnalyzeResult,
-    AreaFeature,
     EiendomArgs,
     KommuneByPointArgs,
     KommuneFeature,
@@ -28,6 +27,7 @@ import type {
     Timeline,
     TimelineArgs,
 } from '@/types/health.types';
+import type { MultiPolygon, Polygon } from 'geojson';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -88,18 +88,15 @@ export const api = createApi({
                 };
             },
         }),
-        getEiendom: builder.mutation<AreaFeature | null, EiendomArgs>({
-            query: ({ geometry }) => ({
-                url: 'eiendom',
-                body: geometry,
-                method: 'POST',
-            }),
+        getEiendom: builder.query<Polygon | MultiPolygon | null, EiendomArgs>({
+            query: ({ kommunenummer, gardsnummer, bruksnummer, festenummer }) =>
+                `eiendom/${kommunenummer}/${gardsnummer}/${bruksnummer}/${festenummer}`,
         }),
-        getReguleringsplan: builder.query<AreaFeature | null, PlanArgs>({
+        getReguleringsplan: builder.query<CrsGeometry | null, PlanArgs>({
             query: ({ kommunenummer, planId }) =>
                 `plan/reguleringsplan/${kommunenummer}/${planId}`,
         }),
-        getReguleringsplanforslag: builder.query<AreaFeature | null, PlanArgs>({
+        getReguleringsplanforslag: builder.query<CrsGeometry | null, PlanArgs>({
             query: ({ kommunenummer, planId }) =>
                 `plan/reguleringsplanforslag/${kommunenummer}/${planId}`,
         }),
@@ -138,6 +135,6 @@ export const {
     useGetJobQuery,
     useGetJobResultsQuery,
     useAnalyzeMutation,
-    useGetEiendomMutation,
+    useGetEiendomQuery,
     useGetOmrådeMutation,
 } = api;

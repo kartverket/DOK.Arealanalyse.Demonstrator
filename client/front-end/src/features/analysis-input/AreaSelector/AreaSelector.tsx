@@ -2,6 +2,7 @@ import { useDeferredValue, useMemo, useState } from 'react';
 import useCurrentLocation from '@/hooks/useCurrentLocation';
 import { api } from '@/lib/api/api';
 import { bufferGeometry } from '@/lib/geo/buffer';
+import Form from '../Form/Form';
 import GeoJson from './GeoJson/GeoJson';
 import MapView from './MapView/MapView';
 import SampleSelector from './SampleSelector/SampleSelector';
@@ -15,12 +16,16 @@ import { Button, Heading, Popover, Tabs } from 'dibk-designsystemet';
 import { QuestionmarkCircleFillIcon } from '@navikt/aksel-icons';
 import styles from './AreaSelector.module.scss';
 
-import type { AreaFeature, Sample } from '@/types/api.types';
+import type { Sample } from '@/types/api.types';
 import type { CrsGeometry } from '@/types/geo.types';
 
 const DEFAULT_EPSG = 25833;
 
-export default function AreaSelector() {
+interface AreaSelectorProps {
+    onAreaSelected?: (title: string) => void;
+}
+
+export default function AreaSelector({ onAreaSelected }: AreaSelectorProps) {
     const geometry = useAppSelector(
         (state) => state.app.formData.inputGeometry,
     );
@@ -32,19 +37,23 @@ export default function AreaSelector() {
     const bufferDistance = useDeferredValue(
         parseRequestedBuffer(requestedBuffer),
     );
-    const bufferedGeometry = useMemo(
-        () =>
-            geometry !== null ? bufferGeometry(geometry, bufferDistance) : null,
-        [geometry, bufferDistance],
-    );
+
+    const bufferedGeometry = useMemo(() => {
+        return geometry !== null
+            ? bufferGeometry(geometry, bufferDistance)
+            : null;
+    }, [geometry, bufferDistance]);
+
     const [selectedTab, setSelectedTab] = useState('map');
     const [selectedSample, setSelectedSample] = useState<Sample | null>(null);
-    const [title, setTitle] = useState<string | null>(null);
+    const [areaName, setAreaName] = useState('');
     const currentLocation = useCurrentLocation();
     const dispatch = useAppDispatch();
 
-    function setGeometry(value: CrsGeometry | null) {
-        dispatch(setFormData({ name: 'inputGeometry', value }));
+    function setArea(geometry: CrsGeometry, title: string) {
+        dispatch(setFormData({ name: 'inputGeometry', value: geometry }));
+        setAreaName(title);
+        onAreaSelected?.(title);
     }
 
     async function handleFileSelected(file: File | null) {
@@ -59,8 +68,7 @@ export default function AreaSelector() {
             });
             if (geoJson !== null) {
                 setSelectedSample(null);
-                setTitle(file.name);
-                setGeometry(geoJson);
+                setArea(geoJson, file.name);
             }
         } catch (error) {
             console.log(error);
@@ -69,33 +77,34 @@ export default function AreaSelector() {
 
     function handleSampleSelected(sample: Sample) {
         setSelectedSample(sample);
-        setTitle(sample.fileName);
-        setGeometry(sample.geoJson);
+        setArea(sample.geoJson, sample.fileName);
     }
 
-    function handleSearchResponse(feature: AreaFeature) {
+    function handleSearchResponse(geometry: CrsGeometry, title: string) {
         setSelectedSample(null);
-        setTitle(feature.properties.tittel);
-        setGeometry(feature.geometry);
+        setArea(geometry, title);
     }
 
     return (
         <section className={styles.areaSelector}>
-            <Heading level={2}>
-                Analyseområde{title !== null ? `: ${title}` : ''}
-            </Heading>
+            <div className={styles.content}>
+                <div className={styles.top}>
+                    <div>
+                        {/* Search leser kommunenummeret kun ved første rendring, så den rendres på nytt når posisjonen er funnet */}
+                        <Search
+                            key={currentLocation.kommunenummer ?? ''}
+                            onResponse={handleSearchResponse}
+                            kommunenummer={currentLocation.kommunenummer}
+                        />
+                    </div>
 
-            <div className={styles.top}>
-                <div>
-                    {/* Search leser kommunenummeret kun ved første rendring, så den rendres på nytt når posisjonen er funnet */}
-                    <Search
-                        key={currentLocation.kommunenummer ?? ''}
-                        onResponse={handleSearchResponse}
-                        kommunenummer={currentLocation.kommunenummer}
-                    />
-                </div>
+                    <div className={styles.sampleSelector}>
+                        <SampleSelector
+                            selectedSample={selectedSample}
+                            onSampleSelect={handleSampleSelected}
+                        />
+                    </div>
 
-                <div className={styles.topRight}>
                     <div className={styles.filePicker}>
                         <FilePicker
                             label="Legg til fil"
@@ -129,47 +138,52 @@ export default function AreaSelector() {
                             GeoJSON, GML, SOSI, GeoPackage
                         </Popover>
                     </div>
+                </div>
 
-                    <div className={styles.sampleSelector}>
-                        <SampleSelector
-                            selectedSample={selectedSample}
-                            onSampleSelect={handleSampleSelected}
-                        />
-                    </div>
+                <div>
+                    <Heading data-size="xs" className={styles.heading}>
+                        {areaName || 'Analyseområde ikke valgt'}
+                    </Heading>
+
+                    <Tabs
+                        value={selectedTab}
+                        onChange={setSelectedTab}
+                        className={styles.tabs}
+                    >
+                        <Tabs.List>
+                            <Tabs.Tab value="map">Kart</Tabs.Tab>
+                            <Tabs.Tab value="geojson">GeoJSON</Tabs.Tab>
+                        </Tabs.List>
+
+                        <Tabs.Panel
+                            value="map"
+                            className={styles.tabPanel}
+                        >
+                            <div className={styles.map}>
+                                <MapView
+                                    geometry={geometry}
+                                    bufferedGeometry={bufferedGeometry}
+                                    currentLocation={
+                                        currentLocation.coordinates
+                                    }
+                                />
+                            </div>
+                        </Tabs.Panel>
+                        <Tabs.Panel
+                            value="geojson"
+                            className={styles.tabPanel}
+                        >
+                            <div className={styles.geojson}>
+                                <GeoJson data={geometry} />
+                            </div>
+                        </Tabs.Panel>
+                    </Tabs>
+                </div>
+
+                <div>
+                    <Form />
                 </div>
             </div>
-
-            <Tabs
-                value={selectedTab}
-                onChange={setSelectedTab}
-                className={styles.tabs}
-            >
-                <Tabs.List>
-                    <Tabs.Tab value="map">Kart</Tabs.Tab>
-                    <Tabs.Tab value="geojson">GeoJSON</Tabs.Tab>
-                </Tabs.List>
-
-                <Tabs.Panel
-                    value="map"
-                    className={styles.tabPanel}
-                >
-                    <div className={styles.map}>
-                        <MapView
-                            geometry={geometry}
-                            bufferedGeometry={bufferedGeometry}
-                            currentLocation={currentLocation.coordinates}
-                        />
-                    </div>
-                </Tabs.Panel>
-                <Tabs.Panel
-                    value="geojson"
-                    className={styles.tabPanel}
-                >
-                    <div className={styles.geojson}>
-                        <GeoJson data={geometry} />
-                    </div>
-                </Tabs.Panel>
-            </Tabs>
         </section>
     );
 }

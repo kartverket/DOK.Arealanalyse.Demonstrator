@@ -180,118 +180,113 @@ export default function Form() {
 
     return (
         <section className={styles.form}>
-            <div className={styles.input}>
-                <div className={styles.row}>
-                    <Field className={styles.buffer}>
-                        <Label>Buffer</Label>
-                        <Field.Affixes>
-                            <Input
-                                type="number"
-                                min={0}
-                                name="requestedBuffer"
-                                value={formData.requestedBuffer}
-                                onChange={handleChange}
-                            />
-                            <Field.Affix>meter</Field.Affix>
-                        </Field.Affixes>
-                    </Field>
+            <Field className={styles.buffer}>
+                <Label>Buffer</Label>
+                <Field.Affixes>
+                    <Input
+                        type="number"
+                        min={0}
+                        name="requestedBuffer"
+                        value={formData.requestedBuffer}
+                        onChange={handleChange}
+                    />
+                    <Field.Affix>meter</Field.Affix>
+                </Field.Affixes>
+            </Field>
 
-                    <Field>
-                        <Label>Bruksområde</Label>
-                        <Select
-                            name="context"
-                            value={formData.context}
-                            onChange={handleChange}
+            <Field>
+                <Label>Bruksområde</Label>
+                <Select
+                    name="context"
+                    value={formData.context}
+                    onChange={handleChange}
+                >
+                    <Select.Option value="">
+                        Velg bruksområde
+                    </Select.Option>
+                    <Select.Option value="Reguleringsplan">
+                        Reguleringsplan
+                    </Select.Option>
+                    <Select.Option value="Kommuneplan">
+                        Kommuneplan
+                    </Select.Option>
+                    <Select.Option value="Byggesak">
+                        Byggesak
+                    </Select.Option>
+                </Select>
+            </Field>
+
+            <Field>
+                <Label>Tema</Label>
+                <Select
+                    name="theme"
+                    value={formData.theme}
+                    onChange={handleChange}
+                >
+                    <Select.Option value="">Velg tema</Select.Option>
+                    {themes.map((theme) => (
+                        <Select.Option
+                            key={theme}
+                            value={theme}
                         >
-                            <Select.Option value="">
-                                Velg bruksområde
-                            </Select.Option>
-                            <Select.Option value="Reguleringsplan">
-                                Reguleringsplan
-                            </Select.Option>
-                            <Select.Option value="Kommuneplan">
-                                Kommuneplan
-                            </Select.Option>
-                            <Select.Option value="Byggesak">
-                                Byggesak
-                            </Select.Option>
-                        </Select>
-                    </Field>
+                            {theme}
+                        </Select.Option>
+                    ))}
+                </Select>
+            </Field>
 
-                    <Field>
-                        <Label>Tema</Label>
-                        <Select
-                            name="theme"
-                            value={formData.theme}
-                            onChange={handleChange}
-                        >
-                            <Select.Option value="">Velg tema</Select.Option>
-                            {themes.map((theme) => (
-                                <Select.Option
-                                    key={theme}
-                                    value={theme}
-                                >
-                                    {theme}
-                                </Select.Option>
-                            ))}
-                        </Select>
-                    </Field>
+            <div className={styles.checkboxes}>
+                <Checkbox
+                    name="includeGuidance"
+                    checked={formData.includeGuidance}
+                    onChange={handleChange}
+                    label="Inkluder veiledning"
+                />
 
-                    <div className={styles.checkboxes}>
-                        <Checkbox
-                            name="includeGuidance"
-                            checked={formData.includeGuidance}
-                            onChange={handleChange}
-                            label="Inkluder veiledning"
-                        />
+                <Checkbox
+                    name="includeQualityMeasurement"
+                    checked={formData.includeQualityMeasurement}
+                    onChange={handleChange}
+                    label="Inkluder kvalitetsinformasjon"
+                />
 
-                        <Checkbox
-                            name="includeFilterChosenDOK"
-                            checked={formData.includeFilterChosenDOK}
-                            onChange={handleChange}
-                            label="Inkluder kun kommunens valgte DOK-data"
-                        />
+                <Checkbox
+                    name="includeFacts"
+                    checked={formData.includeFacts}
+                    onChange={handleChange}
+                    label="Inkluder faktainformasjon"
+                />
 
-                        <Checkbox
-                            name="includeQualityMeasurement"
-                            checked={formData.includeQualityMeasurement}
-                            onChange={handleChange}
-                            label="Inkluder kvalitetsinformasjon"
-                        />
+                <Checkbox
+                    name="includeFilterChosenDOK"
+                    checked={formData.includeFilterChosenDOK}
+                    onChange={handleChange}
+                    label="Inkluder kun kommunens valgte DOK-data"
+                />
 
-                        <Checkbox
-                            name="createBinaries"
-                            checked={formData.createBinaries}
-                            onChange={handleChange}
-                            label="Lag kartbilder og PDF-rapport"
-                        />
+                <Checkbox
+                    name="createBinaries"
+                    checked={formData.createBinaries}
+                    onChange={handleChange}
+                    label="Lag kartbilder og PDF-rapport"
+                />
+            </div>
 
-                        <Checkbox
-                            name="includeFacts"
-                            checked={formData.includeFacts}
-                            onChange={handleChange}
-                            label="Inkluder faktainformasjon"
-                        />
-                    </div>
-                </div>
-                <div className={styles.row}>
-                    <div className={styles.submit}>
-                        <Button
-                            onClick={runAnalyses}
-                            variant="primary"
-                            disabled={!canSubmit()}
-                        >
-                            Start DOK-analyse
-                        </Button>
+            <div className={styles.submit}>
+                <Button
+                    onClick={runAnalyses}
+                    variant="primary"
+                    disabled={!canSubmit()}
+                >
+                    Start DOK-analyse
+                </Button>
 
-                        <Checkbox
-                            name="respondAsync"
-                            checked={formData.respondAsync}
-                            onChange={handleChange}
-                            label="Kjør asynkront"
-                        />
-                    </div>
-                </div>
+                <Checkbox
+                    name="respondAsync"
+                    checked={formData.respondAsync}
+                    onChange={handleChange}
+                    label="Kjør asynkront"
+                />
             </div>
         </section>
     );

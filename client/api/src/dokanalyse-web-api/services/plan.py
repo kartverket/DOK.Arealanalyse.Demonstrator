@@ -1,6 +1,7 @@
 import os
 import json
 import math
+from operator import itemgetter
 import asyncio
 from typing import Any, Dict, List, Tuple
 import aiohttp
@@ -20,16 +21,16 @@ _api_urls = {
 }
 
 
-@alru_cache(ttl=86400)
-async def get_plan_ids(kommunenummer: str) -> Dict[str, List[str]]:
-    tasks: List[asyncio.Task[List[str]]] = []
+# @alru_cache(ttl=86400)
+async def get_plan_ids(kommunenummer: str) -> Dict[str, List[Dict[str, Any]]]:
+    tasks: List[asyncio.Task[List[Dict[str, Any]]]] = []
 
     async with asyncio.TaskGroup() as tg:
         for name, url in _api_urls.items():
             tasks.append(tg.create_task(_get_plan_ids(
                 kommunenummer, url), name=name))
 
-    result: Dict[str, List[str]] = {}
+    result: Dict[str, List[Dict[str, Any]]] = {}
 
     for task in tasks:
         result[task.get_name()] = task.result()
@@ -37,14 +38,14 @@ async def get_plan_ids(kommunenummer: str) -> Dict[str, List[str]]:
     return result
 
 
-async def search_plan_ids(kommunenummer: str, search_str: str) -> Dict[str, List[str]]:
+async def search_plan_ids(kommunenummer: str, search_str: str) -> Dict[str, List[Dict[str, Any]]]:
     search_str = search_str.casefold()
     all_plan_ids = await get_plan_ids(kommunenummer)
-    result: Dict[str, List[str]] = {}
+    result: Dict[str, List[Dict[str, Any]]] = {}
 
     for type, plan_ids in all_plan_ids.items():
         result[type] = [
-            plan_id for plan_id in plan_ids if search_str in plan_id.casefold()]
+            plan_id for plan_id in plan_ids if search_str in plan_id['planId'].casefold()]
 
     return result
 
@@ -83,17 +84,17 @@ async def _get_plan(kommunenummer: str, plan_id: str, type: str) -> Dict[str, An
         if not geometries:
             return None
 
-        return _create_feature(features[0], geometries, type)
+        return _create_geometry(geometries)
 
 
-async def _get_plan_ids(kommunenummer: str, url: str) -> List[str]:
+async def _get_plan_ids(kommunenummer: str, url: str) -> List[Dict[str, Any]]:
     semaphore = asyncio.Semaphore(_MAX_CONCURRENT)
 
     all_plan_ids, number_matched = await _fetch_plan_ids(semaphore, kommunenummer, url, 0)
     num_pages = math.ceil(number_matched / _LIMIT)
     offsets = [i * _LIMIT for i in range(num_pages)][1:]
 
-    tasks: List[asyncio.Task[Tuple[List[str], int]]] = []
+    tasks: List[asyncio.Task[Tuple[List[Dict[str, Any]], int]]] = []
 
     async with asyncio.TaskGroup() as tg:
         for offset in offsets:
@@ -105,7 +106,7 @@ async def _get_plan_ids(kommunenummer: str, url: str) -> List[str]:
         plan_ids, _ = task.result()
         all_plan_ids.extend(plan_ids)
 
-    return sorted(set(all_plan_ids))
+    return sorted(all_plan_ids, key=itemgetter('planId'))
 
 
 async def _fetch_plan_ids(
@@ -113,10 +114,10 @@ async def _fetch_plan_ids(
     kommunenummer: str,
     url: str,
     offset: int
-) -> Tuple[List[str], int]:
+) -> Tuple[List[Dict[str, Any]], int]:
     async with semaphore:
         params = _get_query_params(kommunenummer, offset)
-        plan_ids: List[str] = []
+        plan_ids: List[Dict[str, Any]] = []
 
         async with get_session().get(url, params=params, auth=_get_auth()) as response:
             response.raise_for_status()
@@ -126,17 +127,20 @@ async def _fetch_plan_ids(
             features: List[Dict[str, Any]] = data['features']
 
             for feature in features:
-                plan_id: str = feature['properties']['arealplanId']['planidentifikasjon']
-                plan_ids.append(plan_id)
+                properties: Dict[str, Any] = feature['properties']
+                kopidata: Dict[str, Any] = properties.get('kopidata', {})
+
+                plan_ids.append({
+                    'planId': properties['arealplanId']['planidentifikasjon'],
+                    'plannavn': properties.get('plannavn'),
+                    'kommunenummer': kopidata.get('områdeId'),
+                    'kommunenavn': kopidata.get('originalDatavert')
+                })
 
             return plan_ids, number_matched
 
 
-def _create_feature(
-    feature: Dict[str, Any], 
-    geometries: List[Dict[str, Any]],
-    type: str
-) -> Dict[str, Any]:
+def _create_geometry(geometries: List[Dict[str, Any]]) -> Dict[str, Any]:
     geometry: Dict[str, Any]
 
     if len(geometries) == 1:
@@ -144,24 +148,9 @@ def _create_feature(
     else:
         geometry = _create_multi_polygon(geometries)
 
-    properties: Dict[str, Any] = feature['properties']
-    plan_id = properties['arealplanId']['planidentifikasjon']
-    kommunenummer = properties['kopidata']['områdeId']
+    add_geojson_crs(geometry, _DEFAULT_EPSG)
 
-    new_feature: Dict[str, Any] = {
-        'type': 'Feature',
-        'geometry': geometry,
-        'properties': {
-            'planId': plan_id,
-            'kommunenummer': kommunenummer,
-            'plannavn': properties['plannavn'],
-            'tittel': f'{type} {kommunenummer}_{plan_id}'
-        }
-    }
-
-    add_geojson_crs(new_feature['geometry'], _DEFAULT_EPSG)
-
-    return new_feature
+    return geometry
 
 
 def _create_multi_polygon(geometries: List[Dict[str, Any]]) -> Dict[str, Any]:
@@ -193,7 +182,7 @@ def _get_auth() -> aiohttp.BasicAuth:
 def _get_query_params(kommunenummer: str, offset: int) -> Dict[str, Any]:
     return {
         'kopidata.områdeId': kommunenummer,
-        'properties': 'arealplanId.planidentifikasjon',
+        'properties': 'arealplanId.planidentifikasjon,plannavn,kopidata.områdeId,kopidata.originalDatavert',
         'skipGeometry': 'true',
         'limit': _LIMIT,
         'offset': offset

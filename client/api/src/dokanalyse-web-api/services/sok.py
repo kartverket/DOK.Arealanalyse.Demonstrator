@@ -72,10 +72,8 @@ async def _get_plan_ids(kommunenummer: str, search_str: str) -> List[Dict[str, A
                 'geometry': None,
                 'properties': {
                     'type': type,
-                    'value': plan_id,
-                    'data': {
-                        'planId': plan_id
-                    }
+                    'value': plan_id['planId'],
+                    'data': {**plan_id}
                 }
             })
 

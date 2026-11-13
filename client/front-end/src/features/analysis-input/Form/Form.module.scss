@@ -1,6 +1,9 @@
 .form {
-    border: 1px solid var(--dibk-color-hairline);
-    margin-bottom: 80px;
+    // border: 1px solid var(--dibk-color-hairline);
+    // margin-bottom: 80px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-4);
 }
 
 .input {
@@ -25,13 +28,17 @@
 }
 
 .buffer {
-    width: 150px;
+    width: 200px;
 }
 
 .checkboxes {
-    display: grid;
-    grid-template-columns: auto auto;
-    gap: 12px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-3);
+    margin: var(--ds-size-3) 0 var(--ds-size-6) 0;
+    border-bottom: 1px solid var(--dibk-color-hairline);
+    padding: var(--ds-size-6) 0;
+    border-top: 1px solid var(--dibk-color-hairline);
 }
 
 .submit {
