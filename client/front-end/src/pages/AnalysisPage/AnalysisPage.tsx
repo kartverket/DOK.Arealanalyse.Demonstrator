@@ -1,5 +1,6 @@
 import useSocketIO from '@/lib/socket/useSocketIO';
 import { useAppSelector } from '@/app/hooks';
+import AreaSelector from '@/features/analysis-input/AreaSelector/AreaSelector';
 import Form from '@/features/analysis-input/Form/Form';
 import messageHandlers, {
     handleDisconnect,
@@ -17,6 +18,7 @@ export default function AnalysisPage() {
 
     return (
         <>
+            <AreaSelector />
             <Form />
             <Response key={analysisId} />
             <Drawer />

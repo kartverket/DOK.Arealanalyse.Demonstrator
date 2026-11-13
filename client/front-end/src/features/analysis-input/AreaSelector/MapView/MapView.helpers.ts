@@ -1,5 +1,6 @@
 import bbox from '@turf/bbox';
 import buffer from '@turf/buffer';
+import { containsExtent } from 'ol/extent';
 import proj4 from 'proj4';
 import { reproject } from 'reproject';
 import { getLayer } from '@/lib/map/map';
@@ -27,6 +28,19 @@ export function setupMap(map: OlMap, currentLocation: LonLat | null): void {
 
     view.setMinZoom(basemap.minZoom);
     view.setMaxZoom(basemap.maxZoom);
+}
+
+// Zoomer kun ut når objektene ikke allerede er synlige i kartutsnittet
+export function fitToFeatures(map: OlMap): void {
+    const view = map.getView();
+    const extent = getFeatureExtent(map);
+    if (extent === null || !view.isDef()) {
+        return;
+    }
+
+    if (!containsExtent(view.calculateExtent(), extent)) {
+        view.fit(extent, { duration: 250 });
+    }
 }
 
 function getFeatureExtent(map: OlMap): Extent | null {

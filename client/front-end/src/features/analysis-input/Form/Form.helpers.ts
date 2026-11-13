@@ -12,6 +12,11 @@ export function isAnalysisJob(
     return 'jobID' in response;
 }
 
+// Tomt felt eller ugyldig verdi gir 0, og negative verdier tillates ikke
+export function parseRequestedBuffer(value: string): number {
+    return Math.max(0, parseInt(value) || 0);
+}
+
 export function createPayload(
     formData: AnalysisFormData,
     correlationId: string | null,
@@ -20,7 +25,7 @@ export function createPayload(
 
     const inputs: AnalysisInputs = {
         ...fields,
-        requestedBuffer: parseInt(fields.requestedBuffer),
+        requestedBuffer: parseRequestedBuffer(fields.requestedBuffer),
         context: fields.context !== '' ? fields.context : null,
         theme: fields.theme !== '' ? fields.theme : null,
         correlationId,

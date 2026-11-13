@@ -21,6 +21,7 @@ import type { Options as WmtsOptions } from 'ol/source/WMTS';
 
 const MAP_WIDTH = 720;
 const MAP_HEIGHT = 480;
+const BUFFER_FEATURE_ID = 'buffer';
 
 export type WmtsLayerName =
     (typeof basemap.layers)[keyof typeof basemap.layers];
@@ -183,6 +184,35 @@ function createFeaturesLayer(
     vectorLayer.set('id', 'features');
 
     return vectorLayer;
+}
+
+export function setBufferedGeometry(
+    map: OlMap,
+    bufferedGeometry: CrsGeometry | null,
+): void {
+    const source = getLayer<VectorLayer<VectorSource>>(
+        map,
+        'features',
+    )?.getSource();
+
+    if (!source) {
+        return;
+    }
+
+    const existing = source.getFeatureById(BUFFER_FEATURE_ID);
+    if (existing !== null) {
+        source.removeFeature(existing);
+    }
+
+    if (bufferedGeometry !== null) {
+        const feature = createFeature(
+            bufferedGeometry,
+            getProjection(bufferedGeometry),
+            getBufferStyle(),
+        );
+        feature.setId(BUFFER_FEATURE_ID);
+        source.addFeature(feature);
+    }
 }
 
 function createFeature(

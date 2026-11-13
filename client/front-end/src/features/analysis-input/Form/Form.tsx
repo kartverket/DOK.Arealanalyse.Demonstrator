@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { generatePath, useNavigate } from 'react-router';
 import { api, useGetDokTemaQuery } from '@/lib/api/api';
-import AreaDialog from '../AreaDialog/AreaDialog';
 import { apiFetch } from '@/app/apiFetch';
 import {
     analyzeStart,
@@ -32,11 +31,9 @@ import {
     Label,
     Select,
 } from 'dibk-designsystemet';
-import { CheckmarkCircleFillIcon } from '@navikt/aksel-icons';
 import styles from './Form.module.scss';
 
 import type { AnalysisJob, AnalysisResponse } from '@/types/api.types';
-import type { CrsGeometry } from '@/types/geo.types';
 import type { ChangeEvent } from 'react';
 
 export default function Form() {
@@ -58,15 +55,15 @@ export default function Form() {
     ) {
         const name = event.target.name;
 
-        const value =
+        let value =
             event.target.type === 'checkbox'
                 ? (event.target as HTMLInputElement).checked
                 : event.target.value;
-        dispatch(setFormData({ name, value } as FormDataField));
-    }
+        if (name === 'requestedBuffer' && Number(value) < 0) {
+            value = '0';
+        }
 
-    function handleAreaDialogOk(geometry: CrsGeometry | null) {
-        dispatch(setFormData({ name: 'inputGeometry', value: geometry }));
+        dispatch(setFormData({ name, value } as FormDataField));
     }
 
     function canSubmit() {
@@ -185,26 +182,12 @@ export default function Form() {
         <section className={styles.form}>
             <div className={styles.input}>
                 <div className={styles.row}>
-                    <div className={styles.addGeometry}>
-                        <AreaDialog onOk={handleAreaDialogOk} />
-
-                        <CheckmarkCircleFillIcon
-                            color="#056d13"
-                            fontSize="24px"
-                            style={{
-                                visibility:
-                                    formData.inputGeometry !== null
-                                        ? 'visible'
-                                        : 'hidden',
-                            }}
-                        />
-                    </div>
-
                     <Field className={styles.buffer}>
                         <Label>Buffer</Label>
                         <Field.Affixes>
                             <Input
                                 type="number"
+                                min={0}
                                 name="requestedBuffer"
                                 value={formData.requestedBuffer}
                                 onChange={handleChange}
