@@ -1,3 +1,5 @@
+import { useEffect, useRef } from 'react';
+import { generatePath, useNavigate } from 'react-router';
 import { api, useGetDokTemaQuery } from '@/lib/api/api';
 import AreaDialog from '../AreaDialog/AreaDialog';
 import { apiFetch } from '@/app/apiFetch';
@@ -5,11 +7,19 @@ import {
     analyzeStart,
     analyzeFinish,
     setFormData,
+    setToast,
     type FormDataField,
 } from '@/app/appSlice';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { createPayload, mapResponse } from './Form.helpers';
-import { resetProgress } from '@/features/analysis-progress/progressSlice';
+import { PATHS } from '@/app/paths';
+import { createPayload, isAnalysisJob } from './Form.helpers';
+import pollJob, { JobTimeoutError } from '@/features/analysis-progress/pollJob';
+import {
+    resetProgress,
+    setFetchingResults,
+    updateJob,
+} from '@/features/analysis-progress/progressSlice';
+import mapResponse from '@/features/analysis-response/mapResponse';
 import {
     setResponse,
     resetResponseState,
@@ -25,6 +35,7 @@ import {
 import { CheckmarkCircleFillIcon } from '@navikt/aksel-icons';
 import styles from './Form.module.scss';
 
+import type { AnalysisJob, AnalysisResponse } from '@/types/api.types';
 import type { CrsGeometry } from '@/types/geo.types';
 import type { ChangeEvent } from 'react';
 
@@ -34,6 +45,13 @@ export default function Form() {
     const busy = useAppSelector((state) => state.app.busy);
     const { data: themes = [] } = useGetDokTemaQuery();
     const dispatch = useAppDispatch();
+    const navigate = useNavigate();
+    const abortControllerRef = useRef<AbortController | null>(null);
+
+    useEffect(() => {
+        // Stopper pollingen av en asynkron jobb når brukeren navigerer bort
+        return () => abortControllerRef.current?.abort();
+    }, []);
 
     function handleChange(
         event: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -64,20 +82,103 @@ export default function Form() {
         resetState();
 
         const payload = createPayload(formData, correlationId);
+        const controller = new AbortController();
+        abortControllerRef.current = controller;
+
+        let resultJobId: string | null = null;
 
         try {
             dispatch(analyzeStart());
 
-            const response = await apiFetch(api.endpoints.analyze, { payload });
-            const mapped = mapResponse(response);
-            dispatch(setResponse(mapped));
+            const { response, jobId } = await apiFetch(api.endpoints.analyze, {
+                payload,
+                respondAsync: formData.respondAsync,
+            });
+
+            // pygeoapi svarer synkront hvis process manageren ikke støtter asynkron kjøring
+            const result = isAnalysisJob(response)
+                ? await getJobResult(response, controller.signal)
+                : response;
+
+            if (result === null) {
+                return;
+            }
+
+            resultJobId =
+                jobId ?? (isAnalysisJob(response) ? response.jobID : null);
+
+            if (resultJobId !== null) {
+                // Resultatsiden henter da resultatet fra cachen i stedet for fra pygeoapi
+                dispatch(
+                    api.util.upsertQueryData(
+                        'getJobResults',
+                        resultJobId,
+                        result,
+                    ),
+                );
+            } else {
+                // Uten jobb finnes ingen resultatside, så resultatet vises her
+                dispatch(setResponse(mapResponse(result)));
+            }
         } catch (error) {
-            console.log(error);
+            if (!controller.signal.aborted) {
+                console.log(error);
+            }
         } finally {
             setTimeout(() => {
                 dispatch(analyzeFinish());
+
+                if (resultJobId !== null && !controller.signal.aborted) {
+                    navigate(
+                        generatePath(PATHS.result, { jobId: resultJobId }),
+                    );
+                }
             }, 500);
         }
+    }
+
+    async function getJobResult(
+        job: AnalysisJob,
+        signal: AbortSignal,
+    ): Promise<AnalysisResponse | null> {
+        dispatch(updateJob(job));
+
+        let finishedJob: AnalysisJob;
+        try {
+            finishedJob = await pollJob(job.jobID, {
+                signal,
+                onUpdate: (updated) => dispatch(updateJob(updated)),
+            });
+        } catch (error) {
+            if (!signal.aborted) {
+                const message =
+                    error instanceof JobTimeoutError
+                        ? 'DOK-analysen ble ikke ferdig innen tidsfristen'
+                        : 'Kunne ikke hente status for DOK-analysen';
+                dispatch(setToast({ message }));
+            }
+
+            throw error;
+        }
+
+        if (finishedJob.status !== 'successful') {
+            const message =
+                finishedJob.status === 'dismissed'
+                    ? 'DOK-analysen ble avbrutt'
+                    : 'DOK-analysen feilet';
+            dispatch(
+                setToast({
+                    message: finishedJob.message
+                        ? `${message}: ${finishedJob.message}`
+                        : message,
+                }),
+            );
+            return null;
+        }
+
+        dispatch(setFetchingResults(true));
+
+        return await apiFetch(api.endpoints.getJobResults, job.jobID, false);
     }
 
     return (
@@ -199,6 +300,13 @@ export default function Form() {
                         >
                             Start DOK-analyse
                         </Button>
+
+                        <Checkbox
+                            name="respondAsync"
+                            checked={formData.respondAsync}
+                            onChange={handleChange}
+                            label="Kjør asynkront"
+                        />
                     </div>
                 </div>
             </div>

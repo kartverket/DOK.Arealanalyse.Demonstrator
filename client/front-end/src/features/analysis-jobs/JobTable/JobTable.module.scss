@@ -1,0 +1,28 @@
+.tableContainer {
+    overflow-x: auto;
+}
+
+.jobTable {
+    width: 100%;
+}
+
+.row {
+    cursor: pointer;
+}
+
+.date,
+.number {
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.number {
+    text-align: right;
+}
+
+.jobId {
+    font-family: monospace;
+    font-size: 0.875rem;
+    color: var(--ds-color-accent-text-default, var(--dibk-color-ink));
+    text-underline-offset: 0.2em;
+}

@@ -1,3 +1,4 @@
+import type { AnalysisJob } from '@/types/api.types';
 import type {
     ProgressMessage,
     StateStatus,
@@ -42,4 +43,53 @@ export function getStatusText(
     }
 
     return text;
+}
+
+// Steg som vises når analysen kjøres asynkront og fremdriften hentes fra /jobs/{jobId}
+export const JOB_STEP = {
+    QUEUED: 'QUEUED',
+    RUNNING: 'RUNNING',
+    FETCHING_RESULTS: 'FETCHING_RESULTS',
+} as const;
+
+export type JobStep = (typeof JOB_STEP)[keyof typeof JOB_STEP];
+
+export const JOB_STEP_TEXT: Record<JobStep, string> = {
+    [JOB_STEP.QUEUED]: 'Venter i kø',
+    [JOB_STEP.RUNNING]: 'Kjører DOK-analyse',
+    [JOB_STEP.FETCHING_RESULTS]: 'Henter resultat',
+};
+
+const JOB_STEPS: JobStep[] = [
+    JOB_STEP.QUEUED,
+    JOB_STEP.RUNNING,
+    JOB_STEP.FETCHING_RESULTS,
+];
+
+export function getJobTasks(
+    job: AnalysisJob,
+    fetchingResults: boolean,
+): [JobStep, TaskStatus][] {
+    let current: JobStep = JOB_STEP.FETCHING_RESULTS;
+
+    if (!fetchingResults && job.status === 'accepted') {
+        current = JOB_STEP.QUEUED;
+    } else if (!fetchingResults && job.status === 'running') {
+        current = JOB_STEP.RUNNING;
+    }
+
+    const currentIndex = JOB_STEPS.indexOf(current);
+    const inProgress = current !== JOB_STEP.FETCHING_RESULTS || fetchingResults;
+
+    return JOB_STEPS.map((step, index) => {
+        if (index < currentIndex) {
+            return [step, TASK_STATUS.DONE];
+        }
+
+        if (index === currentIndex && inProgress) {
+            return [step, TASK_STATUS.IN_PROGRESS];
+        }
+
+        return [step, TASK_STATUS.NOT_STARTED];
+    });
 }

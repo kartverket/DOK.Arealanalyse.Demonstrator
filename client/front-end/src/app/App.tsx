@@ -6,6 +6,7 @@ import { DibkAppShell } from 'dibk-designsystemet';
 
 const SHORTCUTS = [
     { label: 'Analyse', href: PATHS.analysis },
+    { label: 'Resultater', href: PATHS.results },
     { label: 'Tjenestestatus', href: PATHS.status },
 ];
 

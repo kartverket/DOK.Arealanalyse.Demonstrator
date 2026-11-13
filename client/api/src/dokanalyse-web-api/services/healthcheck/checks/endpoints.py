@@ -135,7 +135,7 @@ def get_endpoints(datasets: List[DatasetConfig]) -> List[Endpoint]:
                                   ['Process'], validate=_has_key('NorwegianTitle')))
 
     if settings.PYGEOAPI_API_URL:
-        process_url = settings.PYGEOAPI_API_URL.removesuffix('/execution')
+        process_url = f'{settings.PYGEOAPI_API_URL.rstrip("/")}/processes/dokanalyse'
         endpoints.append(Endpoint('pygeoapi', 'DOK-analyse (pygeoapi-prosess)', 'Intern',
                                   process_url, 'json', ['API'], params={'f': 'json'},
                                   validate=_has_key('id')))

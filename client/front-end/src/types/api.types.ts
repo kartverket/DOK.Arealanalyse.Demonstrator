@@ -42,6 +42,47 @@ export interface AnalysisResponse {
     factList: FactPart[];
 }
 
+// Asynkron kjøring (OGC API - Processes, /jobs/{jobId})
+export type JobStatus =
+    | 'accepted'
+    | 'running'
+    | 'successful'
+    | 'failed'
+    | 'dismissed';
+
+export interface AnalysisJob {
+    jobID: string;
+    status: JobStatus;
+    message?: string | null;
+    progress?: number | null;
+    created?: string | null;
+    started?: string | null;
+    finished?: string | null;
+    updated?: string | null;
+}
+
+export interface AnalysisJobList {
+    jobs: AnalysisJob[];
+    numberMatched: number;
+}
+
+export interface JobListArgs {
+    limit: number;
+    offset: number;
+}
+
+export interface AnalyzeArgs {
+    payload: AnalysisPayload;
+    respondAsync: boolean;
+}
+
+export interface AnalyzeResult {
+    response: AnalysisResponse | AnalysisJob;
+
+    // Fra headeren «X-Job-Id»; null hvis process manageren i pygeoapi ikke lagrer jobber
+    jobId: string | null;
+}
+
 export interface AnalysisResult {
     title: string | null;
     runOnInputGeometry: CrsGeometry;

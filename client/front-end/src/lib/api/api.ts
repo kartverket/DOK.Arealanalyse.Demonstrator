@@ -1,12 +1,16 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 import type {
-    AnalysisPayload,
+    AnalysisJob,
+    AnalysisJobList,
     AnalysisResponse,
+    AnalyzeArgs,
+    AnalyzeResult,
     AreaFeature,
     EiendomArgs,
     KommuneByPointArgs,
     KommuneFeature,
+    JobListArgs,
     KommuneFeatureCollection,
     OmrådeArgs,
     PlanArgs,
@@ -31,15 +35,29 @@ export const api = createApi({
     reducerPath: 'api',
     baseQuery: fetchBaseQuery({ baseUrl: API_BASE_URL }),
     endpoints: (builder) => ({
-        analyze: builder.mutation<
-            AnalysisResponse,
-            { payload: AnalysisPayload }
-        >({
-            query: ({ payload }) => ({
+        analyze: builder.mutation<AnalyzeResult, AnalyzeArgs>({
+            query: ({ payload, respondAsync }) => ({
                 url: 'pygeoapi',
                 body: payload,
                 method: 'POST',
+                headers: respondAsync ? { Prefer: 'respond-async' } : undefined,
             }),
+            transformResponse: (
+                response: AnalysisResponse | AnalysisJob,
+                meta,
+            ) => ({
+                response,
+                jobId: meta?.response?.headers.get('X-Job-Id') ?? null,
+            }),
+        }),
+        getJobs: builder.query<AnalysisJobList, JobListArgs>({
+            query: (params) => ({ url: 'pygeoapi/jobs', params }),
+        }),
+        getJob: builder.query<AnalysisJob, string>({
+            query: (jobId) => `pygeoapi/jobs/${jobId}`,
+        }),
+        getJobResults: builder.query<AnalysisResponse, string>({
+            query: (jobId) => `pygeoapi/jobs/${jobId}/results`,
         }),
         getDokTema: builder.query<string[], void>({
             query: () => 'doktema',
@@ -116,6 +134,9 @@ export const {
     useGetStatusStatisticsQuery,
     useGetStatusTimelineQuery,
     useGetStatusIncidentsQuery,
+    useGetJobsQuery,
+    useGetJobQuery,
+    useGetJobResultsQuery,
     useAnalyzeMutation,
     useGetEiendomMutation,
     useGetOmrådeMutation,

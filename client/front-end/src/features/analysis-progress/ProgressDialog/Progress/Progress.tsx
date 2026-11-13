@@ -1,6 +1,14 @@
 import { useMemo } from 'react';
 import { useAppSelector } from '@/app/hooks';
-import { getStatusText, STATE_STATUS, TASK_STATUS } from './Progress.helpers';
+import {
+    getJobTasks,
+    getStatusText,
+    JOB_STEP,
+    JOB_STEP_TEXT,
+    STATE_STATUS,
+    TASK_STATUS,
+    type JobStep,
+} from './Progress.helpers';
 import ProgressBar, {
     PROGRESS_VARIANT,
     type ProgressVariant,
@@ -23,11 +31,20 @@ export default function Progress() {
         return TASK_STATUSES[taskStatus] || '';
     }
 
-    function renderProgressBar() {
+    function renderProgressBar(step: StateStatus | JobStep) {
         let variant: ProgressVariant = PROGRESS_VARIANT.DETERMINATE;
         let value = 0;
-
-        if (progress.status === STATE_STATUS.ANALYZING_DATASETS) {
+        const jobProgress = progress.job?.progress ?? 0;
+        if (
+            step === JOB_STEP.RUNNING &&
+            jobProgress > 10 &&
+            jobProgress < 100
+        ) {
+            // pygeoapi setter 10 når jobben starter; høyere verdier gir en reell fremdrift
+            value = jobProgress / 100;
+        } else if (progress.job !== null) {
+            variant = PROGRESS_VARIANT.INDETERMINATE;
+        } else if (progress.status === STATE_STATUS.ANALYZING_DATASETS) {
             value = progress.analysisCount / progress.analysesTotal;
         } else if (progress.status === STATE_STATUS.CREATING_MAP_IMAGES) {
             value = progress.mapImageCount / progress.mapImagesTotal;
@@ -44,6 +61,18 @@ export default function Progress() {
     }
 
     const progressItems = useMemo(() => {
+        if (progress.job !== null) {
+            return getJobTasks(progress.job, progress.fetchingResults).map(
+                ([step, taskStatus], index) => ({
+                    number: index + 1,
+                    step,
+                    cssClass: getStatusCssClass(taskStatus),
+                    text: JOB_STEP_TEXT[step],
+                    taskStatus,
+                }),
+            );
+        }
+
         if (progress.tasks === null) {
             return [];
         }
@@ -52,6 +81,7 @@ export default function Progress() {
             Object.entries(progress.tasks) as [StateStatus, TaskStatus][]
         ).map(([stateStatus, taskStatus], index) => ({
             number: index + 1,
+            step: stateStatus as StateStatus | JobStep,
             cssClass: getStatusCssClass(taskStatus),
             text: getStatusText(stateStatus, taskStatus, progress),
             taskStatus,
@@ -80,7 +110,7 @@ export default function Progress() {
                                     <div className={styles.progressBar}>
                                         {item.taskStatus ===
                                             TASK_STATUS.IN_PROGRESS &&
-                                            renderProgressBar()}
+                                            renderProgressBar(item.step)}
                                     </div>
                                 </div>
                             </div>

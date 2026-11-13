@@ -22,7 +22,7 @@ services:
     build:
       context: ./client/api
     environment:
-      - PYGEOAPI_API_URL=http://172.17.0.1:5000/processes/dokanalyse/execution
+      - PYGEOAPI_API_URL=http://172.17.0.1:5000
       - NAP_USERNAME=${NAP_USERNAME}
       - NAP_PASSWORD=${NAP_PASSWORD}
       - HEALTHCHECK_ENABLED=true

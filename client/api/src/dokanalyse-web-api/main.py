@@ -9,6 +9,7 @@ import uvicorn
 import aiohttp
 from .routers import (dok_tema, eiendom, eksempler,
                       kommuner, omrade, pygeoapi, plan, sok, status)
+from .routers.pygeoapi import JOB_ID_HEADER
 from .services.kommuner import get_kommuner
 from .services.healthcheck.scheduler import start_scheduler
 from .utils import session_registry
@@ -62,6 +63,7 @@ app.add_middleware(
     ],
     allow_methods=['GET', 'POST'],
     allow_headers=['*'],
+    expose_headers=[JOB_ID_HEADER],
     allow_credentials=True
 )
 

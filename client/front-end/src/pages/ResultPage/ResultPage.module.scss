@@ -1,0 +1,27 @@
+.resultPage {
+    padding-block: 2rem 4rem;
+}
+
+.backLink {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: var(--ds-color-accent-text-default, var(--dibk-color-ink));
+    text-underline-offset: 0.2em;
+}
+
+.meta {
+    color: var(--dibk-color-meta);
+    font-size: 0.875rem;
+    font-variant-numeric: tabular-nums;
+}
+
+.jobId {
+    font-family: monospace;
+}
+
+.pending {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}

@@ -12,6 +12,9 @@ export interface AnalysisFormData {
     includeFilterChosenDOK: boolean;
     includeFacts: boolean;
     createBinaries: boolean;
+
+    // Ikke en del av analysens input: styrer om analysen kjøres som en asynkron jobb
+    respondAsync: boolean;
 }
 
 export type FormDataField = {
@@ -53,6 +56,7 @@ const initialState: AppState = {
         includeFilterChosenDOK: false,
         includeFacts: true,
         createBinaries: false,
+        respondAsync: false,
     },
     currentLocation: {
         coordinates: null,

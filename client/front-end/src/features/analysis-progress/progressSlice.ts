@@ -1,8 +1,15 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
+import type { AnalysisJob } from '@/types/api.types';
 import type { ProgressMessage } from '@/types/socket.types';
 
-const initialState: ProgressMessage = {
+export interface ProgressState extends ProgressMessage {
+    // Satt når analysen kjøres asynkront; fremdriften hentes da fra /jobs/{jobId}
+    job: AnalysisJob | null;
+    fetchingResults: boolean;
+}
+
+const initialState: ProgressState = {
     status: null,
     analysesTotal: 0,
     analysisCount: 0,
@@ -10,6 +17,8 @@ const initialState: ProgressMessage = {
     mapImageCount: 0,
     tasks: null,
     recipient: null,
+    job: null,
+    fetchingResults: false,
 };
 
 export const progressSlice = createSlice({
@@ -25,12 +34,25 @@ export const progressSlice = createSlice({
                 ...action.payload,
             };
         },
+        updateJob: (state, action: PayloadAction<AnalysisJob>) => {
+            return {
+                ...state,
+                job: action.payload,
+            };
+        },
+        setFetchingResults: (state, action: PayloadAction<boolean>) => {
+            return {
+                ...state,
+                fetchingResults: action.payload,
+            };
+        },
         resetProgress: () => {
             return initialState;
         },
     },
 });
 
-export const { updateProgress, resetProgress } = progressSlice.actions;
+export const { updateProgress, updateJob, setFetchingResults, resetProgress } =
+    progressSlice.actions;
 
 export default progressSlice.reducer;
