@@ -151,7 +151,8 @@ public static class Tools
     [McpServerTool, Description(
         "Get sample GeoJSON geometries from the DOK API. " +
         "Use this to discover available test geometries that can be passed to AnalyzeIntersections. " +
-        "Returns an array of sample entries with GeoJSON geometry and metadata.")]
+        "Returns a GeoJSON FeatureCollection where each feature has properties navn, beskrivelse, kommunenummer and kommunenavn, " +
+        "and a geometry with a crs property that can be used directly as inputGeometry.")]
     public static Task<string> ListSamples(DokApiClient apiClient, CancellationToken cancellationToken)
     {
         return apiClient.ListSamplesAsync(cancellationToken);
@@ -203,28 +204,21 @@ public static class Tools
     }
 
     [McpServerTool, Description(
-        "Convert a local SOSI or GML file to an outline GeoJSON geometry. " +
-        "The returned GeoJSON can be used as inputGeometry in AnalyzeIntersections. " +
-        "The output is projected to the specified EPSG (default 25833 / UTM zone 33N).")]
+        "Convert a local file (GeoJSON, SOSI, GML or GeoPackage) to an outline geometry. " +
+        "Returns a GeoJSON Feature with properties kommunenummer and kommunenavn (null if the area is outside Norway). " +
+        "The feature's geometry includes a crs property and can be used as inputGeometry in AnalyzeIntersections. " +
+        "The output is projected to the specified EPSG (default 25833 / UTM zone 33N), except for files containing " +
+        "a single GeoJSON geometry, which are returned in their original coordinate system.")]
     public static async Task<string> ConvertOutline(
         DokApiClient apiClient,
-        [Description("Absolute or relative path to a local file readable by the MCP server process")] string filePath,
-        [Description("Allowed values: sosi or gml")] string fileType,
+        [Description("Absolute or relative path to a local file readable by the MCP server process. The file extension is used to detect the format")] string filePath,
         [Description("Destination EPSG. Defaults to 25833")] int destEpsg = 25833,
         CancellationToken cancellationToken = default)
     {
         if (!File.Exists(filePath))
             throw new FileNotFoundException("File path does not exist.", filePath);
 
-        if (!string.Equals(fileType, "sosi", StringComparison.OrdinalIgnoreCase) &&
-            !string.Equals(fileType, "gml", StringComparison.OrdinalIgnoreCase))
-            throw new ArgumentException("fileType must be either 'sosi' or 'gml'.", nameof(fileType));
-
-        var response = await apiClient.ConvertOutlineAsync(
-            filePath,
-            fileType.ToLowerInvariant(),
-            destEpsg,
-            cancellationToken);
+        var response = await apiClient.ConvertOutlineAsync(filePath, destEpsg, cancellationToken);
 
         return DokApiClient.PrettyJson(response);
     }
@@ -232,7 +226,8 @@ public static class Tools
     [McpServerTool, Description(
         "Validate a GeoJSON geometry before passing it to analysis. " +
         "Use this to check that GeoJSON is well-formed and has valid geometry. " +
-        "Returns validation result indicating whether the geometry is valid.")]
+        "The geometry must be a valid Polygon or MultiPolygon (or a Feature/FeatureCollection containing such geometries). " +
+        "Returns {\"valid\": true} or {\"valid\": false, \"message\": \"<reason>\"}.")]
     public static async Task<string> ValidateGeoJson(
         DokApiClient apiClient,
         [Description("GeoJSON content as a JSON string")] string geoJson,

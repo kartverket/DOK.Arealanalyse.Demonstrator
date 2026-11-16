@@ -1,3 +1,4 @@
+using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
@@ -14,9 +15,9 @@ public sealed class DokApiClient(HttpClient httpClient, ILogger<DokApiClient> lo
 
     public async Task<string> ListSamplesAsync(CancellationToken cancellationToken)
     {
-        logger.LogDebug("GET sample");
-        using var response = await httpClient.GetAsync("sample", cancellationToken);
-        await EnsureSuccessAsync(response, "GET sample", cancellationToken);
+        logger.LogDebug("GET eksempler");
+        using var response = await httpClient.GetAsync("eksempler", cancellationToken);
+        await EnsureSuccessAsync(response, "GET eksempler", cancellationToken);
         return await response.Content.ReadAsStringAsync(cancellationToken);
     }
 
@@ -34,39 +35,48 @@ public sealed class DokApiClient(HttpClient httpClient, ILogger<DokApiClient> lo
         return await response.Content.ReadAsStringAsync(cancellationToken);
     }
 
-    public async Task<string> ConvertOutlineAsync(string filePath, string fileType, int destEpsg, CancellationToken cancellationToken)
+    public async Task<string> ConvertOutlineAsync(string filePath, int destEpsg, CancellationToken cancellationToken)
     {
-        var endpoint = $"convert/{fileType}/outline";
-        logger.LogDebug("POST {Endpoint} for file {FilePath}", endpoint, filePath);
+        logger.LogDebug("POST omrade for file {FilePath}", filePath);
 
         await using var stream = File.OpenRead(filePath);
-        using var content = new MultipartFormDataContent();
-        using var fileContent = new StreamContent(stream);
-
-        fileContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
-        content.Add(fileContent, "file", Path.GetFileName(filePath));
-        content.Add(new StringContent(destEpsg.ToString()), "destEpsg");
-
-        using var response = await httpClient.PostAsync(endpoint, content, cancellationToken);
-        await EnsureSuccessAsync(response, $"POST {endpoint}", cancellationToken);
+        using var response = await PostOmradeAsync(stream, Path.GetFileName(filePath), destEpsg, cancellationToken);
+        await EnsureSuccessAsync(response, "POST omrade", cancellationToken);
         return await response.Content.ReadAsStringAsync(cancellationToken);
     }
 
     public async Task<string> ValidateGeoJsonAsync(string geoJson, CancellationToken cancellationToken)
     {
-        logger.LogDebug("POST validate");
-        var bytes = Encoding.UTF8.GetBytes(geoJson);
+        logger.LogDebug("POST omrade for validation");
 
-        await using var stream = new MemoryStream(bytes);
+        await using var stream = new MemoryStream(Encoding.UTF8.GetBytes(geoJson));
+        using var response = await PostOmradeAsync(stream, "geometry.geojson", null, cancellationToken);
+
+        // /omrade svarer 400 med en forklaring i «detail» når filen eller geometrien er ugyldig
+        if (response.StatusCode == HttpStatusCode.BadRequest)
+        {
+            var body = await response.Content.ReadAsStringAsync(cancellationToken);
+            var detail = JsonNode.Parse(body)?["detail"]?.GetValue<string>();
+
+            return new JsonObject { ["valid"] = false, ["message"] = detail }.ToJsonString();
+        }
+
+        await EnsureSuccessAsync(response, "POST omrade", cancellationToken);
+        return new JsonObject { ["valid"] = true }.ToJsonString();
+    }
+
+    private async Task<HttpResponseMessage> PostOmradeAsync(Stream stream, string fileName, int? outEpsg, CancellationToken cancellationToken)
+    {
         using var content = new MultipartFormDataContent();
-        using var fileContent = new StreamContent(stream);
+        var fileContent = new StreamContent(stream);
 
-        fileContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-        content.Add(fileContent, "file", "geometry.json");
+        fileContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+        content.Add(fileContent, "file", fileName);
 
-        using var response = await httpClient.PostAsync("validate", content, cancellationToken);
-        await EnsureSuccessAsync(response, "POST validate", cancellationToken);
-        return await response.Content.ReadAsStringAsync(cancellationToken);
+        if (outEpsg is not null)
+            content.Add(new StringContent(outEpsg.Value.ToString()), "out_epsg");
+
+        return await httpClient.PostAsync("omrade", content, cancellationToken);
     }
 
     public static string PrettyJson(string json)

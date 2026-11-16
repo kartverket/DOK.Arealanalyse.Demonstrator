@@ -16,7 +16,8 @@ export default function SampleSelector({
     onSampleSelect,
 }: SampleSelectorProps) {
     const [dropdownOpen, setDropdownOpen] = useState(false);
-    const { data: samples = [] } = useGetEksemplerQuery();
+    const { data } = useGetEksemplerQuery();
+    const samples = data?.features ?? [];
     const dropdownTriggerRef = useRef<HTMLButtonElement>(null);
 
     function handleSampleSelect(sample: Sample) {
@@ -37,7 +38,9 @@ export default function SampleSelector({
                 Eksempel
             </div>
 
-            <div data-field="description">Velg et forhåndsdefinert eksempel</div>
+            <div data-field="description">
+                Velg et forhåndsdefinert eksempel
+            </div>
 
             <Button
                 ref={dropdownTriggerRef}
@@ -45,7 +48,7 @@ export default function SampleSelector({
                 className={styles.dropdownTrigger}
                 popovertarget="sampleDropdown"
             >
-                {selectedSample?.name || 'Velg eksempel'}
+                {selectedSample?.properties.navn || 'Velg eksempel'}
                 {dropdownOpen ? (
                     <ChevronUpIcon aria-hidden />
                 ) : (
@@ -63,21 +66,22 @@ export default function SampleSelector({
             >
                 <Dropdown.List>
                     {samples.map((sample) => (
-                        <Dropdown.Item key={sample.name}>
+                        <Dropdown.Item key={sample.properties.navn}>
                             <Dropdown.Button
                                 onClick={() => handleSampleSelect(sample)}
                                 className={
-                                    selectedSample?.name === sample.name
+                                    selectedSample?.properties.navn ===
+                                    sample.properties.navn
                                         ? styles.selected
                                         : ''
                                 }
                             >
                                 <span className={styles.name}>
-                                    {sample.name}
+                                    {sample.properties.navn}
                                 </span>
-                                {sample.description !== null && (
+                                {sample.properties.beskrivelse !== null && (
                                     <span className={styles.description}>
-                                        {sample.description}
+                                        {sample.properties.beskrivelse}
                                     </span>
                                 )}
                             </Dropdown.Button>

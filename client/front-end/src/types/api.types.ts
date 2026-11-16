@@ -168,12 +168,18 @@ export interface RoadLength {
 
 // Web-API (client/api)
 
-export interface Sample {
-    name: string;
-    description: string | null;
-    fileName: string;
-    geoJson: CrsGeometry;
+export interface SampleProperties {
+    navn: string;
+    beskrivelse: string | null;
+    kommunenummer: string | null;
+    kommunenavn: string | null;
 }
+
+export type Sample = Feature<CrsGeometry, SampleProperties>;
+export type SampleFeatureCollection = FeatureCollection<
+    CrsGeometry,
+    SampleProperties
+>;
 
 export interface KommuneProperties {
     kommunenummer: string;

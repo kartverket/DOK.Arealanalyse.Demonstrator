@@ -16,7 +16,11 @@ import { Button, Popover, Tabs } from 'dibk-designsystemet';
 import { QuestionmarkCircleFillIcon } from '@navikt/aksel-icons';
 import styles from './AreaSelector.module.scss';
 
-import type { OmrådeProperties, Sample } from '@/types/api.types';
+import type {
+    OmrådeProperties,
+    Sample,
+    SampleProperties,
+} from '@/types/api.types';
 import type { CrsGeometry } from '@/types/geo.types';
 
 const DEFAULT_EPSG = 25833;
@@ -95,9 +99,27 @@ export default function AreaSelector({ onAreaSelected }: AreaSelectorProps) {
         );
     }
 
+    function renderSampleHeading({
+        navn,
+        kommunenummer,
+        kommunenavn,
+    }: SampleProperties): ReactNode {
+        return (
+            <>
+                <span>Eksempel</span>
+                <span>{navn}</span>
+                {kommunenummer !== null && kommunenavn !== null && (
+                    <span>
+                        {kommunenavn} ({kommunenummer})
+                    </span>
+                )}
+            </>
+        );
+    }
+
     function handleSampleSelected(sample: Sample) {
         setSelectedSample(sample);
-        setArea(sample.geoJson, sample.fileName);
+        setArea(sample.geometry, renderSampleHeading(sample.properties));
     }
 
     function handleSearchResponse(geometry: CrsGeometry, title: ReactNode) {

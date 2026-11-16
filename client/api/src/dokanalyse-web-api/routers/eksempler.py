@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict, List
+from typing import Any, Dict
 from fastapi import APIRouter, Response, HTTPException, status
 from ..services import eksempler
 from ..utils.helpers import describe_error
@@ -11,7 +11,7 @@ _logger = logging.getLogger(__name__)
 @router.get('/eksempler')
 async def get_eksempler(
     response: Response
-) -> List[Dict[str, Any]]:
+) -> Dict[str, Any]:
     response.headers['Cache-Control'] = 'public, max-age=86400'
 
     try:

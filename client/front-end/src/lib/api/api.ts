@@ -14,7 +14,7 @@ import type {
     OmrådeArgs,
     OmrådeFeature,
     PlanArgs,
-    Sample,
+    SampleFeatureCollection,
     SearchArgs,
     SearchFeatureCollection,
 } from '@/types/api.types';
@@ -63,7 +63,7 @@ export const api = createApi({
         getDokTema: builder.query<string[], void>({
             query: () => 'doktema',
         }),
-        getEksempler: builder.query<Sample[], void>({
+        getEksempler: builder.query<SampleFeatureCollection, void>({
             query: () => 'eksempler',
         }),
         getKommuner: builder.query<KommuneFeatureCollection, void>({
