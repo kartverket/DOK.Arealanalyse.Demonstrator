@@ -5,6 +5,10 @@ services:
     container_name: dokanalyse-front-end
     build:
       context: ./client/front-end
+    environment:
+      - FILE_SHARE_ENABLED=true
+    volumes:
+      - ${DOKANALYSE_LOCAL_FILE_SHARE_DIR}:/mnt/files:ro
     ports:
       - "80:80"
       - "443:443"
@@ -52,22 +56,6 @@ services:
     depends_on:
       - web-api
     restart: always
-
-  file-server:
-    container_name: dokanalyse-file-server
-    build:
-      context: ./file-server
-    ports:
-      - "5004:5004"   
-    expose:
-      - "5004"
-    environment:
-      - FILE_SHARE_DIR=/mnt/files
-    volumes:
-      - ${DOKANALYSE_LOCAL_FILE_SHARE_DIR}:/mnt/files
-    networks:
-      - internal 
-    restart: on-failure
 
 volumes:
   dokanalyse:

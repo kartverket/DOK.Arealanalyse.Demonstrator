@@ -3,14 +3,14 @@ import { io, type Socket } from 'socket.io-client';
 
 import type { ServerToClientEvents } from '@/types/socket.types';
 
-const SIO_BASE_URL = import.meta.env.VITE_SIO_BASE_URL;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function useSocketIO(
     messageHandlers: ServerToClientEvents,
     onDisconnect: () => void,
 ) {
     useEffect(() => {
-        const socket: Socket<ServerToClientEvents> = io(SIO_BASE_URL, {
+        const socket: Socket<ServerToClientEvents> = io(API_BASE_URL, {
             path: '/ws/socket.io',
         });
         socket.on('disconnect', onDisconnect);

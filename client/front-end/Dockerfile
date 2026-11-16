@@ -7,7 +7,10 @@ RUN corepack enable && corepack prepare yarn@4.18.1 \
 
 FROM nginx:latest
 COPY --from=build /app/dist /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# nginx-imaget lager /etc/nginx/conf.d/default.conf fra malen med envsubst ved oppstart
+COPY nginx.conf.template /etc/nginx/templates/default.conf.template
+
+ENV FILE_SHARE_ENABLED=false
 
 EXPOSE 80
 

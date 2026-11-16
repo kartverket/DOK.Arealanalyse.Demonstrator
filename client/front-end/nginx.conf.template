@@ -4,6 +4,11 @@ server {
     proxy_connect_timeout 300;
     proxy_send_timeout 300;
 
+    # Malen behandles med envsubst når containeren starter (se Dockerfile).
+    # Filene (rapporter og kartbilder) som pygeoapi lagrer lokalt, serveres på /files/
+    # når FILE_SHARE_ENABLED er true og filområdet er montert på /mnt/files.
+    set $file_share_enabled "${FILE_SHARE_ENABLED}";
+
     location / {
         root /usr/share/nginx/html;
         index index.html;
@@ -34,5 +39,26 @@ server {
         proxy_set_header Connection "";
         proxy_buffering off;
         proxy_read_timeout 300;
+    }
+
+    location /files/ {
+        return 404;
+    }
+
+    # Bare /files/{katalog}/{fil}, som i LocalFileShare i DOK.Arealanalyse.Process
+    location ~ ^/files/[^/]+/[^/]+$ {
+        if ($file_share_enabled != "true") {
+            return 404;
+        }
+
+        root /mnt;
+        try_files $uri =404;
+        disable_symlinks on;
+        limit_except GET {
+            deny all;
+        }
+
+        add_header Cache-Control "public, max-age=86400";
+        add_header X-Content-Type-Options nosniff;
     }
 }

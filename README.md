@@ -58,6 +58,14 @@ docker-compose up --build
 ## Socket.IO
 Web-api-et videreformidler fremdriften i analysen fra pygeoapi til front-end med Socket.IO på `/ws/socket.io`. Koblingene holdes i minnet, så web-api-et må kjøres som én prosess (ingen `--workers`) og én instans.
 
+## Filer (rapporter og kartbilder)
+pygeoapi lagrer PDF-rapporter og kartbilder enten i Azure Blob Storage (`DOKANALYSE_AZURE_BLOB_STORAGE_CONN_STR`) eller lokalt i `DOKANALYSE_LOCAL_FILE_SHARE_DIR`. Lagres de lokalt, serverer nginx i front-end filene på `/files/{katalog}/{fil}`. Da må filområdet monteres på `/mnt/files` i front-end-containeren, og flagget må slås på. Uten flagget svarer `/files/` med 404.
+
+```ini
+FILE_SHARE_ENABLED=true                      # front-end (standard er false)
+DOKANALYSE_LOCAL_FILE_SHARE_BASE_URL=https://<domene>/files   # pygeoapi
+```
+
 ## Tjenestestatus (helsesjekk)
 Web-api-et sjekker jevnlig tjenestene som DOK-analysen er avhengig av, og front-end viser resultatet på `/status`. Datasettene leses fra konfigurasjonsfilene i [DOK.Arealanalyse.Config](https://github.com/kartverket/DOK.Arealanalyse.Config) på GitHub, så nye eller endrede konfigurasjonsfiler blir med i neste kjøring.
 
