@@ -1,14 +1,18 @@
-import type { ReactNode } from 'react';
+import useCurrentLocation from '@/hooks/useCurrentLocation';
+import AreaPreview from '../AreaPreview/AreaPreview';
 import AreaSelector from '../AreaSelector/AreaSelector';
 import Form from '../Form/Form';
+import styles from './AnalysisInput.module.scss';
 
 export default function AnalysisInput() {
-    function handleAreaSelected(_title: ReactNode) {}
+    // Hentes her, så posisjonen bare slås opp én gang
+    const { kommunenummer, coordinates } = useCurrentLocation();
 
     return (
-        <>
-            <AreaSelector onAreaSelected={handleAreaSelected} />
+        <section className={styles.analysisInput}>
+            <AreaSelector kommunenummer={kommunenummer} />
+            <AreaPreview currentLocation={coordinates} />
             <Form />
-        </>
+        </section>
     );
 }

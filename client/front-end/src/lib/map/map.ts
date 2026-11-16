@@ -21,6 +21,7 @@ import type { Options as WmtsOptions } from 'ol/source/WMTS';
 
 const MAP_WIDTH = 720;
 const MAP_HEIGHT = 480;
+const GEOMETRY_FEATURE_ID = 'geometry';
 const BUFFER_FEATURE_ID = 'buffer';
 
 export type WmtsLayerName =
@@ -45,10 +46,7 @@ export async function createMap({
     wmtsLayer: WmtsLayerName;
     wmsUrl?: string | null;
 }): Promise<OlMap> {
-    const featuresLayer =
-        geometry !== null
-            ? createFeaturesLayer(geometry, bufferedGeometry)
-            : null;
+    const featuresLayer = createFeaturesLayer(geometry, bufferedGeometry);
 
     const map = new OlMap({
         interactions: defaultInteractions().extend([new DragRotateAndZoom()]),
@@ -137,7 +135,7 @@ async function createTempMap(
 async function createLayers(
     wmtsLayer: WmtsLayerName,
     wmsUrl: string | null,
-    featuresLayer: VectorLayer<VectorSource> | null,
+    featuresLayer: VectorLayer<VectorSource>,
 ): Promise<BaseLayer[]> {
     const layers: BaseLayer[] = [];
     const wmts = await createWmtsLayer(wmtsLayer);
@@ -149,9 +147,7 @@ async function createLayers(
         layers.push(createWmsLayer(wmsUrl));
     }
 
-    if (featuresLayer !== null) {
-        layers.push(featuresLayer);
-    }
+    layers.push(featuresLayer);
 
     return layers;
 }
@@ -165,20 +161,30 @@ function createView(constrainResolution?: boolean): View {
     });
 }
 
+// Laget lages også uten geometri, så området kan legges til senere med setGeometry
 function createFeaturesLayer(
-    geometry: CrsGeometry,
+    geometry: CrsGeometry | null,
     bufferedGeometry: CrsGeometry | null = null,
 ): VectorLayer<VectorSource> {
-    const projection = getProjection(geometry);
     const source = new VectorSource();
 
-    if (bufferedGeometry !== null) {
-        source.addFeature(
-            createFeature(bufferedGeometry, projection, getBufferStyle()),
-        );
-    }
+    if (geometry !== null) {
+        const projection = getProjection(geometry);
 
-    source.addFeature(createFeature(geometry, projection, getOutlineStyle()));
+        if (bufferedGeometry !== null) {
+            const buffer = createFeature(
+                bufferedGeometry,
+                projection,
+                getBufferStyle(),
+            );
+            buffer.setId(BUFFER_FEATURE_ID);
+            source.addFeature(buffer);
+        }
+
+        const outline = createFeature(geometry, projection, getOutlineStyle());
+        outline.setId(GEOMETRY_FEATURE_ID);
+        source.addFeature(outline);
+    }
 
     const vectorLayer = new VectorLayer({ source });
     vectorLayer.set('id', 'features');
@@ -186,9 +192,23 @@ function createFeaturesLayer(
     return vectorLayer;
 }
 
+// Bytter analyseområdet i et eksisterende kart, så kartet ikke må lages på nytt
+export function setGeometry(map: OlMap, geometry: CrsGeometry | null): void {
+    replaceFeature(map, GEOMETRY_FEATURE_ID, geometry, getOutlineStyle());
+}
+
 export function setBufferedGeometry(
     map: OlMap,
     bufferedGeometry: CrsGeometry | null,
+): void {
+    replaceFeature(map, BUFFER_FEATURE_ID, bufferedGeometry, getBufferStyle());
+}
+
+function replaceFeature(
+    map: OlMap,
+    id: string,
+    geometry: CrsGeometry | null,
+    style: Style,
 ): void {
     const source = getLayer<VectorLayer<VectorSource>>(
         map,
@@ -199,18 +219,14 @@ export function setBufferedGeometry(
         return;
     }
 
-    const existing = source.getFeatureById(BUFFER_FEATURE_ID);
+    const existing = source.getFeatureById(id);
     if (existing !== null) {
         source.removeFeature(existing);
     }
 
-    if (bufferedGeometry !== null) {
-        const feature = createFeature(
-            bufferedGeometry,
-            getProjection(bufferedGeometry),
-            getBufferStyle(),
-        );
-        feature.setId(BUFFER_FEATURE_ID);
+    if (geometry !== null) {
+        const feature = createFeature(geometry, getProjection(geometry), style);
+        feature.setId(id);
         source.addFeature(feature);
     }
 }

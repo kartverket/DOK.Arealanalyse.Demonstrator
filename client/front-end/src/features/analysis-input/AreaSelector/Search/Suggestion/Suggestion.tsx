@@ -1,10 +1,10 @@
-import { useRef, useState, type InputEvent, type ReactNode } from 'react';
-import { useDispatch } from 'react-redux';
+import { useMemo, useRef, useState, type InputEvent } from 'react';
 import { api } from '@/lib/api/api';
 import { debounce } from '@/lib/helpers';
 import { apiFetch } from '@/app/apiFetch';
-import { setFormData } from '@/app/appSlice';
-import { fetchArea } from './Suggestion.helpers';
+import { setArea } from '@/app/appSlice';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import { fetchArea, getAreaTitle } from './Suggestion.helpers';
 import {
     EXPERIMENTAL_Suggestion as DsSuggestion,
     type SuggestionItem,
@@ -12,87 +12,53 @@ import {
 import styles from './Suggestion.module.scss';
 
 import type { SearchFeature } from '@/types/api.types';
-import type { CrsGeometry } from '@/types/geo.types';
 
 interface SuggestionProps {
     kommunenummer: string;
-    onSelected: (geometry: CrsGeometry, title: ReactNode) => void;
 }
 
-export default function Suggestion({
-    kommunenummer,
-    onSelected,
-}: SuggestionProps) {
+export default function Suggestion({ kommunenummer }: SuggestionProps) {
+    const selectedLabel = useAppSelector((state) => {
+        const source = state.app.area?.source;
+        return source?.type === 'search' ? source.label : null;
+    });
     const [suggestions, setSuggestions] = useState<SearchFeature[]>([]);
-    const [selected, setSelected] = useState('');
+
+    // Viser valget mens området hentes, før det ligger i storen
+    const [pendingLabel, setPendingLabel] = useState<string | null>(null);
     const suggestionInputRef = useRef<HTMLInputElement>(null);
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
 
-    const handleSuggestionInput = debounce(
-        async (event: InputEvent<HTMLInputElement>) => {
-            const query = (event.target as HTMLInputElement).value.trim();
-            if (query.length < 3) {
-                return;
-            }
+    // Lages kun på nytt når kommunen endres, ellers nullstilles ikke ventende søk ved rendring
+    const handleSuggestionInput = useMemo(
+        () =>
+            debounce(async (event: InputEvent<HTMLInputElement>) => {
+                const query = (event.target as HTMLInputElement).value.trim();
+                if (query.length < 3) {
+                    return;
+                }
 
-            try {
-                const response = await apiFetch(api.endpoints.search, {
-                    kommunenummer,
-                    query,
-                });
-                setSuggestions(response.features);
-            } catch (error) {
-                console.log(error);
-            }
-        },
-        500,
+                try {
+                    const response = await apiFetch(api.endpoints.search, {
+                        kommunenummer,
+                        query,
+                    });
+                    setSuggestions(response.features);
+                } catch (error) {
+                    console.log(error);
+                }
+            }, 500),
+        [kommunenummer],
     );
 
     function resetSuggestion() {
-        setSelected('');
+        setPendingLabel(null);
         setSuggestions([]);
-        dispatch(setFormData({ name: 'inputGeometry', value: null }));
-    }
 
-    function renderAreaHeading(feature: SearchFeature): ReactNode {
-        const props = feature.properties;
-
-        function renderAreaData(): ReactNode {
-            switch (props.type) {
-                case 'Eiendom':
-                    return (
-                        <>
-                            <span>{props.data.matrikkelnummer}</span>
-                            <span>{props.data.adressetekst}, {props.data.postnummer} {props.data.poststed}</span>
-                        </>
-                    );
-                case 'Vegadresse':
-                    return (
-                        <>
-                            <span>{props.data.adressetekst}, {props.data.postnummer} {props.data.poststed}</span>
-                            <span>{props.data.matrikkelnummer}</span>
-                        </>
-                    );                    
-                case 'Reguleringsplan':
-                case 'Reguleringsplanforslag': {
-                    let plannavn = '';
-
-                    if (props.data.plannavn !== null) {
-                        plannavn = `: ${props.data.plannavn}`;
-                    }
-
-                    return <span>{props.data.planId + plannavn}</span>;
-                }
-            }
+        // Et område valgt fra eksempel eller fil fjernes ikke når søket tømmes
+        if (selectedLabel !== null) {
+            dispatch(setArea(null));
         }
-
-        return (
-            <>
-                <span>{props.type}</span>
-                {renderAreaData()}
-                <span>{props.data.kommunenavn} ({props.data.kommunenummer})</span>
-            </>
-        );
     }
 
     async function handleSuggestionChange(item: SuggestionItem | null) {
@@ -111,15 +77,23 @@ export default function Suggestion({
             return;
         }
 
-        setSelected(item.label);
+        setPendingLabel(item.label);
 
         try {
             const geometry = await fetchArea(kommunenummer, feature);
             if (geometry !== null) {
-                onSelected(geometry, renderAreaHeading(feature));
+                dispatch(
+                    setArea({
+                        geometry,
+                        title: getAreaTitle(feature),
+                        source: { type: 'search', label: item.label },
+                    }),
+                );
             }
         } catch (error) {
             console.log(error);
+        } finally {
+            setPendingLabel(null);
         }
     }
 
@@ -160,7 +134,7 @@ export default function Suggestion({
 
     return (
         <DsSuggestion
-            selected={selected}
+            selected={pendingLabel ?? selectedLabel ?? ''}
             onSelectedChange={handleSuggestionChange}
             filter={() => true}
         >

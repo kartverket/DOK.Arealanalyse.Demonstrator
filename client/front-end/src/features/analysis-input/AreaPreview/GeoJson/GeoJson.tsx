@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { json } from '@codemirror/lang-json';
 import { EditorView } from '@codemirror/view';
 import CodeMirror, { type BasicSetupOptions } from '@uiw/react-codemirror';
@@ -24,7 +24,8 @@ interface GeoJsonProps {
     data: CrsGeometry | null;
 }
 
-export default function GeoJson({ data }: GeoJsonProps) {
+// memo: AreaPreview rendres på nytt for hvert tastetrykk i bufferfeltet, og CodeMirror er dyr å rendre
+export default memo(function GeoJson({ data }: GeoJsonProps) {
     const [copied, setCopied] = useState(false);
     const copiedTimeout = useRef<number | undefined>(undefined);
 
@@ -91,4 +92,4 @@ export default function GeoJson({ data }: GeoJsonProps) {
             />
         </div>
     );
-}
+});

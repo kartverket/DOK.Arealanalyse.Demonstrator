@@ -21,6 +21,22 @@ export type FormDataField = {
     [K in keyof AnalysisFormData]: { name: K; value: AnalysisFormData[K] };
 }[keyof AnalysisFormData];
 
+// Hvor området ble valgt, så velgeren kan vise valget igjen etter navigering
+export type AreaSource =
+    | { type: 'sample'; name: string }
+    | { type: 'search'; label: string }
+    | { type: 'file' };
+
+export interface AreaInfo {
+    // Tekstdeler i stedet for JSX, så tittelen kan ligge i storen
+    title: string[];
+    source: AreaSource;
+}
+
+export interface SelectedArea extends AreaInfo {
+    geometry: CrsGeometry;
+}
+
 export interface CurrentLocation {
     coordinates: LonLat | null;
     kommunenummer: string | null;
@@ -36,6 +52,10 @@ export interface Toast {
 interface AppState {
     correlationId: string | null;
     formData: AnalysisFormData;
+    area: AreaInfo | null;
+
+    // null betyr at brukeren ikke har valgt kommune, og da brukes kommunen der brukeren er
+    searchKommunenummer: string | null;
     currentLocation: CurrentLocation;
     toast: Toast | null;
     errorMessage: string | null;
@@ -58,6 +78,8 @@ const initialState: AppState = {
         createBinaries: false,
         respondAsync: false,
     },
+    area: null,
+    searchKommunenummer: null,
     currentLocation: {
         coordinates: null,
         kommunenummer: null,
@@ -86,6 +108,28 @@ export const appSlice = createSlice({
                     ...state.formData,
                     [action.payload.name]: action.payload.value,
                 },
+            };
+        },
+        setArea: (state, action: PayloadAction<SelectedArea | null>) => {
+            return {
+                ...state,
+                formData: {
+                    ...state.formData,
+                    inputGeometry: action.payload?.geometry ?? null,
+                },
+                area:
+                    action.payload !== null
+                        ? {
+                              title: action.payload.title,
+                              source: action.payload.source,
+                          }
+                        : null,
+            };
+        },
+        setSearchKommunenummer: (state, action: PayloadAction<string>) => {
+            return {
+                ...state,
+                searchKommunenummer: action.payload,
             };
         },
         setCurrentLocation: (state, action: PayloadAction<CurrentLocation>) => {
@@ -136,6 +180,8 @@ export const appSlice = createSlice({
 export const {
     setCorrelationId,
     setFormData,
+    setArea,
+    setSearchKommunenummer,
     setCurrentLocation,
     setToast,
     analyzeStart,

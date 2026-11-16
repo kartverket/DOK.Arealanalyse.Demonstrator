@@ -1,28 +1,34 @@
 import { useRef, useState } from 'react';
 import { useGetEksemplerQuery } from '@/lib/api/api';
+import { setArea } from '@/app/appSlice';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import { getSampleTitle } from '../AreaSelector.helpers';
 import { Button, Dropdown } from 'dibk-designsystemet';
 import { ChevronDownIcon, ChevronUpIcon } from '@navikt/aksel-icons';
 import styles from './SampleSelector.module.scss';
 
 import type { Sample } from '@/types/api.types';
 
-interface SampleSelectorProps {
-    selectedSample: Sample | null;
-    onSampleSelect: (sample: Sample) => void;
-}
-
-export default function SampleSelector({
-    selectedSample,
-    onSampleSelect,
-}: SampleSelectorProps) {
+export default function SampleSelector() {
+    const selectedName = useAppSelector((state) => {
+        const source = state.app.area?.source;
+        return source?.type === 'sample' ? source.name : null;
+    });
     const [dropdownOpen, setDropdownOpen] = useState(false);
+    const dispatch = useAppDispatch();
     const { data } = useGetEksemplerQuery();
     const samples = data?.features ?? [];
     const dropdownTriggerRef = useRef<HTMLButtonElement>(null);
 
     function handleSampleSelect(sample: Sample) {
         setDropdownOpen(false);
-        onSampleSelect(sample);
+        dispatch(
+            setArea({
+                geometry: sample.geometry,
+                title: getSampleTitle(sample.properties),
+                source: { type: 'sample', name: sample.properties.navn },
+            }),
+        );
     }
 
     function handleLabelClick() {
@@ -48,7 +54,7 @@ export default function SampleSelector({
                 className={styles.dropdownTrigger}
                 popovertarget="sampleDropdown"
             >
-                {selectedSample?.properties.navn || 'Velg eksempel'}
+                {selectedName ?? 'Velg eksempel'}
                 {dropdownOpen ? (
                     <ChevronUpIcon aria-hidden />
                 ) : (
@@ -70,8 +76,7 @@ export default function SampleSelector({
                             <Dropdown.Button
                                 onClick={() => handleSampleSelect(sample)}
                                 className={
-                                    selectedSample?.properties.navn ===
-                                    sample.properties.navn
+                                    selectedName === sample.properties.navn
                                         ? styles.selected
                                         : ''
                                 }

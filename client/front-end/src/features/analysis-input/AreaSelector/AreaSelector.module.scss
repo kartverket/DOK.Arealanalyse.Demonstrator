@@ -1,4 +1,4 @@
-.top {
+.areaSelector {
     display: flex;
     flex-direction: column;
     gap: 18px;
@@ -21,62 +21,7 @@
     gap: 3px;
 }
 
-.content {
-    display: grid;
-    grid-template-columns: min-content auto 326px;
-    column-gap: 30px;
-}
-
-.tabs {
-    display: flex;
-    flex-direction: column;
-
-    & > ds-tablist {
-        border-top: 1px solid var(--ds-color-neutral-border-subtle);
-        margin-bottom: var(--ds-size-4);
-    }
-
-    & ds-tab[aria-disabled='true'] {
-        opacity: var(--ds-opacity-disabled);
-        cursor: not-allowed;
-    }
-}
-
-.tabPanel {
-    height: 50vh;
-    min-height: 400px;
-    padding: 0;
-    margin-bottom: var(--ds-size-2);
-}
-
-.map {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-}
-
-.geojson {
-    display: flex;
-    width: 100%;
-    height: 100%;
-}
-
 .popover svg {
     width: 24px;
     height: 24px;
-}
-
-.areaHeading {
-    display: flex;
-    align-items: flex-start;
-    column-rule: 1px solid var(--ds-color-neutral-border-default);
-    gap: var(--ds-size-6);
-    font-weight: 500;
-    margin-bottom: var(--ds-size-2);
-}
-
-.crs {
-    font-weight: 500;
-    margin-top: calc(var(--ds-size-2) * -1);
 }

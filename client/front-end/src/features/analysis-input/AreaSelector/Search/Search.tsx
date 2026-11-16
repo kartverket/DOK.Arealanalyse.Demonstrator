@@ -1,18 +1,23 @@
-import { useMemo, useState, type ChangeEvent, type ReactNode } from 'react';
+import { useMemo, type ChangeEvent } from 'react';
 import { useGetKommunerQuery } from '@/lib/api/api';
 import Suggestion from './Suggestion/Suggestion';
+import { setSearchKommunenummer } from '@/app/appSlice';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { Field, Label, Select } from 'dibk-designsystemet';
 import styles from './Search.module.scss';
 
-import type { CrsGeometry } from '@/types/geo.types';
-
 interface SearchProps {
-    onResponse: (geometry: CrsGeometry, title: ReactNode) => void;
     kommunenummer: string | null;
 }
 
-export default function Search({ onResponse, kommunenummer }: SearchProps) {
-    const [selectedKommune, setSelectedKommune] = useState(kommunenummer ?? '');
+export default function Search({ kommunenummer }: SearchProps) {
+    const searchKommunenummer = useAppSelector(
+        (state) => state.app.searchKommunenummer,
+    );
+    const dispatch = useAppDispatch();
+
+    // Kommunen der brukeren er, brukes til brukeren selv har valgt en kommune
+    const selectedKommune = searchKommunenummer ?? kommunenummer ?? '';
     const { data = null } = useGetKommunerQuery();
 
     const kommuner = useMemo(() => {
@@ -26,9 +31,8 @@ export default function Search({ onResponse, kommunenummer }: SearchProps) {
         }));
     }, [data]);
 
-    async function handleKommuneChange(event: ChangeEvent<HTMLSelectElement>) {
-        const kommunenummer = event.target.value;
-        setSelectedKommune(kommunenummer);
+    function handleKommuneChange(event: ChangeEvent<HTMLSelectElement>) {
+        dispatch(setSearchKommunenummer(event.target.value));
     }
 
     return (
@@ -54,10 +58,7 @@ export default function Search({ onResponse, kommunenummer }: SearchProps) {
             <Field style={{ width: 250 }}>
                 <Label>Plan-ID, matrikkelnr. eller adresse</Label>
 
-                <Suggestion
-                    kommunenummer={selectedKommune}
-                    onSelected={onResponse}
-                />
+                <Suggestion kommunenummer={selectedKommune} />
             </Field>
         </div>
     );

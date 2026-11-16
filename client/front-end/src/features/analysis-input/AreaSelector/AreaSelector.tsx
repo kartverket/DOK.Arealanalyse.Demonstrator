@@ -1,68 +1,24 @@
-import { useDeferredValue, useMemo, useState, type ReactNode } from 'react';
-import useCurrentLocation from '@/hooks/useCurrentLocation';
 import { api } from '@/lib/api/api';
-import { bufferGeometry } from '@/lib/geo/buffer';
-import { getProjection } from '@/lib/geo/crs';
-import Form from '../Form/Form';
-import GeoJson from './GeoJson/GeoJson';
-import MapView from './MapView/MapView';
 import SampleSelector from './SampleSelector/SampleSelector';
 import Search from './Search/Search';
 import { apiFetch } from '@/app/apiFetch';
-import { setFormData } from '@/app/appSlice';
-import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { parseRequestedBuffer } from '../Form/Form.helpers';
+import { setArea } from '@/app/appSlice';
+import { useAppDispatch } from '@/app/hooks';
+import { getFileTitle } from './AreaSelector.helpers';
 import FilePicker from '@/components/FilePicker/FilePicker';
-import { Button, Popover, Tabs } from 'dibk-designsystemet';
+import { Button, Popover } from 'dibk-designsystemet';
 import { QuestionmarkCircleFillIcon } from '@navikt/aksel-icons';
 import styles from './AreaSelector.module.scss';
 
-import type {
-    OmrådeProperties,
-    Sample,
-    SampleProperties,
-} from '@/types/api.types';
-import type { CrsGeometry } from '@/types/geo.types';
-
 const DEFAULT_EPSG = 25833;
+const FILE_TYPES = ['json', 'geojson', 'sos', 'sosi', 'gml', 'gpkg'];
 
 interface AreaSelectorProps {
-    onAreaSelected?: (title: ReactNode) => void;
+    kommunenummer: string | null;
 }
 
-export default function AreaSelector({ onAreaSelected }: AreaSelectorProps) {
-    const geometry = useAppSelector(
-        (state) => state.app.formData.inputGeometry,
-    );
-    const requestedBuffer = useAppSelector(
-        (state) => state.app.formData.requestedBuffer,
-    );
-
-    // Holder bufferfeltet responsivt mens bufferen beregnes på nytt
-    const bufferDistance = useDeferredValue(
-        parseRequestedBuffer(requestedBuffer),
-    );
-
-    const bufferedGeometry = useMemo(() => {
-        return geometry !== null
-            ? bufferGeometry(geometry, bufferDistance)
-            : null;
-    }, [geometry, bufferDistance]);
-
-    const [selectedTab, setSelectedTab] = useState('map');
-
-    // GeoJSON-fanen er deaktivert uten analyseområde, så da vises kartet selv om GeoJSON var valgt
-    const activeTab = geometry === null ? 'map' : selectedTab;
-    const [selectedSample, setSelectedSample] = useState<Sample | null>(null);
-    const [areaName, setAreaName] = useState<ReactNode>(null);
-    const currentLocation = useCurrentLocation();
+export default function AreaSelector({ kommunenummer }: AreaSelectorProps) {
     const dispatch = useAppDispatch();
-
-    function setArea(geometry: CrsGeometry, title: ReactNode) {
-        dispatch(setFormData({ name: 'inputGeometry', value: geometry }));
-        setAreaName(title);
-        onAreaSelected?.(title);
-    }
 
     async function handleFileSelected(file: File | null) {
         if (file === null) {
@@ -75,10 +31,12 @@ export default function AreaSelector({ onAreaSelected }: AreaSelectorProps) {
                 epsg: DEFAULT_EPSG,
             });
             if (feature !== null) {
-                setSelectedSample(null);
-                setArea(
-                    feature.geometry,
-                    renderFileHeading(file, feature.properties),
+                dispatch(
+                    setArea({
+                        geometry: feature.geometry,
+                        title: getFileTitle(file, feature.properties),
+                        source: { type: 'file' },
+                    }),
                 );
             }
         } catch (error) {
@@ -86,177 +44,42 @@ export default function AreaSelector({ onAreaSelected }: AreaSelectorProps) {
         }
     }
 
-    function renderFileHeading(
-        file: File,
-        { kommunenummer, kommunenavn }: OmrådeProperties,
-    ): ReactNode {
-        return (
-            <>
-                <span>Fil</span>
-                <span>{file.name}</span>
-                {kommunenummer !== null && kommunenavn !== null && (
-                    <span>
-                        {kommunenavn} ({kommunenummer})
-                    </span>
-                )}
-            </>
-        );
-    }
-
-    function renderSampleHeading({
-        navn,
-        kommunenummer,
-        kommunenavn,
-    }: SampleProperties): ReactNode {
-        return (
-            <>
-                <span>Eksempel</span>
-                <span>{navn}</span>
-                {kommunenummer !== null && kommunenavn !== null && (
-                    <span>
-                        {kommunenavn} ({kommunenummer})
-                    </span>
-                )}
-            </>
-        );
-    }
-
-    function renderCrs(): ReactNode | null {
-        if (geometry === null) {
-            return null;
-        }
-
-        return <span className={styles.crs}>{getProjection(geometry)}</span>;
-    }
-
-    function handleSampleSelected(sample: Sample) {
-        setSelectedSample(sample);
-        setArea(sample.geometry, renderSampleHeading(sample.properties));
-    }
-
-    function handleTabChange(tab: string) {
-        // Tabs.Tab kaller onChange også når fanen har aria-disabled
-        if (tab === 'geojson' && geometry === null) {
-            return;
-        }
-
-        setSelectedTab(tab);
-    }
-
-    function handleSearchResponse(geometry: CrsGeometry, title: ReactNode) {
-        setSelectedSample(null);
-        setArea(geometry, title);
-    }
-
     return (
-        <section className={styles.areaSelector}>
-            <div className={styles.content}>
-                <div className={styles.top}>
-                    <div>
-                        {/* Search leser kommunenummeret kun ved første rendring, så den rendres på nytt når posisjonen er funnet */}
-                        <Search
-                            key={currentLocation.kommunenummer ?? ''}
-                            onResponse={handleSearchResponse}
-                            kommunenummer={currentLocation.kommunenummer}
-                        />
-                    </div>
-
-                    <div className={styles.sampleSelector}>
-                        <SampleSelector
-                            selectedSample={selectedSample}
-                            onSampleSelect={handleSampleSelected}
-                        />
-                    </div>
-
-                    <div className={styles.filePicker}>
-                        <FilePicker
-                            label="Legg til fil"
-                            fileTypes={[
-                                'json',
-                                'geojson',
-                                'sos',
-                                'sosi',
-                                'gml',
-                                'gpkg',
-                            ]}
-                            onFileSelected={handleFileSelected}
-                        />
-
-                        <Button
-                            icon
-                            variant="tertiary"
-                            popovertarget="fileTypes"
-                            className={styles.popover}
-                        >
-                            <QuestionmarkCircleFillIcon
-                                fontSize="24px"
-                                aria-hidden
-                            />
-                        </Button>
-
-                        <Popover
-                            id="fileTypes"
-                            placement="top"
-                        >
-                            GeoJSON, GML, SOSI, GeoPackage
-                        </Popover>
-                    </div>
-                </div>
-
-                <div>
-                    <div className={styles.areaHeading}>
-                        {geometry !== null && areaName !== null
-                            ? areaName
-                            : 'Analyseområde ikke valgt'}
-                    </div>
-
-                    <Tabs
-                        value={activeTab}
-                        onChange={handleTabChange}
-                        className={styles.tabs}
-                    >
-                        <Tabs.List>
-                            <Tabs.Tab value="map">Kart</Tabs.Tab>
-                            <Tabs.Tab
-                                value="geojson"
-                                // ds-tab er et custom element, så React rendrer true som en tom streng
-                                aria-disabled={`${geometry === null}`}
-                            >
-                                GeoJSON
-                            </Tabs.Tab>
-                        </Tabs.List>
-
-                        <Tabs.Panel
-                            value="map"
-                            className={styles.tabPanel}
-                        >
-                            <div className={styles.map}>
-                                <MapView
-                                    geometry={geometry}
-                                    bufferedGeometry={bufferedGeometry}
-                                    currentLocation={
-                                        currentLocation.coordinates
-                                    }
-                                />
-                            </div>
-                        </Tabs.Panel>
-                        <Tabs.Panel
-                            value="geojson"
-                            className={styles.tabPanel}
-                        >
-                            <div className={styles.geojson}>
-                                <GeoJson data={geometry} />
-                            </div>
-                        </Tabs.Panel>
-                    </Tabs>
-
-                    {renderCrs()}
-                </div>
-
-                <div>
-                    <Form />
-                </div>
+        <div className={styles.areaSelector}>
+            <div>
+                <Search kommunenummer={kommunenummer} />
             </div>
-        </section>
+
+            <div className={styles.sampleSelector}>
+                <SampleSelector />
+            </div>
+
+            <div className={styles.filePicker}>
+                <FilePicker
+                    label="Legg til fil"
+                    fileTypes={FILE_TYPES}
+                    onFileSelected={handleFileSelected}
+                />
+
+                <Button
+                    icon
+                    variant="tertiary"
+                    popovertarget="fileTypes"
+                    className={styles.popover}
+                >
+                    <QuestionmarkCircleFillIcon
+                        fontSize="24px"
+                        aria-hidden
+                    />
+                </Button>
+
+                <Popover
+                    id="fileTypes"
+                    placement="top"
+                >
+                    GeoJSON, GML, SOSI, GeoPackage
+                </Popover>
+            </div>
+        </div>
     );
 }

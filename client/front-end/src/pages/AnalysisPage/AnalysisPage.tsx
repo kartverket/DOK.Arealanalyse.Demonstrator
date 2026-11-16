@@ -1,5 +1,5 @@
 import useSocketIO from '@/lib/socket/useSocketIO';
-import AreaSelector from '@/features/analysis-input/AreaSelector/AreaSelector';
+import AnalysisInput from '@/features/analysis-input/AnalysisInput/AnalysisInput';
 import messageHandlers, {
     handleDisconnect,
 } from '@/features/analysis-progress/messageHandlers';
@@ -7,11 +7,9 @@ import ProgressDialog from '@/features/analysis-progress/ProgressDialog/Progress
 
 export default function AnalysisPage() {
     useSocketIO(messageHandlers, handleDisconnect);
-
     return (
         <>
-            <AreaSelector />
-            {/* <Form /> */}
+            <AnalysisInput />
             <ProgressDialog />
         </>
     );
