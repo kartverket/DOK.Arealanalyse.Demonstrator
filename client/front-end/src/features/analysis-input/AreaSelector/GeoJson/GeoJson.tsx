@@ -1,95 +1,94 @@
-import { useMemo, useRef, useState } from 'react';
-import { prettyPrintJson } from 'pretty-print-json';
-import { getCrsName, getEpsgCode } from '@/lib/geo/crs';
-import { Button } from 'dibk-designsystemet';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { json } from '@codemirror/lang-json';
+import { EditorView } from '@codemirror/view';
+import CodeMirror, { type BasicSetupOptions } from '@uiw/react-codemirror';
+import { Button, Tooltip } from 'dibk-designsystemet';
 import { CheckmarkIcon, FilesIcon } from '@navikt/aksel-icons';
 import styles from './GeoJson.module.scss';
 
 import type { CrsGeometry } from '@/types/geo.types';
+
+const COPIED_DURATION_MS = 1500;
+
+// Ligger utenfor komponenten fordi CodeMirror rekonfigureres hver gang extensions eller basicSetup får ny identitet
+const extensions = [json(), EditorView.lineWrapping];
+
+const basicSetup: BasicSetupOptions = {
+    lineNumbers: true,
+    foldGutter: true,
+    highlightActiveLine: false,
+    highlightActiveLineGutter: false,
+};
 
 interface GeoJsonProps {
     data: CrsGeometry | null;
 }
 
 export default function GeoJson({ data }: GeoJsonProps) {
-    const json = useMemo(() => {
-        return data !== null
-            ? prettyPrintJson.toHtml(data, {
-                  quoteKeys: true,
-                  trailingCommas: false,
-              })
-            : null;
-    }, [data]);
-
     const [copied, setCopied] = useState(false);
-    const outputRef = useRef<HTMLOutputElement>(null);
+    const copiedTimeout = useRef<number | undefined>(undefined);
 
-    function renderCrs() {
-        if (json === null || data === null) {
-            return null;
-        }
+    // Store geometrier gir lange strenger, så de formateres bare når data endres
+    const formatted = useMemo(
+        () => (data !== null ? JSON.stringify(data, null, 4) : ''),
+        [data],
+    );
 
-        const epsg = getEpsgCode(getCrsName(data));
-        const crs = epsg !== null ? `EPSG:${epsg}` : 'CRS84';
-        return (
-            <div className={styles.crs}>
-                <strong>CRS:</strong> {crs}
-            </div>
-        );
-    }
+    useEffect(() => () => clearTimeout(copiedTimeout.current), []);
 
     async function copyText() {
-        await navigator.clipboard.writeText(
-            outputRef.current?.textContent ?? '',
-        );
+        try {
+            await navigator.clipboard.writeText(formatted);
+        } catch (error) {
+            console.log(error);
+            return;
+        }
 
-        const timeout = setTimeout(() => {
-            setCopied(false);
-            clearTimeout(timeout);
-        }, 1500);
-
+        clearTimeout(copiedTimeout.current);
         setCopied(true);
+        copiedTimeout.current = window.setTimeout(
+            () => setCopied(false),
+            COPIED_DURATION_MS,
+        );
     }
 
     return (
-        <div className={styles.geoJsonContainer}>
-            <div className={styles.geoJsonWrapper}>
-                {json !== null && (
-                    <>
-                        <div className={styles.geoJson}>
-                            <output
-                                ref={outputRef}
-                                dangerouslySetInnerHTML={{ __html: json }}
-                            ></output>
-                        </div>
-
-                        <Button
-                            icon
-                            onClick={copyText}
-                            variant="tertiary"
-                            title="Kopiér"
-                            aria-label="Kopiér"
-                            className={styles.copyButton}
-                        >
-                            {!copied ? (
-                                <FilesIcon
-                                    width="24px"
-                                    height="24px"
-                                    aria-hidden
-                                />
-                            ) : (
-                                <CheckmarkIcon
-                                    width="24px"
-                                    height="24px"
-                                    aria-hidden
-                                />
-                            )}
-                        </Button>
-                    </>
-                )}
+        <div className={styles.container}>
+            <div className={styles.copyButton}>
+                <Tooltip
+                    content="Kopier tekst"
+                    data-size="sm"
+                >
+                    <Button
+                        onClick={copyText}
+                        variant="secondary"
+                        icon
+                    >
+                        {!copied ? (
+                            <FilesIcon
+                                fontSize="24px"
+                                aria-hidden
+                            />
+                        ) : (
+                            <CheckmarkIcon
+                                fontSize="24px"
+                                aria-hidden
+                            />
+                        )}
+                    </Button>
+                </Tooltip>
             </div>
 
-            {renderCrs()}
+            {/* Innholdet i ds-tabpanel er slottet inn i en shadow root, og uten root
+                legger CodeMirror stilene sine der i stedet for i document */}
+            <CodeMirror
+                root={document}
+                value={formatted}
+                extensions={extensions}
+                editable={false}
+                basicSetup={basicSetup}
+                className={styles.editor}
+            />
         </div>
     );
 }

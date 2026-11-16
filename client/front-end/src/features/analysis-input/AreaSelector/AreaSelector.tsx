@@ -2,6 +2,7 @@ import { useDeferredValue, useMemo, useState, type ReactNode } from 'react';
 import useCurrentLocation from '@/hooks/useCurrentLocation';
 import { api } from '@/lib/api/api';
 import { bufferGeometry } from '@/lib/geo/buffer';
+import { getProjection } from '@/lib/geo/crs';
 import Form from '../Form/Form';
 import GeoJson from './GeoJson/GeoJson';
 import MapView from './MapView/MapView';
@@ -49,6 +50,9 @@ export default function AreaSelector({ onAreaSelected }: AreaSelectorProps) {
     }, [geometry, bufferDistance]);
 
     const [selectedTab, setSelectedTab] = useState('map');
+
+    // GeoJSON-fanen er deaktivert uten analyseområde, så da vises kartet selv om GeoJSON var valgt
+    const activeTab = geometry === null ? 'map' : selectedTab;
     const [selectedSample, setSelectedSample] = useState<Sample | null>(null);
     const [areaName, setAreaName] = useState<ReactNode>(null);
     const currentLocation = useCurrentLocation();
@@ -117,9 +121,26 @@ export default function AreaSelector({ onAreaSelected }: AreaSelectorProps) {
         );
     }
 
+    function renderCrs(): ReactNode | null {
+        if (geometry === null) {
+            return null;
+        }
+
+        return <span className={styles.crs}>{getProjection(geometry)}</span>;
+    }
+
     function handleSampleSelected(sample: Sample) {
         setSelectedSample(sample);
         setArea(sample.geometry, renderSampleHeading(sample.properties));
+    }
+
+    function handleTabChange(tab: string) {
+        // Tabs.Tab kaller onChange også når fanen har aria-disabled
+        if (tab === 'geojson' && geometry === null) {
+            return;
+        }
+
+        setSelectedTab(tab);
     }
 
     function handleSearchResponse(geometry: CrsGeometry, title: ReactNode) {
@@ -190,13 +211,19 @@ export default function AreaSelector({ onAreaSelected }: AreaSelectorProps) {
                     </div>
 
                     <Tabs
-                        value={selectedTab}
-                        onChange={setSelectedTab}
+                        value={activeTab}
+                        onChange={handleTabChange}
                         className={styles.tabs}
                     >
                         <Tabs.List>
                             <Tabs.Tab value="map">Kart</Tabs.Tab>
-                            <Tabs.Tab value="geojson">GeoJSON</Tabs.Tab>
+                            <Tabs.Tab
+                                value="geojson"
+                                // ds-tab er et custom element, så React rendrer true som en tom streng
+                                aria-disabled={`${geometry === null}`}
+                            >
+                                GeoJSON
+                            </Tabs.Tab>
                         </Tabs.List>
 
                         <Tabs.Panel
@@ -222,6 +249,8 @@ export default function AreaSelector({ onAreaSelected }: AreaSelectorProps) {
                             </div>
                         </Tabs.Panel>
                     </Tabs>
+
+                    {renderCrs()}
                 </div>
 
                 <div>

@@ -1,5 +1,4 @@
 @use 'ol/ol';
-@use '../../node_modules/pretty-print-json/dist/css/pretty-print-json.css';
 @use 'fonts';
 @use 'overrides';
 
@@ -20,7 +19,6 @@ html {
 
 body {
     background-color: #ffffff;
-    // color: #101828;
 }
 
 *[role='button'] {
