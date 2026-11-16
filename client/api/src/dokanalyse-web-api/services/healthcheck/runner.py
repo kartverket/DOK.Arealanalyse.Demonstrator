@@ -1,6 +1,6 @@
 import asyncio
 import logging
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Dict, List, Set
 from .http_client import RunContext, create_session
 from .config_source import load_configs
@@ -9,7 +9,7 @@ from .checks.dataset import check_dataset, create_failed_dataset_result, create_
 from .checks.endpoints import (check_endpoint, create_config_source_result,
                                get_endpoints, get_geolett_ids)
 from .checks.services import ServiceInfo
-from . import stats, store
+from . import settings, stats, store
 
 _logger = logging.getLogger(__name__)
 _run_lock = asyncio.Lock()
@@ -60,12 +60,40 @@ async def run_and_store(trigger: str, ref: str | None = None) -> RunSummary | No
         return None
 
     async with _run_lock:
-        summary = await run_checks(ref)
-        await asyncio.to_thread(store.save_run, summary, trigger)
-        await asyncio.to_thread(store.delete_old_results)
+        # Med PostgreSQL kan flere instanser dele databasen, og da skal bare én av dem kjøre helsesjekken
+        release_lock = await asyncio.to_thread(store.acquire_run_lock)
+
+        if release_lock is None:
+            _logger.info('Healthcheck is running in another instance, skipping')
+            return None
+
+        try:
+            if trigger == 'scheduler' and await asyncio.to_thread(_has_recent_run):
+                _logger.info('Healthcheck was run recently by another instance, skipping')
+                await asyncio.to_thread(stats.warm_cache)
+                return None
+
+            summary = await run_checks(ref)
+            await asyncio.to_thread(store.save_run, summary, trigger)
+            await asyncio.to_thread(store.delete_old_results)
+        finally:
+            await asyncio.to_thread(release_lock)
+
         await asyncio.to_thread(stats.warm_cache)
 
         return summary
+
+
+def _has_recent_run() -> bool:
+    # Instansene startes ikke samtidig, så låsen alene hindrer ikke at de kjører hver sin sjekk i samme intervall
+    run = store.get_latest_run()
+
+    if run is None:
+        return False
+
+    age = datetime.now(timezone.utc) - datetime.fromisoformat(run['started_at'])
+
+    return age < timedelta(minutes=settings.INTERVAL_MINUTES / 2)
 
 
 async def _check_dataset(context: RunContext, config: DatasetConfig, geolett_ids: Set[str] | None) -> CheckResult:

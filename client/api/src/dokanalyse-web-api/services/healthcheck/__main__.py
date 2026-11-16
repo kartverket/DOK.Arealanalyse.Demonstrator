@@ -4,6 +4,7 @@ import argparse
 from collections import Counter
 from .models import RunSummary, Status
 from .runner import run_and_store, run_checks
+from . import store
 
 _SYMBOLS = {
     Status.OK: 'OK  ',
@@ -25,7 +26,10 @@ def main() -> int:
     if args.no_store:
         summary = asyncio.run(run_checks(args.ref))
     else:
-        summary = asyncio.run(run_and_store('cli', args.ref))
+        try:
+            summary = asyncio.run(run_and_store('cli', args.ref))
+        finally:
+            store.close()
 
     if summary is None:
         return 1
