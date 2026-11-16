@@ -8,7 +8,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const DEFAULT_API_PROXY_TARGET = 'http://127.0.0.1:5001';
-const DEFAULT_SIO_PROXY_TARGET = 'http://127.0.0.1:5002';
 
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, __dirname, '');
@@ -27,7 +26,7 @@ export default defineConfig(({ mode }) => {
                     changeOrigin: false,
                 },
                 '/ws': {
-                    target: env.VITE_WS_BASE_URL || DEFAULT_SIO_PROXY_TARGET,
+                    target: env.VITE_WS_BASE_URL || DEFAULT_API_PROXY_TARGET,
                     ws: true,
                     changeOrigin: false
                 }

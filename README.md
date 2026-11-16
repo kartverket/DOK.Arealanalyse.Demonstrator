@@ -13,7 +13,7 @@ Disse verktøyene er nødvendige for å bygge og kjøre applikasjonen i et conta
 ![Arkitektur](komponenter.jpg)
 
 ## Last ned demonstratorprosjektet
-Start med å laste ned demonstratorprosjektet som inneholder front-end, socket-io og web-api.
+Start med å laste ned demonstratorprosjektet som inneholder front-end og web-api.
 
 ```bash
 git clone https://github.com/kartverket/DOK.Arealanalyse.Demonstrator.git
@@ -48,20 +48,15 @@ DOKANALYSE_APP_FILES_DIR=/mnt/dokanalyse
 DOKANALYSE_CONFIG_DIR=/mnt/dokanalyse/config
 DOKANALYSE_AR5_FGDB_PATH=
 DOKANALYSE_BLOB_STORAGE_CONN_STR=
-DOKANALYSE_SOCKET_IO_SRV_URL=http://host.docker.internal:5002/
+DOKANALYSE_SOCKET_IO_SRV_URL=http://host.docker.internal:5001/
 ```
 ### Kjøre applikasjonene i docker 
 ```bash
 docker-compose up --build
 ```
 
-## Socket.IO-serveren
-Socket.IO-serveren videreformidler fremdriften i analysen fra pygeoapi til front-end. Opprinnelser (origins) som skal få gjøre CORS-forespørsler mot serveren, settes som en kommaseparert liste. Er variabelen tom, avvises alle CORS-forespørsler.
-
-```ini
-CORS_ALLOWED_ORIGINS=http://localhost:5173,http://localhost
-PORT=5002
-```
+## Socket.IO
+Web-api-et videreformidler fremdriften i analysen fra pygeoapi til front-end med Socket.IO på `/ws/socket.io`. Koblingene holdes i minnet, så web-api-et må kjøres som én prosess (ingen `--workers`) og én instans.
 
 ## Tjenestestatus (helsesjekk)
 Web-api-et sjekker jevnlig tjenestene som DOK-analysen er avhengig av, og front-end viser resultatet på `/status`. Datasettene leses fra konfigurasjonsfilene i [DOK.Arealanalyse.Config](https://github.com/kartverket/DOK.Arealanalyse.Config) på GitHub, så nye eller endrede konfigurasjonsfiler blir med i neste kjøring.

@@ -18,7 +18,7 @@ jobs:
       strategy:
          fail-fast: false
          matrix:
-            app: [frontend, api, mcp, socket-io, file-server]
+            app: [frontend, api, mcp, file-server]
 
       steps:
          - name: Checkout
@@ -36,8 +36,6 @@ jobs:
                    - 'client/api/**'
                  mcp:
                    - 'client/mcp/**'
-                 socket:
-                   - 'socket-io/**'
                  fileserver:
                    - 'file-server/**'                   
 
@@ -66,13 +64,6 @@ jobs:
                   IMAGE_NAME="dokanalyse-mcp-server"
                   if [[ "${GITHUB_EVENT_NAME}" == "push" ]]; then
                     SHOULD_BUILD="${{ steps.changes.outputs.mcp }}"
-                  fi
-                  ;;
-                socket-io)
-                  APP_DIR="socket-io"
-                  IMAGE_NAME="dokanalyse-socket-io"
-                  if [[ "${GITHUB_EVENT_NAME}" == "push" ]]; then
-                    SHOULD_BUILD="${{ steps.changes.outputs.socket }}"
                   fi
                   ;;
                 file-server)

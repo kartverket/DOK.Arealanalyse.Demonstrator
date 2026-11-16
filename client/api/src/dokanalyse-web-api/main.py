@@ -12,6 +12,7 @@ from .routers import (dok_tema, eiendom, eksempler,
 from .routers.pygeoapi import JOB_ID_HEADER
 from .services.kommuner import get_kommuner
 from .services.healthcheck.scheduler import start_scheduler
+from .services.socket_io import sio_app
 from .utils import session_registry
 from .utils.helpers import is_development
 
@@ -82,6 +83,8 @@ app.include_router(plan.router)
 app.include_router(pygeoapi.router)
 app.include_router(sok.router)
 app.include_router(status.router)
+
+app.mount('/ws', sio_app)
 
 
 if __name__ == '__main__':
