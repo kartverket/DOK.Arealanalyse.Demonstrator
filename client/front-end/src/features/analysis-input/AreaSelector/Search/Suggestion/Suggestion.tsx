@@ -16,7 +16,7 @@ import type { CrsGeometry } from '@/types/geo.types';
 
 interface SuggestionProps {
     kommunenummer: string;
-    onSelected: (geometry: CrsGeometry, title: string) => void;
+    onSelected: (geometry: CrsGeometry, title: ReactNode) => void;
 }
 
 export default function Suggestion({
@@ -54,27 +54,46 @@ export default function Suggestion({
         dispatch(setFormData({ name: 'inputGeometry', value: null }));
     }
 
-    function getAreaTitle(feature: SearchFeature): ReactNode {
+    function renderAreaHeading(feature: SearchFeature): ReactNode {
         const props = feature.properties;
 
-        switch (props.type) {
-            case 'Eiendom':
-                return `${props.data.matrikkelnummer}, ${props.data.postnummer} ${props.data.poststed}`;
-            case 'Vegadresse':
-                return `Eiendom ${props.data.matrikkelnummer} (${props.data.adressetekst}, ${props.data.postnummer} ${props.data.poststed})`;
-            case 'Reguleringsplan':
-            case 'Reguleringsplanforslag': {
-                return (
-                    <>
-                        <span>{props.type}</span>
-                        <span>{props.data.planId} {props.data.plannavn !== null && `: ${props.data.plannavn}`}</span>
-                        <span>{props.data.kommunenavn} ({props.data.kommunenummer})</span>
-                    </>
-                )
+        function renderAreaData(): ReactNode {
+            switch (props.type) {
+                case 'Eiendom':
+                    return (
+                        <>
+                            <span>{props.data.matrikkelnummer}</span>
+                            <span>{props.data.adressetekst}, {props.data.postnummer} {props.data.poststed}</span>
+                        </>
+                    );
+                case 'Vegadresse':
+                    return (
+                        <>
+                            <span>{props.data.adressetekst}, {props.data.postnummer} {props.data.poststed}</span>
+                            <span>{props.data.matrikkelnummer}</span>
+                        </>
+                    );                    
+                case 'Reguleringsplan':
+                case 'Reguleringsplanforslag': {
+                    let plannavn = '';
+
+                    if (props.data.plannavn !== null) {
+                        plannavn = `: ${props.data.plannavn}`;
+                    }
+
+                    return <span>{props.data.planId + plannavn}</span>;
+                }
             }
         }
-    }
 
+        return (
+            <>
+                <span>{props.type}</span>
+                {renderAreaData()}
+                <span>{props.data.kommunenavn} ({props.data.kommunenummer})</span>
+            </>
+        );
+    }
 
     async function handleSuggestionChange(item: SuggestionItem | null) {
         if (item === null) {
@@ -97,7 +116,7 @@ export default function Suggestion({
         try {
             const geometry = await fetchArea(kommunenummer, feature);
             if (geometry !== null) {
-                onSelected(geometry, getAreaTitle(feature));
+                onSelected(geometry, renderAreaHeading(feature));
             }
         } catch (error) {
             console.log(error);

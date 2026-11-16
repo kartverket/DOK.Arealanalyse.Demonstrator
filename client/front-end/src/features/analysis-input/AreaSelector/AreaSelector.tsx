@@ -1,4 +1,4 @@
-import { useDeferredValue, useMemo, useState } from 'react';
+import { useDeferredValue, useMemo, useState, type ReactNode } from 'react';
 import useCurrentLocation from '@/hooks/useCurrentLocation';
 import { api } from '@/lib/api/api';
 import { bufferGeometry } from '@/lib/geo/buffer';
@@ -12,17 +12,17 @@ import { setFormData } from '@/app/appSlice';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { parseRequestedBuffer } from '../Form/Form.helpers';
 import FilePicker from '@/components/FilePicker/FilePicker';
-import { Button, Heading, Popover, Tabs } from 'dibk-designsystemet';
+import { Button, Popover, Tabs } from 'dibk-designsystemet';
 import { QuestionmarkCircleFillIcon } from '@navikt/aksel-icons';
 import styles from './AreaSelector.module.scss';
 
-import type { Sample } from '@/types/api.types';
+import type { OmrådeProperties, Sample } from '@/types/api.types';
 import type { CrsGeometry } from '@/types/geo.types';
 
 const DEFAULT_EPSG = 25833;
 
 interface AreaSelectorProps {
-    onAreaSelected?: (title: string) => void;
+    onAreaSelected?: (title: ReactNode) => void;
 }
 
 export default function AreaSelector({ onAreaSelected }: AreaSelectorProps) {
@@ -46,11 +46,11 @@ export default function AreaSelector({ onAreaSelected }: AreaSelectorProps) {
 
     const [selectedTab, setSelectedTab] = useState('map');
     const [selectedSample, setSelectedSample] = useState<Sample | null>(null);
-    const [areaName, setAreaName] = useState('');
+    const [areaName, setAreaName] = useState<ReactNode>(null);
     const currentLocation = useCurrentLocation();
     const dispatch = useAppDispatch();
 
-    function setArea(geometry: CrsGeometry, title: string) {
+    function setArea(geometry: CrsGeometry, title: ReactNode) {
         dispatch(setFormData({ name: 'inputGeometry', value: geometry }));
         setAreaName(title);
         onAreaSelected?.(title);
@@ -62,17 +62,37 @@ export default function AreaSelector({ onAreaSelected }: AreaSelectorProps) {
         }
 
         try {
-            const geoJson = await apiFetch(api.endpoints.getOmråde, {
+            const feature = await apiFetch(api.endpoints.getOmråde, {
                 file,
                 epsg: DEFAULT_EPSG,
             });
-            if (geoJson !== null) {
+            if (feature !== null) {
                 setSelectedSample(null);
-                setArea(geoJson, file.name);
+                setArea(
+                    feature.geometry,
+                    renderFileHeading(file, feature.properties),
+                );
             }
         } catch (error) {
             console.log(error);
         }
+    }
+
+    function renderFileHeading(
+        file: File,
+        { kommunenummer, kommunenavn }: OmrådeProperties,
+    ): ReactNode {
+        return (
+            <>
+                <span>Fil</span>
+                <span>{file.name}</span>
+                {kommunenummer !== null && kommunenavn !== null && (
+                    <span>
+                        {kommunenavn} ({kommunenummer})
+                    </span>
+                )}
+            </>
+        );
     }
 
     function handleSampleSelected(sample: Sample) {
@@ -80,7 +100,7 @@ export default function AreaSelector({ onAreaSelected }: AreaSelectorProps) {
         setArea(sample.geoJson, sample.fileName);
     }
 
-    function handleSearchResponse(geometry: CrsGeometry, title: string) {
+    function handleSearchResponse(geometry: CrsGeometry, title: ReactNode) {
         setSelectedSample(null);
         setArea(geometry, title);
     }
@@ -141,9 +161,11 @@ export default function AreaSelector({ onAreaSelected }: AreaSelectorProps) {
                 </div>
 
                 <div>
-                    <Heading data-size="xs" className={styles.heading}>
-                        {areaName || 'Analyseområde ikke valgt'}
-                    </Heading>
+                    <div className={styles.areaHeading}>
+                        {geometry !== null && areaName !== null
+                            ? areaName
+                            : 'Analyseområde ikke valgt'}
+                    </div>
 
                     <Tabs
                         value={selectedTab}

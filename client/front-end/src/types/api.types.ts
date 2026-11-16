@@ -190,6 +190,13 @@ export interface KommuneByPointArgs {
     coordinates: LonLat;
 }
 
+export interface OmrådeProperties {
+    kommunenummer: string | null;
+    kommunenavn: string | null;
+}
+
+export type OmrådeFeature = Feature<CrsGeometry, OmrådeProperties>;
+
 export interface OmrådeArgs {
     file: File;
     epsg: number;

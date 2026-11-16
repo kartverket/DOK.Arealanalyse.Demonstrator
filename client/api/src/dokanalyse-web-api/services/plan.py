@@ -134,10 +134,17 @@ async def _fetch_plan_ids(
                     'planId': properties['arealplanId']['planidentifikasjon'],
                     'plannavn': properties.get('plannavn'),
                     'kommunenummer': kopidata.get('områdeId'),
-                    'kommunenavn': kopidata.get('originalDatavert')
+                    'kommunenavn': _get_kommunenavn(kopidata.get('originalDatavert'))
                 })
 
             return plan_ids, number_matched
+
+
+def _get_kommunenavn(datavert: str | None) -> str | None:
+    if datavert is None:
+        return None
+
+    return datavert.removesuffix(' kommune')
 
 
 def _create_geometry(geometries: List[Dict[str, Any]]) -> Dict[str, Any]:

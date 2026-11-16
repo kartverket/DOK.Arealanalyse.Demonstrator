@@ -12,6 +12,7 @@ import type {
     JobListArgs,
     KommuneFeatureCollection,
     OmrådeArgs,
+    OmrådeFeature,
     PlanArgs,
     Sample,
     SearchArgs,
@@ -75,7 +76,7 @@ export const api = createApi({
             query: ({ coordinates }) =>
                 `kommuner/punkt/${coordinates[0]}/${coordinates[1]}`,
         }),
-        getOmråde: builder.mutation<CrsGeometry | null, OmrådeArgs>({
+        getOmråde: builder.mutation<OmrådeFeature | null, OmrådeArgs>({
             query: ({ file, epsg }) => {
                 const formData = new FormData();
                 formData.append('file', file);

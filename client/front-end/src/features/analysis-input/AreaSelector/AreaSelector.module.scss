@@ -31,19 +31,23 @@
     display: flex;
     flex-direction: column;
     margin-right: 18px;
+
+    &>ds-tablist {
+        border-top: 1px solid var(--ds-color-neutral-border-subtle);
+    }
 }
 
 .tabPanel {
     height: 50vh;
     min-height: 400px;
-    padding: 24px 0 0;
+    padding-left: 0;
+    padding-right: 0;
 }
 
 .map {
     position: relative;
     width: 100%;
     height: 100%;
-    border: 1px solid var(--dibk-color-hairline);
     overflow: hidden;
 }
 
@@ -58,21 +62,11 @@
     height: 24px;
 }
 
-.heading {
+.areaHeading {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
+    column-rule: 1px solid var(--ds-color-neutral-border-default);
+    gap: var(--ds-size-6);
     font-weight: 500;
-
-    span {
-        &::after {
-            content: '';
-            height: 24px;
-            margin: 0 var(--ds-size-3);
-            border-right: 1px solid var(--ds-color-neutral-border-default);
-        }
-
-        &:last-child::after {
-            content: none;
-        }
-    }
+    margin-bottom: var(--ds-size-2);
 }

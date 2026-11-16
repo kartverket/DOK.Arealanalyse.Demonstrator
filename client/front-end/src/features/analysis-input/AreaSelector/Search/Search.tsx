@@ -1,4 +1,4 @@
-import { useMemo, useState, type ChangeEvent } from 'react';
+import { useMemo, useState, type ChangeEvent, type ReactNode } from 'react';
 import { useGetKommunerQuery } from '@/lib/api/api';
 import Suggestion from './Suggestion/Suggestion';
 import { Field, Label, Select } from 'dibk-designsystemet';
@@ -7,7 +7,7 @@ import styles from './Search.module.scss';
 import type { CrsGeometry } from '@/types/geo.types';
 
 interface SearchProps {
-    onResponse: (geometry: CrsGeometry, title: string) => void;
+    onResponse: (geometry: CrsGeometry, title: ReactNode) => void;
     kommunenummer: string | null;
 }
 

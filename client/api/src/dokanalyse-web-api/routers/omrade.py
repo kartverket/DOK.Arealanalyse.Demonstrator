@@ -1,4 +1,3 @@
-import asyncio
 import logging
 import tempfile
 import aiofiles
@@ -43,7 +42,7 @@ async def get_omrade(
 
                     await out.write(chunk)
 
-            response = await asyncio.to_thread(omrade.get_omrade, tmp_filepath, out_epsg)
+            response = await omrade.get_omrade(tmp_filepath, out_epsg)
     except DatasetTooLargeError:
         raise HTTPException(
             status_code=status.HTTP_413_CONTENT_TOO_LARGE,

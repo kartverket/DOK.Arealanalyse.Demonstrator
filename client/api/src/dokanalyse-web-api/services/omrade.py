@@ -1,10 +1,14 @@
 import json
+import asyncio
+import logging
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple
+import aiohttp
 from osgeo import ogr, osr, gdal
 from shapely.geometry import shape
 from .common import add_geojson_crs, get_polygons_from_geometries
 from .exceptions import InvalidDatasetError, InvalidGeometryError, GeometryConversionError
+from ..utils.session_registry import get_session
 
 ogr.UseExceptions()
 osr.UseExceptions()
@@ -13,13 +17,33 @@ gdal.UseExceptions()
 HOLE_AREA_MIN_SIZE = 1
 WGS_84 = 4326
 
+_ADM_ENHETER_API_URL = 'https://ws.geonorge.no/kommuneinfo/v1/punkt'
+
+_logger = logging.getLogger(__name__)
+
+
+async def get_omrade(filepath: Path, out_epsg: int | None) -> Dict[str, Any]:
+    geometry, geojson_obj, epsg = await asyncio.to_thread(_get_omrade_geometry, filepath, out_epsg)
+    adm_enhet = await _get_administrativ_enhet(geometry, epsg)
+
+    return {
+        'type': 'Feature',
+        'geometry': geojson_obj,
+        'properties': {
+            'kommunenummer': adm_enhet.get('kommunenummer'),
+            'kommunenavn': adm_enhet.get('kommunenavn')
+        }
+    }
+
 
 # Synkron og CPU-tung (GDAL); kall den fra en tråd for ikke å blokkere event-loopen
-def get_omrade(filepath: Path, out_epsg: int | None) -> Dict[str, Any]:
-    geojson_obj = _handle_geojson_geometry(filepath)
+def _get_omrade_geometry(filepath: Path, out_epsg: int | None) -> Tuple[ogr.Geometry, Dict[str, Any], int]:
+    geojson_geometry = _handle_geojson_geometry(filepath)
 
-    if geojson_obj:
-        return geojson_obj
+    if geojson_geometry:
+        geometry, geojson_obj = geojson_geometry
+
+        return geometry, geojson_obj, _get_epsg_from_geojson(geojson_obj)
 
     try:
         dataset: gdal.Dataset | None = ogr.Open(str(filepath), 0)
@@ -44,10 +68,10 @@ def get_omrade(filepath: Path, out_epsg: int | None) -> Dict[str, Any]:
     json_str = out_geometry.ExportToJson(options)
     geojson_obj = json.loads(json_str)
 
-    if out_epsg and out_epsg != WGS_84:
+    if out_epsg != WGS_84:
         add_geojson_crs(geojson_obj, out_epsg)
 
-    return geojson_obj
+    return out_geometry, geojson_obj, out_epsg
 
 
 def _get_geometry_from_dataset(dataset: gdal.Dataset, out_epsg: int) -> ogr.Geometry:
@@ -85,7 +109,7 @@ def _get_geometry_from_dataset(dataset: gdal.Dataset, out_epsg: int) -> ogr.Geom
     return out_geometry
 
 
-def _handle_geojson_geometry(filepath: Path) -> Dict[str, Any] | None:
+def _handle_geojson_geometry(filepath: Path) -> Tuple[ogr.Geometry, Dict[str, Any]] | None:
     try:
         json_str = filepath.read_text()
     except (OSError, ValueError):
@@ -101,7 +125,20 @@ def _handle_geojson_geometry(filepath: Path) -> Dict[str, Any] | None:
 
     _validate(geometry)
 
-    return json.loads(json_str)
+    return geometry, json.loads(json_str)
+
+
+def _get_epsg_from_geojson(geojson_obj: Dict[str, Any]) -> int:
+    # F.eks. «urn:ogc:def:crs:EPSG::25833» eller «EPSG:25833»; uten crs er GeoJSON WGS 84
+    name: str | None = geojson_obj.get('crs', {}).get('properties', {}).get('name')
+
+    if name is None:
+        return WGS_84
+
+    try:
+        return int(name.rsplit(':', 1)[-1])
+    except ValueError:
+        return WGS_84
 
 
 def _is_geojson_geometry(json_str: str) -> bool:
@@ -274,6 +311,28 @@ def _validate(geometry: ogr.Geometry) -> None:
 
     if not geometry.IsValid() or geom_type not in [ogr.wkbPolygon, ogr.wkbMultiPolygon]:
         raise InvalidGeometryError()
+
+
+async def _get_administrativ_enhet(geometry: ogr.Geometry, epsg: int) -> Dict[str, Any]:
+    point: ogr.Geometry = geometry.PointOnSurface()
+
+    params = {
+        'nord': point.GetY(),
+        'ost': point.GetX(),
+        'koordsys': epsg,
+        'filtrer': 'kommunenummer,kommunenavn'
+    }
+
+    # Området kan ligge utenfor Norge; da returneres det uten kommune i stedet for å feile
+    try:
+        async with get_session().get(_ADM_ENHETER_API_URL, params=params) as response:
+            response.raise_for_status()
+
+            return await response.json()
+    except aiohttp.ClientError as err:
+        _logger.warning('Kunne ikke hente kommune for området: %s', err)
+
+        return {}
 
 
 __all__ = ['get_omrade']
