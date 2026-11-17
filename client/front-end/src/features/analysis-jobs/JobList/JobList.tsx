@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Stack } from 'dibk-designsystemet/layout';
 import { api, useGetJobsQuery } from '@/lib/api/api';
 import { JOBS_PER_PAGE } from '../constants';
 import { isFinalJobStatus } from '../helpers';
 import JobTable from '../JobTable/JobTable';
+import { useAppSelector } from '@/app/hooks';
 import {
     Alert,
     DibkSectionHeader,
@@ -26,10 +27,26 @@ export default function JobList() {
         current?.jobs.some((job) => !isFinalJobStatus(job.status)) ?? false;
 
     // Hentes på nytt når forsiden vises, så analyser som er startet siden sist kommer med
-    const { data, isLoading, isError } = useGetJobsQuery(args, {
+    const { data, isLoading, isError, refetch } = useGetJobsQuery(args, {
         pollingInterval: hasActiveJobs ? POLLING_INTERVAL : 0,
         refetchOnMountOrArgChange: true,
     });
+
+    // Analysen brukeren starter, skal komme med i listen så snart jobId er kjent
+    const activeJobId = useAppSelector((state) => state.progress.jobId);
+    const previousJobIdRef = useRef(activeJobId);
+
+    useEffect(() => {
+        if (activeJobId === previousJobIdRef.current) {
+            return;
+        }
+
+        previousJobIdRef.current = activeJobId;
+
+        if (activeJobId !== null) {
+            refetch();
+        }
+    }, [activeJobId, refetch]);
 
     const totalPages = Math.max(
         1,

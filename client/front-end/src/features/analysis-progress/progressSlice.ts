@@ -6,6 +6,9 @@ export interface ProgressState extends ProgressMessage {
     // Jobbene som er startet tidligere i økten. Socketen er felles for alle kjøringene,
     // så meldinger om disse jobbene skal ikke blandes inn i den aktive analysen.
     previousJobIds: string[];
+
+    // Status-dialogen er åpen fra analysen startes til brukeren går til resultatet eller lukker den
+    dialogOpen: boolean;
 }
 
 const initialState: ProgressState = {
@@ -18,6 +21,7 @@ const initialState: ProgressState = {
     recipient: null,
     jobId: null,
     previousJobIds: [],
+    dialogOpen: false,
 };
 
 export const progressSlice = createSlice({
@@ -45,13 +49,20 @@ export const progressSlice = createSlice({
                 jobId: action.payload,
             };
         },
-        resetProgress: (state) => {
+        startProgress: (state) => {
             return {
                 ...initialState,
                 previousJobIds:
                     state.jobId !== null
                         ? [...state.previousJobIds, state.jobId]
                         : state.previousJobIds,
+                dialogOpen: true,
+            };
+        },
+        closeProgressDialog: (state) => {
+            return {
+                ...state,
+                dialogOpen: false,
             };
         },
     },
@@ -63,7 +74,7 @@ function isActiveJob(state: ProgressState, jobId: string): boolean {
         : !state.previousJobIds.includes(jobId);
 }
 
-export const { updateProgress, setJobId, resetProgress } =
+export const { updateProgress, setJobId, startProgress, closeProgressDialog } =
     progressSlice.actions;
 
 export default progressSlice.reducer;

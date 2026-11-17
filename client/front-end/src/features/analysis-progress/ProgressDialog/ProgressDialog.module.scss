@@ -2,3 +2,16 @@
     width: fit-content;
     max-width: none;
 }
+
+.footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--ds-size-4);
+    width: 448px;
+    margin: 0 auto var(--ds-size-6);
+}
+
+.alert {
+    width: 100%;
+}

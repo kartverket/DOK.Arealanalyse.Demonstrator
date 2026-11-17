@@ -1,16 +1,27 @@
-import { Link } from 'react-router';
-import { PATHS } from '@/app/paths';
-import { DibkSectionHeader, Paragraph } from 'dibk-designsystemet';
+import { useNavigate, Link as RouterLink } from 'react-router';
+import { Heading, Link, Paragraph } from 'dibk-designsystemet';
 import styles from './NotFoundPage.module.scss';
 
 export default function NotFoundPage() {
+    const navigate = useNavigate();
+
     return (
-        <div className={styles.notFoundPage}>
-            <DibkSectionHeader title="Siden finnes ikke" />
+        <div className={styles.container}>
+            <Heading level={1}>Ressursen ble ikke funnet</Heading>
 
             <Paragraph>
-                Vi fant ikke siden du lette etter.{' '}
-                <Link to={PATHS.analysis}>Gå til forsiden</Link>
+                Vi kunne dessverre ikke finne ressursen du leter etter.&nbsp;
+                <Link
+                    href="#"
+                    onClick={() => navigate(-1)}
+                >
+                    Gå tilbake
+                </Link>{' '}
+                eller til{' '}
+                <Link asChild={true}>
+                    <RouterLink to="/">forsiden</RouterLink>
+                </Link>{' '}
+                for å komme bort fra denne siden.
             </Paragraph>
         </div>
     );

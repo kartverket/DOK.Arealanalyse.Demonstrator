@@ -1,38 +1,23 @@
-import { useEffect, useRef } from 'react';
-import { generatePath, useNavigate } from 'react-router';
 import { api } from '@/lib/api/api';
 import { apiFetch } from '@/app/apiFetch';
 import { analyzeStart, analyzeFinish, setToast } from '@/app/appSlice';
-import { useAppDispatch, useAppSelector, useAppStore } from '@/app/hooks';
-import { PATHS } from '@/app/paths';
+import { useAppDispatch, useAppStore } from '@/app/hooks';
 import { createPayload, isAnalysisJob } from './Form.helpers';
 import {
-    resetProgress,
+    closeProgressDialog,
     setJobId,
+    startProgress,
 } from '@/features/analysis-progress/progressSlice';
 import { resetResponseState } from '@/features/analysis-response/responseSlice';
 
 export default function useRunAnalysis() {
     const store = useAppStore();
     const dispatch = useAppDispatch();
-    const navigate = useNavigate();
-    const jobId = useAppSelector((state) => state.progress.jobId);
 
-    // Satt fra brukeren starter en analyse til brukeren er sendt til siden for den
-    const navigationPendingRef = useRef(false);
-
-    useEffect(() => {
-        if (jobId !== null && navigationPendingRef.current) {
-            navigationPendingRef.current = false;
-            navigate(generatePath(PATHS.result, { jobId }));
-        }
-    }, [jobId, navigate]);
-
-    // Kjøringen er ikke knyttet til komponenten, så den fortsetter når brukeren sendes videre
+    // Status-dialogen på forsiden følger analysen, og sender brukeren til resultatet når den er ferdig
     async function runAnalysis() {
         dispatch(resetResponseState());
-        dispatch(resetProgress());
-        navigationPendingRef.current = true;
+        dispatch(startProgress());
 
         // Skjemaet leses først her, så komponenten slipper å abonnere på alle feltene
         const { formData, correlationId } = store.getState().app;
@@ -49,7 +34,7 @@ export default function useRunAnalysis() {
                 },
             );
 
-            // Asynkron kjøring: resultatsiden henter status og resultat for jobben
+            // Asynkron kjøring: status-dialogen henter status og resultat for jobben
             if (isAnalysisJob(response)) {
                 dispatch(setJobId(response.jobID));
                 return;
@@ -60,6 +45,7 @@ export default function useRunAnalysis() {
             const resultJobId =
                 responseJobId ?? store.getState().progress.jobId;
             if (resultJobId === null) {
+                dispatch(closeProgressDialog());
                 dispatch(
                     setToast({
                         message:
@@ -82,6 +68,8 @@ export default function useRunAnalysis() {
 
             dispatch(setJobId(resultJobId));
         } catch (error) {
+            // Feilen vises som toast
+            dispatch(closeProgressDialog());
             console.log(error);
         } finally {
             dispatch(analyzeFinish());

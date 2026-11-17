@@ -1,16 +1,15 @@
 import { useEffect } from 'react';
 import { Link, useParams } from 'react-router';
 import { Cluster, Stack } from 'dibk-designsystemet/layout';
-import { api, useGetJobQuery, useGetJobResultsQuery } from '@/lib/api/api';
-import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import { useGetJobQuery, useGetJobResultsQuery } from '@/lib/api/api';
+import { useAppDispatch } from '@/app/hooks';
 import { PATHS } from '@/app/paths';
+import { JOB_UNAVAILABLE_TEXTS } from '@/features/analysis-jobs/constants';
 import {
     formatDateTime,
     formatDuration,
-    isFinalJobStatus,
 } from '@/features/analysis-jobs/helpers';
 import JobStatusTag from '@/features/analysis-jobs/JobStatusTag/JobStatusTag';
-import ProgressDialog from '@/features/analysis-progress/ProgressDialog/ProgressDialog';
 import Drawer from '@/features/analysis-response/Drawer/Drawer';
 import MapDialog from '@/features/analysis-response/MapDialog/MapDialog';
 import mapResponse from '@/features/analysis-response/mapResponse';
@@ -20,41 +19,23 @@ import {
     setResponse,
 } from '@/features/analysis-response/responseSlice';
 import FactInfo from '@/features/fact-info/FactInfo/FactInfo';
-import { Alert, Paragraph, Skeleton, Spinner } from 'dibk-designsystemet';
+import { Alert, Paragraph, Skeleton } from 'dibk-designsystemet';
 import { ArrowLeftIcon } from '@navikt/aksel-icons';
 import styles from './ResultPage.module.scss';
 
 import type { SerializedError } from '@reduxjs/toolkit';
 import type { FetchBaseQueryError } from '@reduxjs/toolkit/query';
 
-const POLLING_INTERVAL = 2_000;
-
 export default function ResultPage() {
     const { jobId = '' } = useParams();
     const dispatch = useAppDispatch();
 
-    // Analysen brukeren nettopp startet. Status-dialogen vises bare for den.
-    const isActiveRun = useAppSelector(
-        (state) => state.progress.jobId === jobId,
-    );
-
-    // Ved synkron kjøring kommer fremdriften fra Socket.IO, og jobben hentes når svaret er kommet
-    const syncRunning = useAppSelector(
-        (state) => isActiveRun && state.app.busy,
-    );
-
-    // Jobben hentes på nytt til den er ferdig, f.eks. hvis brukeren åpner en analyse som kjører
-    const { data: current } = api.endpoints.getJob.useQueryState(jobId);
-    const running = current !== undefined && !isFinalJobStatus(current.status);
-
+    // Brukeren sendes hit når analysen er ferdig, så jobben trenger ikke å følges
     const {
         data: job,
         error: jobError,
         isLoading: jobLoading,
-    } = useGetJobQuery(jobId, {
-        skip: syncRunning,
-        pollingInterval: running ? POLLING_INTERVAL : 0,
-    });
+    } = useGetJobQuery(jobId);
 
     const {
         data: result,
@@ -75,15 +56,8 @@ export default function ResultPage() {
         };
     }, [result, dispatch]);
 
-    const showProgress =
-        isActiveRun &&
-        (syncRunning ||
-            jobLoading ||
-            resultLoading ||
-            (job !== undefined && !isFinalJobStatus(job.status)));
-
     function renderContent() {
-        if (syncRunning || jobLoading || resultLoading) {
+        if (jobLoading || resultLoading) {
             return <Skeleton height="24rem" />;
         }
 
@@ -97,27 +71,11 @@ export default function ResultPage() {
             );
         }
 
-        if (!isFinalJobStatus(job.status)) {
-            return (
-                <Alert data-color="info">
-                    <div className={styles.pending}>
-                        <Spinner
-                            data-size="sm"
-                            aria-hidden
-                        />
-                        DOK-analysen er ikke ferdig ennå. Resultatet vises når
-                        den er ferdig.
-                    </div>
-                </Alert>
-            );
-        }
-
+        // F.eks. hvis brukeren åpner adressen til en analyse som ikke er fullført
         if (job.status !== 'successful') {
             return (
-                <Alert data-color="danger">
-                    {job.status === 'dismissed'
-                        ? 'DOK-analysen ble avbrutt.'
-                        : 'DOK-analysen feilet.'}
+                <Alert data-color="warning">
+                    {JOB_UNAVAILABLE_TEXTS[job.status]}
                     {job.message && <Paragraph>{job.message}</Paragraph>}
                 </Alert>
             );
@@ -175,12 +133,6 @@ export default function ResultPage() {
             </Cluster>
 
             {renderContent()}
-
-            <ProgressDialog
-                open={showProgress}
-                job={job}
-                fetchingResults={job?.status === 'successful'}
-            />
         </Stack>
     );
 }

@@ -9,16 +9,15 @@ export default function Dialog({
     modal = true,
     ...props
 }: DialogProps) {
+    // Fjernes også når dialogen forsvinner fordi brukeren sendes til en annen side
     useEffect(() => {
-        if (!modal) {
+        if (!modal || !props.open) {
             return;
         }
 
-        if (props.open) {
-            document.documentElement.classList.add('no-scroll');
-        } else {
-            document.documentElement.classList.remove('no-scroll');
-        }
+        document.documentElement.classList.add('no-scroll');
+
+        return () => document.documentElement.classList.remove('no-scroll');
     }, [modal, props.open]);
 
     function renderModal() {
