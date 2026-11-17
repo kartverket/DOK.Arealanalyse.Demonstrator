@@ -22,7 +22,9 @@ import type { Options as WmtsOptions } from 'ol/source/WMTS';
 
 const MAP_WIDTH = 720;
 const MAP_HEIGHT = 480;
-export const MAP_PROJECTION = 'EPSG:25833';
+
+// Samme projeksjon som flisene i bakgrunnskartet, så de ikke må reprojiseres i nettleseren
+export const MAP_PROJECTION = 'EPSG:3857';
 const GEOMETRY_FEATURE_ID = 'geometry';
 const BUFFER_FEATURE_ID = 'buffer';
 
@@ -293,7 +295,7 @@ async function getWmtsOptions(
 
     const options = optionsFromCapabilities(capabilities, {
         layer: wmtsLayer,
-        matrixSet: 'EPSG:3857',
+        matrixSet: MAP_PROJECTION,
     });
 
     if (options === null) {

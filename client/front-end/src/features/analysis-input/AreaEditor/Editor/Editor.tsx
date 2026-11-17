@@ -26,6 +26,7 @@ import {
     getEditedAreaName,
     getEditorStyle,
     NORWAY_EXTENT,
+    OUTPUT_EPSG,
     writeGeometry,
 } from '../AreaEditor.helpers';
 import Zoom from '@/components/Map/Zoom/Zoom';
@@ -37,8 +38,6 @@ import type { CrsGeometry, LonLat } from '@/types/geo.types';
 import type VectorLayer from 'ol/layer/Vector';
 import type OlMap from 'ol/Map';
 import type VectorSource from 'ol/source/Vector';
-
-const DEFAULT_EPSG = 25833;
 
 // Holder området fri for verktøylinjen og zoomknappene som ligger over kartet
 const VIEW_PADDING = [90, 80, 40, 40];
@@ -161,7 +160,7 @@ export default function Editor({
             // /omrade validerer geometrien og finner kommunen den ligger i
             const feature = await apiFetch(api.endpoints.getOmråde, {
                 file: geometryToFile(edited),
-                epsg: DEFAULT_EPSG,
+                epsg: OUTPUT_EPSG,
             });
 
             if (feature !== null) {

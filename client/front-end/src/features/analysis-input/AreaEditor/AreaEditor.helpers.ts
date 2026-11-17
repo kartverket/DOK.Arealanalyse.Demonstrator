@@ -1,10 +1,10 @@
 import union from '@turf/union';
 import dayjs from 'dayjs';
 import GeoJSON from 'ol/format/GeoJSON';
+import { transformExtent } from 'ol/proj';
 import Fill from 'ol/style/Fill';
 import Stroke from 'ol/style/Stroke';
 import Style from 'ol/style/Style';
-import { getEpsgCode } from '@/lib/geo/crs';
 import { MAP_PROJECTION } from '@/lib/map/map';
 
 import type { AreaInfo } from '@/app/appSlice';
@@ -13,11 +13,18 @@ import type { FeatureCollection, MultiPolygon, Polygon } from 'geojson';
 import type { Extent } from 'ol/extent';
 import type Geometry from 'ol/geom/Geometry';
 
+// Områder fra editoren skrives i samme projeksjon som /omrade og analysen bruker
+export const OUTPUT_EPSG = 25833;
+
 // Samme presisjon som /omrade bruker for projiserte koordinater
 const COORDINATE_DECIMALS = 2;
 
 // Utsnittet som vises når det verken finnes et område eller en posisjon å zoome til
-export const NORWAY_EXTENT: Extent = [-100000, 6400000, 1150000, 7950000];
+export const NORWAY_EXTENT: Extent = transformExtent(
+    [4, 57.7, 31, 71.6],
+    'EPSG:4326',
+    MAP_PROJECTION,
+);
 
 export function getEditorStyle(): Style {
     return new Style({
@@ -35,6 +42,8 @@ export function getEditorStyle(): Style {
 export function writeGeometry(geometry: Geometry): CrsGeometry {
     const writer = new GeoJSON();
     const geoJson = writer.writeGeometryObject(geometry, {
+        dataProjection: `EPSG:${OUTPUT_EPSG}`,
+        featureProjection: MAP_PROJECTION,
         decimals: COORDINATE_DECIMALS,
     }) as CrsGeometry;
     return {
@@ -42,7 +51,7 @@ export function writeGeometry(geometry: Geometry): CrsGeometry {
         crs: {
             type: 'name',
             properties: {
-                name: `urn:ogc:def:crs:EPSG::${getEpsgCode(MAP_PROJECTION)}`,
+                name: `urn:ogc:def:crs:EPSG::${OUTPUT_EPSG}`,
             },
         },
     };
