@@ -1,4 +1,4 @@
-import { useSearchParams } from 'react-router';
+import { useState } from 'react';
 import { Stack } from 'dibk-designsystemet/layout';
 import { api, useGetJobsQuery } from '@/lib/api/api';
 import { JOBS_PER_PAGE } from '../constants';
@@ -12,14 +12,12 @@ import {
     Skeleton,
     usePagination,
 } from 'dibk-designsystemet';
-import styles from './JobsPage.module.scss';
+import styles from './JobList.module.scss';
 
-const PAGE_PARAM = 'side';
 const POLLING_INTERVAL = 5_000;
 
-export default function JobsPage() {
-    const [searchParams, setSearchParams] = useSearchParams();
-    const page = Math.max(1, Number(searchParams.get(PAGE_PARAM)) || 1);
+export default function JobList() {
+    const [page, setPage] = useState(1);
     const args = { limit: JOBS_PER_PAGE, offset: (page - 1) * JOBS_PER_PAGE };
 
     // Listen oppdateres så lenge noen av analysene på siden ikke er ferdige
@@ -27,8 +25,10 @@ export default function JobsPage() {
     const hasActiveJobs =
         current?.jobs.some((job) => !isFinalJobStatus(job.status)) ?? false;
 
+    // Hentes på nytt når forsiden vises, så analyser som er startet siden sist kommer med
     const { data, isLoading, isError } = useGetJobsQuery(args, {
         pollingInterval: hasActiveJobs ? POLLING_INTERVAL : 0,
+        refetchOnMountOrArgChange: true,
     });
 
     const totalPages = Math.max(
@@ -39,8 +39,7 @@ export default function JobsPage() {
     const { pages, prevButtonProps, nextButtonProps } = usePagination({
         currentPage: page,
         totalPages,
-        setCurrentPage: (value) =>
-            setSearchParams(value > 1 ? { [PAGE_PARAM]: String(value) } : {}),
+        setCurrentPage: setPage,
     });
 
     function renderContent() {
@@ -99,10 +98,10 @@ export default function JobsPage() {
     return (
         <Stack
             gap="lg"
-            className={styles.jobsPage}
+            className={styles.jobList}
         >
             <DibkSectionHeader
-                title="Resultater"
+                title="DOK-analyser"
                 description="DOK-analyser som er kjørt, med den nyeste først. Velg en analyse for å se resultatet."
             />
 

@@ -1,5 +1,6 @@
 import useSocketIO from '@/lib/socket/useSocketIO';
 import AnalysisInput from '@/features/analysis-input/AnalysisInput/AnalysisInput';
+import JobList from '@/features/analysis-jobs/JobList/JobList';
 import messageHandlers, {
     handleDisconnect,
 } from '@/features/analysis-progress/messageHandlers';
@@ -10,6 +11,7 @@ export default function AnalysisPage() {
     return (
         <>
             <AnalysisInput />
+            <JobList />
             <ProgressDialog />
         </>
     );

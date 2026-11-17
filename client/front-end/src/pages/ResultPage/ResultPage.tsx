@@ -134,11 +134,11 @@ export default function ResultPage() {
                 className={styles.header}
             >
                 <Link
-                    to={PATHS.results}
+                    to={PATHS.analysis}
                     className={styles.backLink}
                 >
                     <ArrowLeftIcon aria-hidden />
-                    Alle resultater
+                    Til forsiden
                 </Link>
 
                 {job && (

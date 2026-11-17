@@ -1,6 +1,5 @@
 export const PATHS = {
     analysis: '/',
-    results: '/resultat',
-    result: '/resultat/:jobId',
+    result: '/analyse/:jobId',
     status: '/status',
 } as const;
