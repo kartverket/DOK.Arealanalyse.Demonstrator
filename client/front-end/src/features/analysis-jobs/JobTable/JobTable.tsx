@@ -1,6 +1,11 @@
 import { useState, type MouseEvent } from 'react';
 import { generatePath, Link, useNavigate } from 'react-router';
-import { formatDateTime, formatDuration } from '../helpers';
+import {
+    formatDateTime,
+    formatDescription,
+    formatDuration,
+    formatKommune,
+} from '../helpers';
 import JobStatusDialog from '../JobStatusDialog/JobStatusDialog';
 import JobStatusTag from '../JobStatusTag/JobStatusTag';
 import { PATHS } from '@/app/paths';
@@ -48,6 +53,8 @@ export default function JobTable({ jobs }: JobTableProps) {
                 <Table.Head>
                     <Table.Row>
                         <Table.HeaderCell>Status</Table.HeaderCell>
+                        <Table.HeaderCell>Beskrivelse</Table.HeaderCell>
+                        <Table.HeaderCell>Kommune</Table.HeaderCell>
                         <Table.HeaderCell>Opprettet</Table.HeaderCell>
                         <Table.HeaderCell>Ferdig</Table.HeaderCell>
                         <Table.HeaderCell className={styles.number}>
@@ -66,6 +73,12 @@ export default function JobTable({ jobs }: JobTableProps) {
                         >
                             <Table.Cell>
                                 <JobStatusTag status={job.status} />
+                            </Table.Cell>
+                            <Table.Cell className={styles.description}>
+                                {formatDescription(job)}
+                            </Table.Cell>
+                            <Table.Cell className={styles.kommune}>
+                                {formatKommune(job)}
                             </Table.Cell>
                             <Table.Cell className={styles.date}>
                                 {formatDateTime(job.created)}

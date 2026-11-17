@@ -14,8 +14,9 @@ CONFIG_REPO: str = getenv(
     'HEALTHCHECK_CONFIG_REPO', 'kartverket/DOK.Arealanalyse.Config')
 CONFIG_REF: str = getenv('HEALTHCHECK_CONFIG_REF', 'main')
 DB_PATH: str = getenv('HEALTHCHECK_DB_PATH', '/tmp/dokanalyse-healthcheck.db')
-# Er DB_URL satt (postgresql://...), brukes PostgreSQL i stedet for SQLite-filen i DB_PATH
-DB_URL: str | None = getenv('HEALTHCHECK_DB_URL') or None
+# Er DB_URL satt (postgresql://...), brukes PostgreSQL i stedet for SQLite-filen i DB_PATH.
+# Databasen deles med resten av web-api-et, men tabellene ligger i et eget skjema.
+DB_URL: str | None = getenv('DB_URL') or None
 DB_SCHEMA: str = getenv('HEALTHCHECK_DB_SCHEMA', 'healthcheck')
 DB_POOL_SIZE: int = int(getenv('HEALTHCHECK_DB_POOL_SIZE', 5))
 ENABLED: bool = _get_bool('HEALTHCHECK_ENABLED', False)

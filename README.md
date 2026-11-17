@@ -58,6 +58,17 @@ docker-compose up --build
 ## Socket.IO
 Web-api-et videreformidler fremdriften i analysen fra pygeoapi til front-end med Socket.IO på `/ws/socket.io`. Koblingene holdes i minnet, så web-api-et må kjøres som én prosess (ingen `--workers`) og én instans.
 
+## DOK-analysene på forsiden
+Forsiden viser analysene som pygeoapi har lagret jobber for. Beskrivelsen av området (f.eks. «Eksempel: Bodø» eller «Eiendom: 4020-51/299 (…)») og kommunen lagres ikke av pygeoapi, så web-api-et lagrer dem selv i tabellen `analysis_jobs` i PostgreSQL. Tabellen bør ligge i samme database som jobbene til pygeoapi, men i et eget skjema. Er `DB_URL` ikke satt, vises analysene uten beskrivelse og kommune.
+
+```ini
+DB_URL=postgresql://<bruker>:<passord>@<vert>:5432/<database>   # deles med helsesjekken
+ANALYSIS_DB_SCHEMA=dokanalyse                # skjemaet tabellen legges i
+ANALYSIS_DB_POOL_SIZE=5                      # maks antall tilkoblinger
+```
+
+Skjemaet og tabellen opprettes automatisk første gang, hvis brukeren har CREATE-rettighet på databasen. Ellers må de opprettes på forhånd, og da holder det at web-api-et har `USAGE` på skjemaet og `SELECT` og `INSERT` på tabellen. Analyser som er startet av andre klienter, f.eks. MCP-serveren, får ingen beskrivelse.
+
 ## Filer (rapporter og kartbilder)
 pygeoapi lagrer PDF-rapporter og kartbilder enten i Azure Blob Storage (`DOKANALYSE_AZURE_BLOB_STORAGE_CONN_STR`) eller lokalt i `DOKANALYSE_LOCAL_FILE_SHARE_DIR`. Lagres de lokalt, serverer nginx i front-end filene på `/files/{katalog}/{fil}`. Da må filområdet monteres på `/mnt/files` i front-end-containeren, og flagget må slås på. Uten flagget svarer `/files/` med 404.
 
@@ -69,14 +80,13 @@ DOKANALYSE_LOCAL_FILE_SHARE_BASE_URL=https://<domene>/files   # pygeoapi
 ## Tjenestestatus (helsesjekk)
 Web-api-et sjekker jevnlig tjenestene som DOK-analysen er avhengig av, og front-end viser resultatet på `/status`. Datasettene leses fra konfigurasjonsfilene i [DOK.Arealanalyse.Config](https://github.com/kartverket/DOK.Arealanalyse.Config) på GitHub, så nye eller endrede konfigurasjonsfiler blir med i neste kjøring.
 
-For hvert datasett sjekkes det at datatjenesten (WFS, ArcGIS REST eller OGC API) og WMS-en svarer, at lagene finnes, at egenskapene i `properties`, `geom_field` og feltene i `filter` finnes i skjemaet, og at en intersect-spørring mot et testområde fungerer. I tillegg sjekkes Geolett-id-ene, metadata i Kartkatalogen og de andre registrene og API-ene som Process og web-api-et bruker. Resultatene lagres i en SQLite-database, eller i PostgreSQL hvis `HEALTHCHECK_DB_URL` er satt.
+For hvert datasett sjekkes det at datatjenesten (WFS, ArcGIS REST eller OGC API) og WMS-en svarer, at lagene finnes, at egenskapene i `properties`, `geom_field` og feltene i `filter` finnes i skjemaet, og at en intersect-spørring mot et testområde fungerer. I tillegg sjekkes Geolett-id-ene, metadata i Kartkatalogen og de andre registrene og API-ene som Process og web-api-et bruker. Resultatene lagres i en SQLite-database, eller i PostgreSQL hvis `DB_URL` er satt (se over).
 
 ```ini
 HEALTHCHECK_ENABLED=true                     # kjør helsesjekken som bakgrunnsjobb i web-api-et
 HEALTHCHECK_INTERVAL_MINUTES=15
 HEALTHCHECK_CONFIG_REF=main                  # branch i konfigurasjonsrepoet (main = produksjon, staging = staging)
-HEALTHCHECK_DB_PATH=/data/healthcheck/healthcheck.db   # SQLite-fil (brukes når HEALTHCHECK_DB_URL ikke er satt)
-HEALTHCHECK_DB_URL=postgresql://<bruker>:<passord>@<vert>:5432/<database>   # valgfri, bruker PostgreSQL i stedet for SQLite
+HEALTHCHECK_DB_PATH=/data/healthcheck/healthcheck.db   # SQLite-fil (brukes når DB_URL ikke er satt)
 HEALTHCHECK_DB_SCHEMA=healthcheck            # skjemaet tabellene legges i (PostgreSQL)
 HEALTHCHECK_DB_POOL_SIZE=5                   # maks antall tilkoblinger (PostgreSQL)
 HEALTHCHECK_RETENTION_DAYS=90                # hvor lenge resultatene beholdes

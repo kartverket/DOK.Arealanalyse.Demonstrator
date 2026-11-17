@@ -13,6 +13,7 @@ from .routers.pygeoapi import JOB_ID_HEADER
 from .services.kommuner import get_kommuner
 from .services.healthcheck import store as healthcheck_store
 from .services.healthcheck.scheduler import start_scheduler
+from .services import job_metadata
 from .services.socket_io import sio_app
 from .utils import session_registry
 from .utils.helpers import is_development
@@ -50,6 +51,7 @@ async def lifespan(app: FastAPI):
                 pass
 
         await asyncio.to_thread(healthcheck_store.close)
+        await job_metadata.close()
         await session.close()
         session_registry.set_session(None)
 

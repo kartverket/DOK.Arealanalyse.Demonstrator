@@ -1,4 +1,4 @@
-import type { AnalysisFormData } from '@/app/appSlice';
+import type { AnalysisFormData, AreaInfo } from '@/app/appSlice';
 import type {
     AnalysisInputs,
     AnalysisJob,
@@ -19,6 +19,7 @@ export function parseRequestedBuffer(value: string): number {
 
 export function createPayload(
     formData: AnalysisFormData,
+    area: AreaInfo | null,
     correlationId: string | null,
 ): AnalysisPayload {
     const { respondAsync: _respondAsync, ...fields } = formData;
@@ -33,5 +34,6 @@ export function createPayload(
 
     return {
         inputs,
+        metadata: area?.metadata ?? null,
     };
 }

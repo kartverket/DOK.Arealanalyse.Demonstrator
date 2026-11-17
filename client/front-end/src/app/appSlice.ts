@@ -1,5 +1,6 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
+import type { JobMetadata } from '@/types/api.types';
 import type { CrsGeometry, LonLat } from '@/types/geo.types';
 
 export interface AnalysisFormData {
@@ -33,6 +34,9 @@ export interface AreaInfo {
     // Tekstdeler i stedet for JSX, så tittelen kan ligge i storen
     title: string[];
     source: AreaSource;
+
+    // Sendes med analysen, så jobblisten kan vise område og kommune
+    metadata: JobMetadata;
 }
 
 export interface SelectedArea extends AreaInfo {
@@ -124,6 +128,7 @@ export const appSlice = createSlice({
                         ? {
                               title: action.payload.title,
                               source: action.payload.source,
+                              metadata: action.payload.metadata,
                           }
                         : null,
             };

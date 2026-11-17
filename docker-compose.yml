@@ -29,6 +29,7 @@ services:
       - HEALTHCHECK_ENABLED=true
       - HEALTHCHECK_CONFIG_REF=main
       - HEALTHCHECK_DB_PATH=/data/healthcheck/healthcheck.db
+      - DB_URL=${DB_URL:-}
     volumes:
       - healthcheck:/data/healthcheck
     ports:

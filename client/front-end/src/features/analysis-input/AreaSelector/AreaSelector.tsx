@@ -6,7 +6,7 @@ import SampleSelector from './SampleSelector/SampleSelector';
 import { apiFetch } from '@/app/apiFetch';
 import { setArea } from '@/app/appSlice';
 import { useAppDispatch } from '@/app/hooks';
-import { getFileTitle } from './AreaSelector.helpers';
+import { describeFileArea } from './AreaSelector.helpers';
 import FilePicker from '@/components/FilePicker/FilePicker';
 import { Button, Popover } from 'dibk-designsystemet';
 import { PencilIcon, QuestionmarkCircleFillIcon } from '@navikt/aksel-icons';
@@ -43,7 +43,7 @@ export default function AreaSelector({
                 dispatch(
                     setArea({
                         geometry: feature.geometry,
-                        title: getFileTitle(file, feature.properties),
+                        ...describeFileArea(file, feature.properties),
                         source: { type: 'file' },
                     }),
                 );

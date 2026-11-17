@@ -20,8 +20,8 @@ export default function useRunAnalysis() {
         dispatch(startProgress());
 
         // Skjemaet leses først her, så komponenten slipper å abonnere på alle feltene
-        const { formData, correlationId } = store.getState().app;
-        const payload = createPayload(formData, correlationId);
+        const { formData, area, correlationId } = store.getState().app;
+        const payload = createPayload(formData, area, correlationId);
 
         try {
             dispatch(analyzeStart());

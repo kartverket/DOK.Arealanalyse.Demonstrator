@@ -11,6 +11,19 @@ export function formatDateTime(value: string | null | undefined): string {
     return value ? dayjs(value).format('DD.MM.YYYY HH:mm:ss') : '–';
 }
 
+export function formatDescription(job: AnalysisJob): string {
+    return job.metadata?.description ?? '–';
+}
+
+export function formatKommune(job: AnalysisJob): string {
+    const { kommunenavn, kommunenummer } = job.metadata ?? {};
+    if (kommunenavn && kommunenummer) {
+        return `${kommunenavn} (${kommunenummer})`;
+    }
+
+    return kommunenavn || kommunenummer || '–';
+}
+
 export function formatDuration(job: AnalysisJob): string {
     if (!job.started || !job.finished) {
         return '–';

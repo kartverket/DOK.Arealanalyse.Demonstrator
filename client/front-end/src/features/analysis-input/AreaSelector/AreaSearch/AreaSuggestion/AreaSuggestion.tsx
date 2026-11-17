@@ -4,7 +4,7 @@ import { debounce } from '@/lib/helpers';
 import { apiFetch } from '@/app/apiFetch';
 import { setArea } from '@/app/appSlice';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { fetchArea, getAreaTitle } from './AreaSuggestion.helpers';
+import { describeSearchArea, fetchArea } from './AreaSuggestion.helpers';
 import {
     EXPERIMENTAL_Suggestion as DsSuggestion,
     type SuggestionItem,
@@ -85,7 +85,7 @@ export default function AreaSuggestion({ kommunenummer }: AreaSuggestionProps) {
                 dispatch(
                     setArea({
                         geometry,
-                        title: getAreaTitle(feature),
+                        ...describeSearchArea(feature),
                         source: { type: 'search', label: item.label },
                     }),
                 );

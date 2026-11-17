@@ -1,8 +1,8 @@
 import { api } from '@/lib/api/api';
 import { apiFetch } from '@/app/apiFetch';
-import { getKommuneTitle } from '../../AreaSelector.helpers';
+import { describeArea, type AreaDescription } from '../../AreaSelector.helpers';
 
-import type { SearchFeature } from '@/types/api.types';
+import type { AnalysisAreaType, SearchFeature } from '@/types/api.types';
 import type { CrsGeometry } from '@/types/geo.types';
 
 export async function fetchArea(
@@ -35,12 +35,20 @@ export async function fetchArea(
     }
 }
 
-export function getAreaTitle(feature: SearchFeature): string[] {
+const SEARCH_AREA_TYPES = {
+    Eiendom: 'eiendom',
+    Vegadresse: 'vegadresse',
+    Reguleringsplan: 'reguleringsplan',
+    Reguleringsplanforslag: 'reguleringsplanforslag',
+} as const satisfies Record<
+    SearchFeature['properties']['type'],
+    AnalysisAreaType
+>;
+
+export function describeSearchArea(feature: SearchFeature): AreaDescription {
     const props = feature.properties;
-    const kommune = getKommuneTitle(
-        props.data.kommunenavn,
-        props.data.kommunenummer,
-    );
+    const { kommunenummer, kommunenavn } = props.data;
+    const type = SEARCH_AREA_TYPES[props.type];
 
     switch (props.type) {
         case 'Eiendom':
@@ -48,18 +56,36 @@ export function getAreaTitle(feature: SearchFeature): string[] {
             const { matrikkelnummer, adressetekst, postnummer, poststed } =
                 props.data;
             const adresse = `${adressetekst}, ${postnummer} ${poststed}`;
+
             return props.type === 'Eiendom'
-                ? [props.type, matrikkelnummer, adresse, ...kommune]
-                : [props.type, adresse, matrikkelnummer, ...kommune];
+                ? describeArea({
+                      type,
+                      label: props.type,
+                      name: matrikkelnummer,
+                      detail: adresse,
+                      kommunenummer,
+                      kommunenavn,
+                  })
+                : describeArea({
+                      type,
+                      label: props.type,
+                      name: adresse,
+                      detail: matrikkelnummer,
+                      kommunenummer,
+                      kommunenavn,
+                  });
         }
         case 'Reguleringsplan':
         case 'Reguleringsplanforslag': {
             const { planId, plannavn } = props.data;
-            return [
-                props.type,
-                plannavn !== null ? `${planId}: ${plannavn}` : planId,
-                ...kommune,
-            ];
+
+            return describeArea({
+                type,
+                label: props.type,
+                name: plannavn !== null ? `${planId}: ${plannavn}` : planId,
+                kommunenummer,
+                kommunenavn,
+            });
         }
     }
 }

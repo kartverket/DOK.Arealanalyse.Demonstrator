@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import { useGetEksemplerQuery } from '@/lib/api/api';
 import { setArea } from '@/app/appSlice';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { getSampleTitle } from '../AreaSelector.helpers';
+import { describeSampleArea } from '../AreaSelector.helpers';
 import { Button, Dropdown } from 'dibk-designsystemet';
 import { ChevronDownIcon, ChevronUpIcon } from '@navikt/aksel-icons';
 import styles from './SampleSelector.module.scss';
@@ -25,7 +25,7 @@ export default function SampleSelector() {
         dispatch(
             setArea({
                 geometry: sample.geometry,
-                title: getSampleTitle(sample.properties),
+                ...describeSampleArea(sample.properties),
                 source: { type: 'sample', name: sample.properties.navn },
             }),
         );

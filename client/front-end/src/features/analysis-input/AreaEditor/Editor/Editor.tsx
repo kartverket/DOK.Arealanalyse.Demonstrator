@@ -21,7 +21,7 @@ import {
     zoomToLocation,
     zoomToPoint,
 } from '../../AreaPreview/MapView/MapView.helpers';
-import { getDrawnTitle } from '../../AreaSelector/AreaSelector.helpers';
+import { describeDrawnArea } from '../../AreaSelector/AreaSelector.helpers';
 import {
     createAddressLayer,
     downloadGeometry,
@@ -190,7 +190,7 @@ export default function Editor({
                 dispatch(
                     setArea({
                         geometry: feature.geometry,
-                        title: getDrawnTitle(name, feature.properties),
+                        ...describeDrawnArea(name, feature.properties),
                         source: { type: 'drawn', name },
                     }),
                 );

@@ -32,8 +32,28 @@ export interface AnalysisInputs {
     correlationId: string | null;
 }
 
+// Hvor området kommer fra; «drawn» er tegnet fra bunnen av, «edited» er et redigert område
+export type AnalysisAreaType =
+    | 'sample'
+    | 'file'
+    | 'vegadresse'
+    | 'eiendom'
+    | 'reguleringsplan'
+    | 'reguleringsplanforslag'
+    | 'drawn'
+    | 'edited';
+
+// Lagres av web-API-et sammen med jobben, siden pygeoapi ikke lagrer noe om området
+export interface JobMetadata {
+    areaType: AnalysisAreaType;
+    description: string | null;
+    kommunenummer: string | null;
+    kommunenavn: string | null;
+}
+
 export interface AnalysisPayload {
     inputs: AnalysisInputs;
+    metadata: JobMetadata | null;
 }
 
 export interface AnalysisResponse {
@@ -65,6 +85,9 @@ export interface AnalysisJob {
     started?: string | null;
     finished?: string | null;
     updated?: string | null;
+
+    // Bare i svarene fra web-API-et, og null for analyser som er startet av andre klienter
+    metadata?: JobMetadata | null;
 }
 
 export interface AnalysisJobList {
