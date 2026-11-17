@@ -18,7 +18,15 @@
 
     & ds-tab[aria-disabled='true'] {
         opacity: var(--ds-opacity-disabled);
-        cursor: not-allowed;
+        cursor: default;
+
+        &:hover {
+            color: var(--dsc-tabs-tab-color);
+
+            &::after {
+                background: unset;
+            }
+        }
     }
 }
 

@@ -47,7 +47,7 @@ import type VectorSource from 'ol/source/Vector';
 const VIEW_PADDING = [90, 80, 90, 40];
 
 // Viser gatene rundt adressen, ikke bare bygningen
-const ADDRESS_ZOOM = 15;
+const ADDRESS_ZOOM = 17;
 
 interface EditorProps {
     // null når et nytt område skal tegnes

@@ -142,6 +142,7 @@ export default function AreaSuggestion({ kommunenummer }: AreaSuggestionProps) {
                 ref={suggestionInputRef}
                 onInput={handleSuggestionInput}
                 disabled={kommunenummer === ''}
+                spellCheck={false}
             />
 
             <DsSuggestion.Toggle disabled={kommunenummer === ''} />

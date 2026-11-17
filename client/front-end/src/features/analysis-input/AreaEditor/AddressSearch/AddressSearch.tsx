@@ -79,8 +79,9 @@ export default function AddressSearch({ onSelect }: AddressSearchProps) {
             <DsSuggestion.Input
                 ref={inputRef}
                 onInput={handleInput}
-                placeholder="Søk etter adresse"
-                aria-label="Søk etter adresse"
+                placeholder="Søk etter vegadresse"
+                aria-label="Søk etter vegadresse"
+                spellCheck={false}
             />
 
             <DsSuggestion.Clear />
