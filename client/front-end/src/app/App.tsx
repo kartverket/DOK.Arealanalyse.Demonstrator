@@ -1,5 +1,9 @@
 import { Outlet } from 'react-router';
+import useSocketIO from '@/lib/socket/useSocketIO';
 import { PATHS } from './paths';
+import messageHandlers, {
+    handleDisconnect,
+} from '@/features/analysis-progress/messageHandlers';
 import RouterLink from '@/components/RouterLink/RouterLink';
 import Toaster from '@/components/Toaster/Toaster';
 import { DibkAppShell } from 'dibk-designsystemet';
@@ -10,6 +14,9 @@ const SHORTCUTS = [
 ];
 
 export default function App() {
+    // Kobles til her, så correlationId og fremdriften beholdes når brukeren navigerer
+    useSocketIO(messageHandlers, handleDisconnect);
+
     return (
         <DibkAppShell
             search={false}

@@ -1,18 +1,35 @@
 import Progress from './Progress/Progress';
-import { useAppSelector } from '@/app/hooks';
 import Dialog from '@/components/Dialog/Dialog';
 import styles from './ProgressDialog.module.scss';
 
-export default function ProgressDialog() {
-    const busy = useAppSelector((state) => state.app.busy);
+import type { AnalysisJob } from '@/types/api.types';
+
+interface ProgressDialogProps {
+    open: boolean;
+
+    // Brukes når det ikke kommer fremdrift fra Socket.IO
+    job?: AnalysisJob;
+    fetchingResults?: boolean;
+}
+
+export default function ProgressDialog({
+    open,
+    job,
+    fetchingResults = false,
+}: ProgressDialogProps) {
     return (
         <Dialog
-            open={busy}
+            open={open}
             closeButton={false}
             className={styles.progressDialog}
             aria-label="Status"
         >
-            {busy && <Progress />}
+            {open && (
+                <Progress
+                    job={job}
+                    fetchingResults={fetchingResults}
+                />
+            )}
         </Dialog>
     );
 }

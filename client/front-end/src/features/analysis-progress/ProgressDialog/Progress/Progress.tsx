@@ -16,6 +16,7 @@ import ProgressBar, {
 import { Heading, Spinner } from 'dibk-designsystemet';
 import styles from './Progress.module.scss';
 
+import type { AnalysisJob } from '@/types/api.types';
 import type { StateStatus, TaskStatus } from '@/types/socket.types';
 
 const TASK_STATUSES: Record<TaskStatus, string> = {
@@ -24,8 +25,16 @@ const TASK_STATUSES: Record<TaskStatus, string> = {
     [TASK_STATUS.DONE]: styles.done,
 };
 
-export default function Progress() {
+interface ProgressProps {
+    job?: AnalysisJob;
+    fetchingResults: boolean;
+}
+
+export default function Progress({ job, fetchingResults }: ProgressProps) {
     const progress = useAppSelector((state) => state.progress);
+
+    // Fremdriften fra Socket.IO er mer detaljert enn jobbstatusen, så den brukes når den finnes
+    const fallbackJob = progress.tasks === null ? job : undefined;
 
     function getStatusCssClass(taskStatus: TaskStatus) {
         return TASK_STATUSES[taskStatus] || '';
@@ -34,15 +43,16 @@ export default function Progress() {
     function renderProgressBar(step: StateStatus | JobStep) {
         let variant: ProgressVariant = PROGRESS_VARIANT.DETERMINATE;
         let value = 0;
-        const jobProgress = progress.job?.progress ?? 0;
+        const jobProgress = fallbackJob?.progress ?? 0;
         if (
+            fallbackJob !== undefined &&
             step === JOB_STEP.RUNNING &&
             jobProgress > 10 &&
             jobProgress < 100
         ) {
             // pygeoapi setter 10 når jobben starter; høyere verdier gir en reell fremdrift
             value = jobProgress / 100;
-        } else if (progress.job !== null) {
+        } else if (fallbackJob !== undefined) {
             variant = PROGRESS_VARIANT.INDETERMINATE;
         } else if (progress.status === STATE_STATUS.ANALYZING_DATASETS) {
             value = progress.analysisCount / progress.analysesTotal;
@@ -61,8 +71,8 @@ export default function Progress() {
     }
 
     const progressItems = useMemo(() => {
-        if (progress.job !== null) {
-            return getJobTasks(progress.job, progress.fetchingResults).map(
+        if (fallbackJob !== undefined) {
+            return getJobTasks(fallbackJob, fetchingResults).map(
                 ([step, taskStatus], index) => ({
                     number: index + 1,
                     step,
@@ -86,7 +96,7 @@ export default function Progress() {
             text: getStatusText(stateStatus, taskStatus, progress),
             taskStatus,
         }));
-    }, [progress]);
+    }, [progress, fallbackJob, fetchingResults]);
 
     return (
         <div className={styles.progress}>

@@ -9,7 +9,7 @@ interface RejectedPayload {
     };
 }
 
-// Feil ved henting av jobber vises av pollJob og av sidene for resultater
+// Feil ved henting av jobber vises av jobblisten og resultatsiden
 const SILENT_ENDPOINTS = new Set(['getJob', 'getJobs']);
 
 export const rtkQueryErrorCatcher: Middleware = (api) => (next) => (action) => {

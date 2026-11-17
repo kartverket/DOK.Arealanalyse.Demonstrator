@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { Link, useParams } from 'react-router';
 import { Cluster, Stack } from 'dibk-designsystemet/layout';
 import { api, useGetJobQuery, useGetJobResultsQuery } from '@/lib/api/api';
-import { useAppDispatch } from '@/app/hooks';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { PATHS } from '@/app/paths';
 import {
     formatDateTime,
@@ -10,6 +10,7 @@ import {
     isFinalJobStatus,
 } from '@/features/analysis-jobs/helpers';
 import JobStatusTag from '@/features/analysis-jobs/JobStatusTag/JobStatusTag';
+import ProgressDialog from '@/features/analysis-progress/ProgressDialog/ProgressDialog';
 import Drawer from '@/features/analysis-response/Drawer/Drawer';
 import MapDialog from '@/features/analysis-response/MapDialog/MapDialog';
 import mapResponse from '@/features/analysis-response/mapResponse';
@@ -32,6 +33,16 @@ export default function ResultPage() {
     const { jobId = '' } = useParams();
     const dispatch = useAppDispatch();
 
+    // Analysen brukeren nettopp startet. Status-dialogen vises bare for den.
+    const isActiveRun = useAppSelector(
+        (state) => state.progress.jobId === jobId,
+    );
+
+    // Ved synkron kjøring kommer fremdriften fra Socket.IO, og jobben hentes når svaret er kommet
+    const syncRunning = useAppSelector(
+        (state) => isActiveRun && state.app.busy,
+    );
+
     // Jobben hentes på nytt til den er ferdig, f.eks. hvis brukeren åpner en analyse som kjører
     const { data: current } = api.endpoints.getJob.useQueryState(jobId);
     const running = current !== undefined && !isFinalJobStatus(current.status);
@@ -41,6 +52,7 @@ export default function ResultPage() {
         error: jobError,
         isLoading: jobLoading,
     } = useGetJobQuery(jobId, {
+        skip: syncRunning,
         pollingInterval: running ? POLLING_INTERVAL : 0,
     });
 
@@ -63,8 +75,15 @@ export default function ResultPage() {
         };
     }, [result, dispatch]);
 
+    const showProgress =
+        isActiveRun &&
+        (syncRunning ||
+            jobLoading ||
+            resultLoading ||
+            (job !== undefined && !isFinalJobStatus(job.status)));
+
     function renderContent() {
-        if (jobLoading || resultLoading) {
+        if (syncRunning || jobLoading || resultLoading) {
             return <Skeleton height="24rem" />;
         }
 
@@ -156,6 +175,12 @@ export default function ResultPage() {
             </Cluster>
 
             {renderContent()}
+
+            <ProgressDialog
+                open={showProgress}
+                job={job}
+                fetchingResults={job?.status === 'successful'}
+            />
         </Stack>
     );
 }

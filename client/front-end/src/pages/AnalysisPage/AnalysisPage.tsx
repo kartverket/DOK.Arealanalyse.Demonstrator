@@ -1,18 +1,23 @@
-import useSocketIO from '@/lib/socket/useSocketIO';
+import { useAppSelector } from '@/app/hooks';
 import AnalysisInput from '@/features/analysis-input/AnalysisInput/AnalysisInput';
 import JobList from '@/features/analysis-jobs/JobList/JobList';
-import messageHandlers, {
-    handleDisconnect,
-} from '@/features/analysis-progress/messageHandlers';
 import ProgressDialog from '@/features/analysis-progress/ProgressDialog/ProgressDialog';
 
 export default function AnalysisPage() {
-    useSocketIO(messageHandlers, handleDisconnect);
     return (
         <>
             <AnalysisInput />
             <JobList />
-            <ProgressDialog />
+            <StartProgressDialog />
         </>
     );
+}
+
+// Vises til jobId er kjent og brukeren er sendt til siden for analysen.
+// Egen komponent, så resten av siden ikke rendres på nytt når den åpnes og lukkes.
+function StartProgressDialog() {
+    const open = useAppSelector(
+        (state) => state.app.busy && state.progress.jobId === null,
+    );
+    return <ProgressDialog open={open} />;
 }

@@ -1,12 +1,11 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
-import type { AnalysisJob } from '@/types/api.types';
 import type { ProgressMessage } from '@/types/socket.types';
 
 export interface ProgressState extends ProgressMessage {
-    // Satt når analysen kjøres asynkront; fremdriften hentes da fra /jobs/{jobId}
-    job: AnalysisJob | null;
-    fetchingResults: boolean;
+    // Jobbene som er startet tidligere i økten. Socketen er felles for alle kjøringene,
+    // så meldinger om disse jobbene skal ikke blandes inn i den aktive analysen.
+    previousJobIds: string[];
 }
 
 const initialState: ProgressState = {
@@ -17,8 +16,8 @@ const initialState: ProgressState = {
     mapImageCount: 0,
     tasks: null,
     recipient: null,
-    job: null,
-    fetchingResults: false,
+    jobId: null,
+    previousJobIds: [],
 };
 
 export const progressSlice = createSlice({
@@ -29,30 +28,42 @@ export const progressSlice = createSlice({
             state,
             action: PayloadAction<Partial<ProgressMessage>>,
         ) => {
+            const jobId = action.payload.jobId ?? null;
+            if (jobId !== null && !isActiveJob(state, jobId)) {
+                return state;
+            }
+
             return {
                 ...state,
                 ...action.payload,
+                jobId: jobId ?? state.jobId,
             };
         },
-        updateJob: (state, action: PayloadAction<AnalysisJob>) => {
+        setJobId: (state, action: PayloadAction<string>) => {
             return {
                 ...state,
-                job: action.payload,
+                jobId: action.payload,
             };
         },
-        setFetchingResults: (state, action: PayloadAction<boolean>) => {
+        resetProgress: (state) => {
             return {
-                ...state,
-                fetchingResults: action.payload,
+                ...initialState,
+                previousJobIds:
+                    state.jobId !== null
+                        ? [...state.previousJobIds, state.jobId]
+                        : state.previousJobIds,
             };
-        },
-        resetProgress: () => {
-            return initialState;
         },
     },
 });
 
-export const { updateProgress, updateJob, setFetchingResults, resetProgress } =
+function isActiveJob(state: ProgressState, jobId: string): boolean {
+    return state.jobId !== null
+        ? state.jobId === jobId
+        : !state.previousJobIds.includes(jobId);
+}
+
+export const { updateProgress, setJobId, resetProgress } =
     progressSlice.actions;
 
 export default progressSlice.reducer;

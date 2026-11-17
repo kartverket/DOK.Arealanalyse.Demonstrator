@@ -15,6 +15,9 @@ export interface ProgressMessage {
     mapImageCount: number;
     tasks: Partial<Record<StateStatus, TaskStatus>> | null;
     recipient: string | null;
+
+    // Jobben i pygeoapi; sendes også når analysen kjøres synkront
+    jobId: string | null;
 }
 
 export interface ServerToClientEvents {
