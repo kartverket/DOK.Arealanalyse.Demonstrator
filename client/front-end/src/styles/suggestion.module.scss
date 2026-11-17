@@ -21,7 +21,7 @@
 
 .list {
     overflow: hidden;
-    width: 300px !important;
+    width: var(--suggestion-list-width, 300px) !important;
 }
 
 .innerList {

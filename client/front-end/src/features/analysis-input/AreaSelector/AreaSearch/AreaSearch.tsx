@@ -1,16 +1,16 @@
 import { useMemo, type ChangeEvent } from 'react';
 import { useGetKommunerQuery } from '@/lib/api/api';
-import Suggestion from './Suggestion/Suggestion';
+import AreaSuggestion from './AreaSuggestion/AreaSuggestion';
 import { setSearchKommunenummer } from '@/app/appSlice';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { Field, Label, Select } from 'dibk-designsystemet';
-import styles from './Search.module.scss';
+import styles from './AreaSearch.module.scss';
 
-interface SearchProps {
+interface AreaSearchProps {
     kommunenummer: string | null;
 }
 
-export default function Search({ kommunenummer }: SearchProps) {
+export default function AreaSearch({ kommunenummer }: AreaSearchProps) {
     const searchKommunenummer = useAppSelector(
         (state) => state.app.searchKommunenummer,
     );
@@ -58,7 +58,7 @@ export default function Search({ kommunenummer }: SearchProps) {
             <Field style={{ width: 250 }}>
                 <Label>Plan-ID, matrikkelnr. eller adresse</Label>
 
-                <Suggestion kommunenummer={selectedKommune} />
+                <AreaSuggestion kommunenummer={selectedKommune} />
             </Field>
         </div>
     );

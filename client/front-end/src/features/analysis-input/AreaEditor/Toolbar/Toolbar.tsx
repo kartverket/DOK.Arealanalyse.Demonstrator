@@ -115,9 +115,11 @@ export default function Toolbar({
 
             {TOOL_BUTTONS.map(
                 ({ tool, title, Icon, requiresGeometry, iconSize }) => (
-                    <Tooltip content={title}>
+                    <Tooltip
+                        key={tool}
+                        content={title}
+                    >
                         <Button
-                            key={tool}
                             icon
                             variant="tertiary"
                             aria-pressed={tool === activeTool}

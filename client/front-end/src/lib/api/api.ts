@@ -15,6 +15,8 @@ import type {
     OmrådeFeature,
     PlanArgs,
     SampleFeatureCollection,
+    AdresseSearchArgs,
+    AdresseSearchFeatureCollection,
     SearchArgs,
     SearchFeatureCollection,
 } from '@/types/api.types';
@@ -102,8 +104,19 @@ export const api = createApi({
                 `plan/reguleringsplanforslag/${kommunenummer}/${planId}`,
         }),
         search: builder.query<SearchFeatureCollection, SearchArgs>({
-            query: ({ kommunenummer, query }) =>
-                `sok/${kommunenummer}?q=${query}`,
+            query: ({ kommunenummer, query }) => ({
+                url: `sok/${kommunenummer}`,
+                params: { q: query },
+            }),
+        }),
+        searchAdresse: builder.query<
+            AdresseSearchFeatureCollection,
+            AdresseSearchArgs
+        >({
+            query: ({ query }) => ({
+                url: 'sok/adresse',
+                params: { q: query },
+            }),
         }),
         getStatus: builder.query<StatusOverview, void>({
             query: () => 'status',
@@ -128,6 +141,7 @@ export const {
     useGetReguleringsplanQuery,
     useGetReguleringsplanforslagQuery,
     useSearchQuery,
+    useSearchAdresseQuery,
     useGetStatusQuery,
     useGetStatusStatisticsQuery,
     useGetStatusTimelineQuery,

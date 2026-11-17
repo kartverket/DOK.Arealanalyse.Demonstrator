@@ -1,5 +1,11 @@
 import type { CrsGeometry, LonLat } from './geo.types';
-import type { Feature, FeatureCollection, Geometry, MultiPoint } from 'geojson';
+import type {
+    Feature,
+    FeatureCollection,
+    Geometry,
+    MultiPoint,
+    Point,
+} from 'geojson';
 
 // Analyse (pygeoapi-prosessen «dokanalyse»)
 
@@ -263,4 +269,20 @@ export type SearchFeature = Feature<Geometry | null, SearchProperties> & {
 export interface SearchFeatureCollection {
     type: 'FeatureCollection';
     features: SearchFeature[];
+}
+
+export interface AdresseSearchArgs {
+    query: string;
+}
+
+export type AdresseSearchFeature = Feature<
+    Point,
+    { type: 'Vegadresse'; value: string; data: EiendomSearchData }
+> & {
+    id: number;
+};
+
+export interface AdresseSearchFeatureCollection {
+    type: 'FeatureCollection';
+    features: AdresseSearchFeature[];
 }

@@ -67,6 +67,19 @@ export function zoomToLocation(map: OlMap, coordinates: LonLat): void {
     view.setZoom(LOCATION_ZOOM);
 }
 
+export function zoomToPoint(
+    map: OlMap,
+    coordinates: LonLat,
+    zoom: number,
+): void {
+    const view = map.getView();
+    view.animate({
+        center: fromLonLat(coordinates, view.getProjection()),
+        zoom,
+        duration: 500,
+    });
+}
+
 export function zoomToExtent(map: OlMap, extent: Extent): void {
     if (!hasSize(map)) {
         map.once('change:size', () => zoomToExtent(map, extent));

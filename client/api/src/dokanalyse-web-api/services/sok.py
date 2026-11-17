@@ -42,6 +42,22 @@ async def search(kommunenummer: str, search_str: str) -> Dict[str, Any]:
     plan_ids = await _get_plan_ids(kommunenummer, search_str)
     features.extend(plan_ids)
 
+    return _to_feature_collection(features, search_str)
+
+
+@alru_cache(maxsize=1024, ttl=86400)
+async def search_adresse(search_str: str) -> Dict[str, Any]:
+    search_str = search_str.strip()
+    features: List[Dict[str, Any]] = []
+
+    if len(search_str) >= 3 and _adresse_pattern.match(search_str):
+        response = await search_by_adresse(None, search_str)
+        features = response['features']
+
+    return _to_feature_collection(features, search_str)
+
+
+def _to_feature_collection(features: List[Dict[str, Any]], search_str: str) -> Dict[str, Any]:
     sorted_features = sorted(
         features,
         key=lambda feature: Levenshtein.distance(
@@ -80,4 +96,4 @@ async def _get_plan_ids(kommunenummer: str, search_str: str) -> List[Dict[str, A
     return features
 
 
-__all__ = ['search']
+__all__ = ['search', 'search_adresse']

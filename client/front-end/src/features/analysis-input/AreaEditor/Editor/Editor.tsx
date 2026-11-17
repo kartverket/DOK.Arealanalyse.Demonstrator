@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Feature } from 'ol';
 import { api } from '@/lib/api/api';
 import { createMap, getLayer, readGeometry } from '@/lib/map/map';
+import AddressSearch from '../AddressSearch/AddressSearch';
 import {
     createEditorController,
     type EditorController,
@@ -18,15 +19,18 @@ import {
     zoomToExtent,
     zoomToFeatures,
     zoomToLocation,
+    zoomToPoint,
 } from '../../AreaPreview/MapView/MapView.helpers';
 import { getDrawnTitle } from '../../AreaSelector/AreaSelector.helpers';
 import {
+    createAddressLayer,
     downloadGeometry,
     geometryToFile,
     getEditedAreaName,
     getEditorStyle,
     NORWAY_EXTENT,
     OUTPUT_EPSG,
+    setAddressMarker,
     writeGeometry,
 } from '../AreaEditor.helpers';
 import Zoom from '@/components/Map/Zoom/Zoom';
@@ -39,8 +43,11 @@ import type VectorLayer from 'ol/layer/Vector';
 import type OlMap from 'ol/Map';
 import type VectorSource from 'ol/source/Vector';
 
-// Holder området fri for verktøylinjen og zoomknappene som ligger over kartet
-const VIEW_PADDING = [90, 80, 40, 40];
+// Holder området fri for søkefeltet, verktøylinjen og zoomknappene som ligger over kartet
+const VIEW_PADDING = [90, 80, 90, 40];
+
+// Viser gatene rundt adressen, ikke bare bygningen
+const ADDRESS_ZOOM = 15;
 
 interface EditorProps {
     // null når et nytt område skal tegnes
@@ -68,6 +75,7 @@ export default function Editor({
     });
     const [saving, setSaving] = useState(false);
     const mapElementRef = useRef<HTMLDivElement>(null);
+    const addressLayerRef = useRef<VectorLayer<VectorSource> | null>(null);
 
     // Leses bare når kartet lages, så en posisjon som kommer senere ikke nullstiller redigeringen
     const initialRef = useRef({ geometry, currentLocation });
@@ -100,6 +108,10 @@ export default function Editor({
             if (initial) {
                 layer.getSource()!.addFeature(new Feature(initial));
             }
+
+            const addressLayer = createAddressLayer();
+            created.addLayer(addressLayer);
+            addressLayerRef.current = addressLayer;
 
             created.setTarget(mapElementRef.current ?? undefined);
             setupMap(created);
@@ -134,6 +146,16 @@ export default function Editor({
     function handleToolChange(tool: EditorTool | null) {
         editor?.setTool(tool);
         setActiveTool(tool);
+    }
+
+    function handleAddressSelect(coordinates: LonLat | null) {
+        if (addressLayerRef.current !== null) {
+            setAddressMarker(addressLayerRef.current, coordinates);
+        }
+
+        if (map !== null && coordinates !== null) {
+            zoomToPoint(map, coordinates, ADDRESS_ZOOM);
+        }
     }
 
     function getEditedGeometry(): CrsGeometry | null {
@@ -192,6 +214,10 @@ export default function Editor({
 
                 {map !== null && editor !== null && (
                     <>
+                        <div className={styles.search}>
+                            <AddressSearch onSelect={handleAddressSelect} />
+                        </div>
+
                         <div className={styles.toolbar}>
                             <Toolbar
                                 editor={editor}

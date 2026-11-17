@@ -4,20 +4,20 @@ import { debounce } from '@/lib/helpers';
 import { apiFetch } from '@/app/apiFetch';
 import { setArea } from '@/app/appSlice';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { fetchArea, getAreaTitle } from './Suggestion.helpers';
+import { fetchArea, getAreaTitle } from './AreaSuggestion.helpers';
 import {
     EXPERIMENTAL_Suggestion as DsSuggestion,
     type SuggestionItem,
 } from 'dibk-designsystemet';
-import styles from './Suggestion.module.scss';
+import styles from '@/styles/suggestion.module.scss';
 
 import type { SearchFeature } from '@/types/api.types';
 
-interface SuggestionProps {
+interface AreaSuggestionProps {
     kommunenummer: string;
 }
 
-export default function Suggestion({ kommunenummer }: SuggestionProps) {
+export default function AreaSuggestion({ kommunenummer }: AreaSuggestionProps) {
     const selectedLabel = useAppSelector((state) => {
         const source = state.app.area?.source;
         return source?.type === 'search' ? source.label : null;

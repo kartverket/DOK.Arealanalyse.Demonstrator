@@ -1,14 +1,19 @@
 import union from '@turf/union';
 import dayjs from 'dayjs';
+import { Feature } from 'ol';
 import GeoJSON from 'ol/format/GeoJSON';
-import { transformExtent } from 'ol/proj';
+import Point from 'ol/geom/Point';
+import VectorLayer from 'ol/layer/Vector';
+import { fromLonLat, transformExtent } from 'ol/proj';
+import VectorSource from 'ol/source/Vector';
+import CircleStyle from 'ol/style/Circle';
 import Fill from 'ol/style/Fill';
 import Stroke from 'ol/style/Stroke';
 import Style from 'ol/style/Style';
 import { MAP_PROJECTION } from '@/lib/map/map';
 
 import type { AreaInfo } from '@/app/appSlice';
-import type { CrsGeometry } from '@/types/geo.types';
+import type { CrsGeometry, LonLat } from '@/types/geo.types';
 import type { FeatureCollection, MultiPolygon, Polygon } from 'geojson';
 import type { Extent } from 'ol/extent';
 import type Geometry from 'ol/geom/Geometry';
@@ -37,6 +42,34 @@ export function getEditorStyle(): Style {
             color: 'rgb(211 51 51 / 15%)',
         }),
     });
+}
+
+// Markøren for adressesøket ligger i et eget lag, så den ikke blir med i området som redigeres
+export function createAddressLayer(): VectorLayer<VectorSource> {
+    return new VectorLayer({
+        source: new VectorSource(),
+        style: new Style({
+            image: new CircleStyle({
+                radius: 7,
+                fill: new Fill({ color: '#0062ba' }),
+                stroke: new Stroke({ color: '#ffffff', width: 2 }),
+            }),
+        }),
+    });
+}
+
+export function setAddressMarker(
+    layer: VectorLayer<VectorSource>,
+    coordinates: LonLat | null,
+): void {
+    const source = layer.getSource()!;
+    source.clear();
+
+    if (coordinates !== null) {
+        source.addFeature(
+            new Feature(new Point(fromLonLat(coordinates, MAP_PROJECTION))),
+        );
+    }
 }
 
 export function writeGeometry(geometry: Geometry): CrsGeometry {

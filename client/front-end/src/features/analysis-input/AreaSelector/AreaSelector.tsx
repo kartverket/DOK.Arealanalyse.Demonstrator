@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { api } from '@/lib/api/api';
 import AreaEditor from '../AreaEditor/AreaEditor';
+import AreaSearch from './AreaSearch/AreaSearch';
 import SampleSelector from './SampleSelector/SampleSelector';
-import Search from './Search/Search';
 import { apiFetch } from '@/app/apiFetch';
 import { setArea } from '@/app/appSlice';
 import { useAppDispatch } from '@/app/hooks';
@@ -56,7 +56,7 @@ export default function AreaSelector({
     return (
         <div className={styles.areaSelector}>
             <div>
-                <Search kommunenummer={kommunenummer} />
+                <AreaSearch kommunenummer={kommunenummer} />
             </div>
 
             <div className={styles.sampleSelector}>

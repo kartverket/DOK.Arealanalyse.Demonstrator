@@ -63,12 +63,12 @@ async def search_by_matrikkel_no(kommunenummer: str, query_params: Dict[str, Any
         return await _map_adresse_response(data, 'Eiendom')
 
 
-async def search_by_adresse(kommunenummer, search_str: str) -> Dict[str, Any]:
-    params = {
-        **_adresse_api_query_params,
-        'kommunenummer': kommunenummer,
-        'sok': search_str
-    }
+async def search_by_adresse(kommunenummer: str | None, search_str: str) -> Dict[str, Any]:
+    params = {**_adresse_api_query_params, 'sok': search_str}
+
+    # Uten kommunenummer søkes det i hele landet
+    if kommunenummer:
+        params['kommunenummer'] = kommunenummer
 
     async with get_session().get(_ADRESSE_API_URL, params=params) as response:
         response.raise_for_status()

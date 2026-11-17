@@ -15,10 +15,18 @@
         height: 100%;
     }
 
-    .toolbar {
+    .search {
         position: absolute;
         z-index: 2;
         top: var(--ds-size-4);
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .toolbar {
+        position: absolute;
+        z-index: 2;
+        bottom: var(--ds-size-4);
         left: 50%;
         transform: translateX(-50%);
     }
