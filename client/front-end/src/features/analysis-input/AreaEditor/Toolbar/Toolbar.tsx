@@ -43,28 +43,28 @@ const TOOL_BUTTONS: ToolButton[] = [
         title: 'Velg polygon',
         Icon: MouseArrowIcon,
         requiresGeometry: false,
-        iconSize: 19
+        iconSize: 19,
     },
     {
         tool: 'draw',
         title: 'Tegn polygon',
         Icon: PolygonIcon,
         requiresGeometry: false,
-        iconSize: 23
+        iconSize: 23,
     },
     {
         tool: 'drawHole',
         title: 'Tegn hull',
         Icon: PolygonHoleIcon,
         requiresGeometry: true,
-        iconSize: 23
+        iconSize: 23,
     },
     {
         tool: 'modify',
         title: 'Endre polygon',
         Icon: PolygonModifyIcon,
         requiresGeometry: true,
-        iconSize: 23
+        iconSize: 23,
     },
 ];
 
@@ -113,24 +113,26 @@ export default function Toolbar({
 
             <div className={styles.separator}></div>
 
-            {TOOL_BUTTONS.map(({ tool, title, Icon, requiresGeometry, iconSize }) => (
-                <Tooltip content={title}>
-                    <Button
-                        key={tool}
-                        icon
-                        variant="tertiary"
-                        aria-pressed={tool === activeTool}
-                        disabled={requiresGeometry && !hasGeometry}
-                        onClick={() => handleToolClick(tool)}
-                        className={styles.tool}
-                    >
-                        <Icon
-                            aria-hidden
-                            style={{ width: iconSize, height: iconSize }}
-                        />
-                    </Button>
-                </Tooltip>
-            ))}
+            {TOOL_BUTTONS.map(
+                ({ tool, title, Icon, requiresGeometry, iconSize }) => (
+                    <Tooltip content={title}>
+                        <Button
+                            key={tool}
+                            icon
+                            variant="tertiary"
+                            aria-pressed={tool === activeTool}
+                            disabled={requiresGeometry && !hasGeometry}
+                            onClick={() => handleToolClick(tool)}
+                            className={styles.tool}
+                        >
+                            <Icon
+                                aria-hidden
+                                style={{ width: iconSize, height: iconSize }}
+                            />
+                        </Button>
+                    </Tooltip>
+                ),
+            )}
 
             <div className={styles.separator}></div>
 

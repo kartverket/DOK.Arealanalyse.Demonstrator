@@ -1,10 +1,10 @@
 import { getLayer } from '@/lib/map/map';
+import { Tooltip } from 'dibk-designsystemet';
 import styles from './ZoomToExtent.module.scss';
 
 import type VectorLayer from 'ol/layer/Vector';
 import type OlMap from 'ol/Map';
 import type VectorSource from 'ol/source/Vector';
-import { Tooltip } from 'dibk-designsystemet';
 
 interface ZoomToExtentProps {
     map: OlMap;
@@ -33,8 +33,8 @@ export default function ZoomToExtent({ map }: ZoomToExtentProps) {
     }
 
     return (
-        <Tooltip 
-            content="Zoom til kartets utstrekning" 
+        <Tooltip
+            content="Zoom til kartets utstrekning"
             placement="right"
         >
             <button

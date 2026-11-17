@@ -1,8 +1,8 @@
+import { Tooltip } from 'dibk-designsystemet';
 import { MinusIcon, PlusIcon } from '@navikt/aksel-icons';
 import styles from './Zoom.module.scss';
 
 import type OlMap from 'ol/Map';
-import { Tooltip } from 'dibk-designsystemet';
 
 interface ZoomProps {
     map: OlMap;
@@ -42,7 +42,8 @@ export default function Zoom({ map, className = '' }: ZoomProps) {
         <div className={`${styles.zoomControl} ${className}`}>
             <Tooltip
                 content="Zoom inn"
-                placement="right">
+                placement="right"
+            >
                 <button
                     className={styles.zoomIn}
                     onClick={zoomIn}

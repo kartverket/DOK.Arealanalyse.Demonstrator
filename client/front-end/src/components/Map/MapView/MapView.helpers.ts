@@ -19,7 +19,7 @@ export function setupMap(map: OlMap): void {
     view.fit(extent);
     view.setMinZoom(basemap.minZoom);
     view.setMaxZoom(basemap.maxZoom);
-    
+
     const currentZoom = view.getZoom();
     if (currentZoom !== undefined && currentZoom > basemap.maxZoom) {
         view.setZoom(basemap.maxZoom);

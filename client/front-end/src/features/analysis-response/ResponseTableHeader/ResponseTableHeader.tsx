@@ -2,7 +2,10 @@ import { StatusFilter } from '../constants';
 import ThemeSelector from './ThemeSelector/ThemeSelector';
 import { toggleFactInfo } from '@/app/appSlice';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { Button, EXPERIMENTAL_Suggestion as Suggestion } from 'dibk-designsystemet';
+import {
+    Button,
+    EXPERIMENTAL_Suggestion as Suggestion,
+} from 'dibk-designsystemet';
 import DownloadIcon from '@/assets/gfx/icon-download.svg?react';
 import FactInfoIcon from '@/assets/gfx/icon-fact-info.svg?react';
 import MustCheckIcon from '@/assets/gfx/icon-must-check.svg?react';

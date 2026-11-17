@@ -227,7 +227,7 @@ export default function Editor({
                     variant="secondary"
                 >
                     Avbryt
-                </Button>                
+                </Button>
             </div>
         </div>
     );

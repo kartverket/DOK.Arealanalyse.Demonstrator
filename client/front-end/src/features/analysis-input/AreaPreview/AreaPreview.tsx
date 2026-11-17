@@ -60,8 +60,8 @@ export default function AreaPreview({ currentLocation }: AreaPreviewProps) {
             <div className={styles.areaHeading}>
                 {geometry !== null && title !== null
                     ? title.map((part, index) => (
-                        <span key={index}>{part}</span>
-                    ))
+                          <span key={index}>{part}</span>
+                      ))
                     : 'Analyseområde ikke valgt'}
             </div>
 
