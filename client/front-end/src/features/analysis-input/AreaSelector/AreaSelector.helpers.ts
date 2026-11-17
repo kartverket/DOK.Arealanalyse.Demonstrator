@@ -15,6 +15,16 @@ export function getSampleTitle({
     return ['Eksempel', navn, ...getKommuneTitle(kommunenavn, kommunenummer)];
 }
 
+export function getDrawnTitle(
+    name: string | null,
+    { kommunenummer, kommunenavn }: OmrådeProperties,
+): string[] {
+    const kommune = getKommuneTitle(kommunenavn, kommunenummer);
+    return name !== null
+        ? ['Redigert', name, ...kommune]
+        : ['Tegnet område', ...kommune];
+}
+
 export function getKommuneTitle(
     kommunenavn: string | null,
     kommunenummer: string | null,

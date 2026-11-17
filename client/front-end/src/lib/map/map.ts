@@ -16,11 +16,13 @@ import { getProjection } from '@/lib/geo/crs';
 import basemap from '@/config/basemap.config';
 
 import type { CrsGeometry } from '@/types/geo.types';
+import type Geometry from 'ol/geom/Geometry';
 import type BaseLayer from 'ol/layer/Base';
 import type { Options as WmtsOptions } from 'ol/source/WMTS';
 
 const MAP_WIDTH = 720;
 const MAP_HEIGHT = 480;
+export const MAP_PROJECTION = 'EPSG:25833';
 const GEOMETRY_FEATURE_ID = 'geometry';
 const BUFFER_FEATURE_ID = 'buffer';
 
@@ -155,7 +157,7 @@ async function createLayers(
 function createView(constrainResolution?: boolean): View {
     return new View({
         padding: [50, 50, 50, 50],
-        projection: 'EPSG:25833',
+        projection: MAP_PROJECTION,
         maxZoom: basemap.maxZoom,
         constrainResolution,
     });
@@ -236,15 +238,22 @@ function createFeature(
     projection: string,
     style: Style,
 ): Feature {
+    const feature = new Feature(readGeometry(geoJson, projection));
+    feature.setStyle(style);
+    return feature;
+}
+
+// Leser geometrien i kartets projeksjon
+export function readGeometry(
+    geoJson: CrsGeometry,
+    projection: string = getProjection(geoJson),
+): Geometry | undefined {
     const reader = new GeoJSON();
     const geometry = reader.readGeometry(geoJson, {
         dataProjection: projection,
-        featureProjection: 'EPSG:25833',
+        featureProjection: MAP_PROJECTION,
     });
-    const feature = new Feature(geometry ?? undefined);
-    feature.setStyle(style);
-
-    return feature;
+    return geometry ?? undefined;
 }
 
 async function createWmtsLayer(

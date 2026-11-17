@@ -25,7 +25,9 @@ export type FormDataField = {
 export type AreaSource =
     | { type: 'sample'; name: string }
     | { type: 'search'; label: string }
-    | { type: 'file' };
+    | { type: 'file' }
+    // name er navnet på området som ble redigert, og null for et nytt område
+    | { type: 'drawn'; name: string | null };
 
 export interface AreaInfo {
     // Tekstdeler i stedet for JSX, så tittelen kan ligge i storen

@@ -36,6 +36,18 @@
     overflow: hidden;
 }
 
+// Samme utseende som de andre knappene i kartet
+.editButton {
+    --dsc-button-background: #ffffff;
+    --dsc-button-background--hover: #f1f1f1;
+    --dsc-button-background--active: #dbdbdb;
+    color: #4a5565;
+    position: absolute;
+    bottom: var(--ds-size-4);
+    left: var(--ds-size-4);
+    box-shadow: var(--ds-shadow-sm);
+}
+
 .geojson {
     display: flex;
     width: 100%;

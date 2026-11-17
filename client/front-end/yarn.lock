@@ -1479,6 +1479,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@turf/union@npm:^7.4.0":
+  version: 7.4.0
+  resolution: "@turf/union@npm:7.4.0"
+  dependencies:
+    "@turf/helpers": "npm:7.4.0"
+    "@turf/meta": "npm:7.4.0"
+    "@types/geojson": "npm:^7946.0.10"
+    polyclip-ts: "npm:^0.16.8"
+    tslib: "npm:^2.8.1"
+  checksum: 10c0/1f30ba610e3913e6b0bdb5283d1858b35873667c31b70dd87658fe033617d8093ad46277f2c5f4a2146780d4699a7e13d822f5fb688ec2a412cae1b2111ec27a
+  languageName: node
+  linkType: hard
+
 "@tybys/wasm-util@npm:^0.10.3":
   version: 0.10.4
   resolution: "@tybys/wasm-util@npm:0.10.4"
@@ -1845,6 +1858,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"bignumber.js@npm:^9.1.0":
+  version: 9.3.1
+  resolution: "bignumber.js@npm:9.3.1"
+  checksum: 10c0/61342ba5fe1c10887f0ecf5be02ff6709271481aff48631f86b4d37d55a99b87ce441cfd54df3d16d10ee07ceab7e272fc0be430c657ffafbbbf7b7d631efb75
+  languageName: node
+  linkType: hard
+
 "browserslist@npm:^4.24.0":
   version: 4.28.2
   resolution: "browserslist@npm:4.28.2"
@@ -2069,6 +2089,7 @@ __metadata:
     "@reduxjs/toolkit": "npm:^2.14.0"
     "@turf/bbox": "npm:^7.4.0"
     "@turf/buffer": "npm:^7.4.0"
+    "@turf/union": "npm:^7.4.0"
     "@types/geojson": "npm:^7946.0.16"
     "@types/lodash.groupby": "npm:^4.6.9"
     "@types/node": "npm:^26.6.6"
@@ -2085,6 +2106,7 @@ __metadata:
     marked: "npm:^18.2.0"
     motion: "npm:^14.12.0"
     ol: "npm:^10.11.0"
+    ol-ext: "npm:^4.0.39"
     oxfmt: "npm:^0.78.0"
     oxlint: "npm:^1.93.0"
     oxlint-rules: "npm:^0.4.3"
@@ -2792,6 +2814,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ol-ext@npm:^4.0.39":
+  version: 4.0.39
+  resolution: "ol-ext@npm:4.0.39"
+  peerDependencies:
+    ol: ">= 5.3.0"
+  checksum: 10c0/6c36c021d84d2c3a6b1bb41e218aa0c219976c1ceb66ad33028704680a27912af938c1c31ac69fc12fac9b7ee6465d8fa1174cd7243636ad01cf3270eb01bc2c
+  languageName: node
+  linkType: hard
+
 "ol@npm:^10.11.0":
   version: 10.11.0
   resolution: "ol@npm:10.11.0"
@@ -3053,6 +3084,16 @@ __metadata:
   version: 4.0.7
   resolution: "picomatch@npm:4.0.7"
   checksum: 10c0/beb6ae02c43ae44e84883b90830196d9046b1726ead292adcf7f57945e0bb0d992d68563d87e03b484b6f3c9a5c6defda7523477f047d7f0e663f126cc01787f
+  languageName: node
+  linkType: hard
+
+"polyclip-ts@npm:^0.16.8":
+  version: 0.16.8
+  resolution: "polyclip-ts@npm:0.16.8"
+  dependencies:
+    bignumber.js: "npm:^9.1.0"
+    splaytree-ts: "npm:^1.0.2"
+  checksum: 10c0/8de02c32e566421875c70890fe6d3d7bd55a92fc39867446e65999e042c4632fb27ab1a7e106e96edd12d63b32a643f3a690d9a980aeda655a41ddf4e8750f5d
   languageName: node
   linkType: hard
 
@@ -3663,6 +3704,13 @@ __metadata:
   version: 1.2.2
   resolution: "source-map-js@npm:1.2.2"
   checksum: 10c0/d5d6dec62266834f83dd4f8a2606a196fb1a006ca5d53b0ef80ee513b7eba2f4e2ae241f4bc129ae7e9b80dea24f6e3d92b446b7e6e96be7653cab8888168a94
+  languageName: node
+  linkType: hard
+
+"splaytree-ts@npm:^1.0.2":
+  version: 1.0.2
+  resolution: "splaytree-ts@npm:1.0.2"
+  checksum: 10c0/4c34573891a749055ffe22381ea841ae03dbf7b55a3ea4a1d7df5013bfbe128e79f6c468579358ec573734cdbdf5f77a97ae7185f155248eb8be58151428c85e
   languageName: node
   linkType: hard
 

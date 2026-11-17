@@ -2,6 +2,7 @@ import { MinusIcon, PlusIcon } from '@navikt/aksel-icons';
 import styles from './Zoom.module.scss';
 
 import type OlMap from 'ol/Map';
+import { Tooltip } from 'dibk-designsystemet';
 
 interface ZoomProps {
     map: OlMap;
@@ -39,23 +40,28 @@ export default function Zoom({ map, className = '' }: ZoomProps) {
 
     return (
         <div className={`${styles.zoomControl} ${className}`}>
-            <button
-                className={styles.zoomIn}
-                onClick={zoomIn}
-                title="Zoom inn"
-                aria-label="Zoom inn"
-            >
-                <PlusIcon aria-hidden />
-            </button>
+            <Tooltip
+                content="Zoom inn"
+                placement="right">
+                <button
+                    className={styles.zoomIn}
+                    onClick={zoomIn}
+                >
+                    <PlusIcon aria-hidden />
+                </button>
+            </Tooltip>
 
-            <button
-                className={styles.zoomOut}
-                onClick={zoomOut}
-                title="Zoom ut"
-                aria-label="Zoom ut"
+            <Tooltip
+                content="Zoom ut"
+                placement="right"
             >
-                <MinusIcon aria-hidden />
-            </button>
+                <button
+                    className={styles.zoomOut}
+                    onClick={zoomOut}
+                >
+                    <MinusIcon aria-hidden />
+                </button>
+            </Tooltip>
         </div>
     );
 }

@@ -1,0 +1,13 @@
+.areaEditor {
+    width: min(1100px, 96vw);
+    height: min(800px, 92vh);
+    max-width: 100%;
+    max-height: none;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-4);
+    height: 100%;
+}

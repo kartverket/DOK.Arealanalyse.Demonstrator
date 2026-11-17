@@ -2,26 +2,26 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid #e5e7eb;
+    background-color: #ffffff;
+    border: 0 none;
+    border-radius: var(--ds-border-radius-md);
+    box-shadow: var(--ds-shadow-sm);
     width: 34px;
     height: 34px;
     padding: 0;
-    background-color: #ffffff;
     cursor: pointer;
     transition: 0.2s;
-    user-select: none;
+
+    &:not(:disabled):hover {
+        background-color: #f1f1f1 !important;
+    }
+
+    &:not(:disabled):active {
+        background-color: #dbdbdb !important;
+    }
 
     span {
         color: #4a5565;
         font-weight: 600;
-    }
-
-    &:not(:disabled):hover {
-        background-color: #eeeeee !important;
-    }
-
-    &:not(:disabled):active {
-        background-color: #eeeeee !important;
-        border-color: var(--ds-color-border-strong);
     }
 }

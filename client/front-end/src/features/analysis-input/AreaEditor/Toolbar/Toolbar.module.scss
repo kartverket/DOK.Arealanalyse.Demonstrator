@@ -1,0 +1,23 @@
+.toolbar {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background-color: #ffffff;
+    box-shadow: var(--ds-shadow-sm);
+    padding: 4px;
+
+    button {
+        transition: unset;
+    }
+}
+
+.tool[aria-pressed='true'] {
+    background-color: var(--ds-color-surface-active);
+}
+
+.separator {
+    align-self: stretch;
+    width: 1px;
+    margin: 0 4px;
+    background-color: #e5e7eb;
+}

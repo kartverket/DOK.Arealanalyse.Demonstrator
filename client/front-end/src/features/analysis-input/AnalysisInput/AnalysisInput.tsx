@@ -10,7 +10,10 @@ export default function AnalysisInput() {
 
     return (
         <section className={styles.analysisInput}>
-            <AreaSelector kommunenummer={kommunenummer} />
+            <AreaSelector
+                kommunenummer={kommunenummer}
+                currentLocation={coordinates}
+            />
             <AreaPreview currentLocation={coordinates} />
             <Form />
         </section>

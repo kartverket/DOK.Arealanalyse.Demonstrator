@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { api } from '@/lib/api/api';
+import AreaEditor from '../AreaEditor/AreaEditor';
 import SampleSelector from './SampleSelector/SampleSelector';
 import Search from './Search/Search';
 import { apiFetch } from '@/app/apiFetch';
@@ -7,17 +9,24 @@ import { useAppDispatch } from '@/app/hooks';
 import { getFileTitle } from './AreaSelector.helpers';
 import FilePicker from '@/components/FilePicker/FilePicker';
 import { Button, Popover } from 'dibk-designsystemet';
-import { QuestionmarkCircleFillIcon } from '@navikt/aksel-icons';
+import { PencilIcon, QuestionmarkCircleFillIcon } from '@navikt/aksel-icons';
 import styles from './AreaSelector.module.scss';
+
+import type { LonLat } from '@/types/geo.types';
 
 const DEFAULT_EPSG = 25833;
 const FILE_TYPES = ['json', 'geojson', 'sos', 'sosi', 'gml', 'gpkg'];
 
 interface AreaSelectorProps {
     kommunenummer: string | null;
+    currentLocation: LonLat | null;
 }
 
-export default function AreaSelector({ kommunenummer }: AreaSelectorProps) {
+export default function AreaSelector({
+    kommunenummer,
+    currentLocation,
+}: AreaSelectorProps) {
+    const [editorOpen, setEditorOpen] = useState(false);
     const dispatch = useAppDispatch();
 
     async function handleFileSelected(file: File | null) {
@@ -79,6 +88,23 @@ export default function AreaSelector({ kommunenummer }: AreaSelectorProps) {
                 >
                     GeoJSON, GML, SOSI, GeoPackage
                 </Popover>
+            </div>
+
+            <div>
+                <Button
+                    variant="secondary"
+                    onClick={() => setEditorOpen(true)}
+                >
+                    <PencilIcon aria-hidden />
+                    Lag analyseområde
+                </Button>
+
+                <AreaEditor
+                    open={editorOpen}
+                    geometry={null}
+                    currentLocation={currentLocation}
+                    onClose={() => setEditorOpen(false)}
+                />
             </div>
         </div>
     );

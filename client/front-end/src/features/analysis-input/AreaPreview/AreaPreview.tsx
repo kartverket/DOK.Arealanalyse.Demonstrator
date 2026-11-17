@@ -2,11 +2,13 @@ import { useMemo, useState } from 'react';
 import useDebounce from '@/hooks/useDebounce';
 import { bufferGeometry } from '@/lib/geo/buffer';
 import { getProjection } from '@/lib/geo/crs';
+import AreaEditor from '../AreaEditor/AreaEditor';
 import GeoJson from './GeoJson/GeoJson';
 import MapView from './MapView/MapView';
 import { useAppSelector } from '@/app/hooks';
 import { parseRequestedBuffer } from '../Form/Form.helpers';
-import { Tabs } from 'dibk-designsystemet';
+import { Button, Tabs, Tooltip } from 'dibk-designsystemet';
+import { PencilIcon } from '@navikt/aksel-icons';
 import styles from './AreaPreview.module.scss';
 
 import type { LonLat } from '@/types/geo.types';
@@ -39,6 +41,7 @@ export default function AreaPreview({ currentLocation }: AreaPreviewProps) {
     }, [geometry, bufferDistance]);
 
     const [selectedTab, setSelectedTab] = useState('map');
+    const [editorOpen, setEditorOpen] = useState(false);
 
     // GeoJSON-fanen er deaktivert uten analyseområde, så da vises kartet selv om GeoJSON var valgt
     const activeTab = geometry === null ? 'map' : selectedTab;
@@ -57,8 +60,8 @@ export default function AreaPreview({ currentLocation }: AreaPreviewProps) {
             <div className={styles.areaHeading}>
                 {geometry !== null && title !== null
                     ? title.map((part, index) => (
-                          <span key={index}>{part}</span>
-                      ))
+                        <span key={index}>{part}</span>
+                    ))
                     : 'Analyseområde ikke valgt'}
             </div>
 
@@ -88,6 +91,19 @@ export default function AreaPreview({ currentLocation }: AreaPreviewProps) {
                             bufferedGeometry={bufferedGeometry}
                             currentLocation={currentLocation}
                         />
+
+                        {geometry !== null && (
+                            <Tooltip content="Rediger analyseområde">
+                                <Button
+                                    variant="tertiary"
+                                    onClick={() => setEditorOpen(true)}
+                                    className={styles.editButton}
+                                >
+                                    <PencilIcon aria-hidden />
+                                    Rediger
+                                </Button>
+                            </Tooltip>
+                        )}
                     </div>
                 </Tabs.Panel>
                 <Tabs.Panel
@@ -103,6 +119,13 @@ export default function AreaPreview({ currentLocation }: AreaPreviewProps) {
             {geometry !== null && (
                 <span className={styles.crs}>{getProjection(geometry)}</span>
             )}
+
+            <AreaEditor
+                open={editorOpen}
+                geometry={geometry}
+                currentLocation={currentLocation}
+                onClose={() => setEditorOpen(false)}
+            />
         </div>
     );
 }

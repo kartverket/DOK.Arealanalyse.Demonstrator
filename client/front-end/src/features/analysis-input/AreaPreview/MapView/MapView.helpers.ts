@@ -71,6 +71,16 @@ export function zoomToLocation(map: OlMap, coordinates: LonLat): void {
     }
 }
 
+export function zoomToExtent(map: OlMap, extent: Extent): void {
+    if (!hasSize(map)) {
+        map.once('change:size', () => zoomToExtent(map, extent));
+
+        return;
+    }
+
+    map.getView().fit(extent);
+}
+
 // Kartet har ingen størrelse mens kartfanen er skjult, og da gir view.fit et ugyldig utsnitt
 function hasSize(map: OlMap): boolean {
     const size = map.getSize();
